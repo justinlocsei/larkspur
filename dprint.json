@@ -1,6 +1,7 @@
 {
   "typescript": {
     "lineWidth": 80,
+    "module.sortImportDeclarations": "maintain",
     "quoteStyle": "preferSingle",
     "semiColons": "prefer",
     "trailingCommas": "never"
