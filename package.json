@@ -1,0 +1,43 @@
+{
+  "name": "larkspur",
+  "version": "0.1.0",
+  "description": "",
+  "keywords": [],
+  "author": "Justin Locsei",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./dist/index.mjs",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.mts"
+    }
+  },
+  "files": ["dist"],
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "check": "npm run check:code && npm run check:format && npm run check:types",
+    "check:code": "biome lint .",
+    "check:format": "biome ci --linter-enabled=false . && dprint check",
+    "check:types": "tsc --noEmit",
+    "format": "biome check --write --linter-enabled=false . && dprint fmt",
+    "prepublishOnly": "npm run build",
+    "test:watch": "vitest",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.9",
+    "@types/node": "^26.2.0",
+    "dprint": "^0.56.0",
+    "tsdown": "^0.22.14",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.11"
+  },
+  "allowScripts": {
+    "dprint@0.56.0": true,
+    "fsevents@2.3.3": true
+  }
+}
