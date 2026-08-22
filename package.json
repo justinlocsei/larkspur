@@ -26,7 +26,7 @@
     "format": "biome check --write --linter-enabled=false . && dprint fmt",
     "prepublishOnly": "npm run build",
     "test:watch": "vitest",
-    "test": "vitest run"
+    "test": "vitest run --reporter verbose"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.9",
