@@ -70,6 +70,11 @@ export type ScalarFlag =
 export type Flag = BooleanFlag | ScalarFlag;
 
 /**
+ * Get the flag with a given type
+ */
+export type FlagOfType<T extends Flag['type']> = Extract<Flag, { type: T }>;
+
+/**
  * A value for a scalar flag
  */
 export type ScalarValue = number | string;
