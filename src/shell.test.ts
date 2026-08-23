@@ -1,4 +1,5 @@
 import { assert, describe, it } from 'vitest';
+
 import { quote } from './shell.js';
 
 describe('quote', () => {

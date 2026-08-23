@@ -1,4 +1,5 @@
 import { assert, describe, it } from 'vitest';
+
 import { checkConversion, flag } from '../tests.js';
 import {
   choicesForFlag,
