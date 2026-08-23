@@ -1,0 +1,53 @@
+import { assert, describe, it } from 'vitest';
+
+import type {
+  BooleanFlag,
+  Flags,
+  NumberFlag,
+  StringFlag
+} from './flags/types.js';
+import { useFlag, useFlags } from './flags.js';
+import * as T from './tests/types.js';
+import { flag } from './tests.js';
+
+describe('useFlag', () => {
+  it('returns the provided flag', () => {
+    const flag: NumberFlag = {
+      description: 'description',
+      type: 'number'
+    };
+
+    assert.deepEqual(useFlag(flag), flag);
+  });
+
+  it('preserves the specific flag type', () => {
+    const number = flag('number');
+    const string = flag('string');
+
+    T.assert<T.Equivalent<typeof number, typeof string>>(false);
+    T.assert<T.Equivalent<NumberFlag, typeof number>>(true);
+    T.assert<T.Equivalent<StringFlag, typeof string>>(true);
+  });
+});
+
+describe('useFlags', () => {
+  it('returns the provided flags', () => {
+    const flags: Flags = {
+      number: flag('number'),
+      string: flag('string')
+    };
+
+    assert.deepEqual(useFlags(flags), flags);
+  });
+
+  it('preserves specific flag types', () => {
+    const flags = useFlags({
+      boolean: flag('boolean'),
+      string: flag('string')
+    });
+
+    T.assert<T.Equivalent<'boolean' | 'string', keyof typeof flags>>(true);
+    T.assert<T.Equivalent<BooleanFlag, typeof flags.boolean>>(true);
+    T.assert<T.Equivalent<StringFlag, typeof flags.string>>(true);
+  });
+});
