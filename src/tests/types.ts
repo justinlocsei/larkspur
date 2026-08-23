@@ -13,8 +13,7 @@ export type NonNever<T> = [T] extends [never] ? false : true;
  */
 export type Equivalent<Left, Right> = Exclude<Left, Right> extends
   Exclude<Right, Left>
-  ? Exclude<Right, Left> extends Exclude<Left, Right> ? true
-  : never
+  ? Exclude<Right, Left> extends Exclude<Left, Right> ? true : never
   : never;
 
 /**
