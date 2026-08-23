@@ -18,6 +18,12 @@
         "organizeImports": {
           "level": "on",
           "options": {
+            "groups": [
+              ":PACKAGE:",
+              ":BLANK_LINE:",
+              ":PATH:",
+              ":BLANK_LINE:"
+            ],
             "identifierOrder": "lexicographic"
           }
         }
