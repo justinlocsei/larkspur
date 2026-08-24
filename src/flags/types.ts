@@ -96,7 +96,7 @@ export type FlagChoices = undefined | string[];
  * possible value of a flag and user code that defines a CLI command, which
  * should know about the specific value of its flags.
  */
-export type FlagContext = 'generic' | 'specific';
+export type FlagContext = 'narrow' | 'wide';
 
 /**
  * Definitions for a set of named CLI flags
