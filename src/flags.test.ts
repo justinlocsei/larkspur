@@ -10,10 +10,12 @@ import { useFlag, useFlags } from './flags.js';
 import * as T from './tests/types.js';
 import { flag } from './tests.js';
 
+const description = 'description';
+
 describe('useFlag', () => {
   it('returns the provided flag', () => {
     const flag: NumberFlag = {
-      description: 'description',
+      description,
       type: 'number'
     };
 
@@ -21,8 +23,8 @@ describe('useFlag', () => {
   });
 
   it('preserves the specific flag type', () => {
-    const number = flag('number');
-    const string = flag('string');
+    const number = useFlag({ description, type: 'number' });
+    const string = useFlag({ description, type: 'string' });
 
     T.assert<T.Equivalent<typeof number, typeof string>>(false);
     T.assert<T.Equivalent<NumberFlag, typeof number>>(true);
@@ -42,8 +44,8 @@ describe('useFlags', () => {
 
   it('preserves specific flag types', () => {
     const flags = useFlags({
-      boolean: flag('boolean'),
-      string: flag('string')
+      boolean: { description, type: 'boolean' },
+      string: { description, type: 'string' }
     });
 
     T.assert<T.Equivalent<'boolean' | 'string', keyof typeof flags>>(true);
