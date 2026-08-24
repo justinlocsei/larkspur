@@ -75,6 +75,11 @@ export type Flag = BooleanFlag | ScalarFlag;
 export type FlagOfType<T extends Flag['type']> = Extract<Flag, { type: T }>;
 
 /**
+ * Mark a flag as required
+ */
+export type IsRequired<T extends Flag> = T & { required: true };
+
+/**
  * A value for a scalar flag
  */
 export type ScalarValue = number | string;
