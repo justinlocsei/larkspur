@@ -1,0 +1,591 @@
+import { assert, describe, it } from 'vitest';
+
+import { NormalizedArgs } from '../args.js';
+import { useFlags } from '../flags.js';
+import { checkConversion, inspect, throwsWith } from '../tests.js';
+import type { DistributiveOmit } from '../types/utils.js';
+import type { FlagParsing, ParsedFlags, ParsingOptions } from './parsing.js';
+import { parseFlags } from './parsing.js';
+import type {
+  Flag,
+  Flags,
+  ScalarFlag,
+  ScalarValidator,
+  ScalarValue,
+  SupportedValue
+} from './types.js';
+
+import os from 'node:os';
+import path from 'node:path';
+
+const description = 'description';
+const scalarTypes: ScalarFlag['type'][] = ['number', 'path', 'string'];
+
+describe('parseFlags', () => {
+  function parse(
+    args: string[],
+    flags: Flags,
+    options?: ParsingOptions
+  ) {
+    return parseFlags(new NormalizedArgs(args), flags, options);
+  }
+
+  function flagValues(flags: ParsedFlags) {
+    return Object.fromEntries(
+      Object.entries(flags).map(([name, parsed]) => [name, parsed.value])
+    );
+  }
+
+  function useWorkingDir<T>(absPath: string, useDir: () => T): T {
+    const cwd = process.cwd();
+
+    try {
+      process.chdir(absPath);
+      return useDir();
+    } finally {
+      process.chdir(cwd);
+    }
+  }
+
+  function checkFlag<T extends string>(
+    name: T,
+    flag: DistributiveOmit<Flag, 'description'>,
+    args: string[]
+  ): FlagParsing<T> {
+    return parse(args, {
+      [name]: {
+        ...flag,
+        description: 'description'
+      }
+    });
+  }
+
+  it('can apply values to all supported flag types', () => {
+    checkConversion<[Flag['type'], string[]], unknown>(
+      ([type, args], value) => {
+        const { flags } = useWorkingDir(
+          '/',
+          () => checkFlag('test', { type }, args)
+        );
+
+        assert.strictEqual(
+          flags.test.value,
+          value,
+          `Unexpected value for ${type} flag for args: ${args.join(' ')}`
+        );
+      },
+      [
+        [['boolean', ['--test']], true],
+        [['boolean', ['--no-test']], false],
+        [['number', ['--test', '1']], 1],
+        [['number', ['--test', '2']], 2],
+        [['path', ['--test', 'alfa']], '/alfa'],
+        [['path', ['--test', '/bravo']], '/bravo'],
+        [['string', ['--test', '1']], '1'],
+        [['string', ['--test', '2']], '2']
+      ]
+    );
+  });
+
+  it('treats unset multi-value flags as undefined', () => {
+    const flags = useFlags({
+      alfa: {
+        allowMany: true,
+        description,
+        type: 'string'
+      },
+      bravo: {
+        allowMany: true,
+        description,
+        type: 'string'
+      }
+    });
+
+    checkConversion<string[], object>(
+      (args, value, message) => {
+        assert.deepEqual(
+          flagValues(parse(args, flags).flags),
+          value,
+          message
+        );
+      },
+      [
+        [[], {}],
+        [['--alfa', 'test'], { alfa: ['test'] }],
+        [['--bravo', 'test'], { bravo: ['test'] }],
+        [
+          ['--alfa', 'one', '--bravo', 'two'],
+          {
+            alfa: ['one'],
+            bravo: ['two']
+          }
+        ]
+      ]
+    );
+  });
+
+  it('supports setting multiple values for flags', () => {
+    checkConversion<[ScalarFlag['type'], string[]], ScalarValue[]>(
+      ([type, args], value) => {
+        const { flags } = useWorkingDir(
+          '/',
+          () => checkFlag('test', { allowMany: true, type }, args)
+        );
+
+        assert.deepStrictEqual(
+          flags.test.value as ScalarValue[],
+          value,
+          `Unexpected value for ${type} flag for args: ${args.join(' ')}`
+        );
+      },
+      [
+        [['number', ['--test=1']], [1]],
+        [['number', ['--test', '1']], [1]],
+        [
+          ['number', ['--test=2', '--test=3']],
+          [2, 3]
+        ],
+        [
+          ['number', ['--test', '2', '--test', '3']],
+          [2, 3]
+        ],
+        [
+          // TODO: I don't think I want to support this
+          ['number', ['--test', '2', '3']],
+          [2, 3]
+        ],
+        [['path', ['--test=alfa']], ['/alfa']],
+        [['path', ['--test', 'alfa']], ['/alfa']],
+        [
+          ['path', ['--test=alfa', '--test=bravo']],
+          ['/alfa', '/bravo']
+        ],
+        [
+          ['path', ['--test', 'alfa', '--test', 'bravo']],
+          ['/alfa', '/bravo']
+        ],
+        [
+          ['path', ['--test', 'alfa', 'bravo']],
+          ['/alfa', '/bravo']
+        ],
+        [['string', ['--test=1']], ['1']],
+        [['string', ['--test', '1']], ['1']],
+        [
+          ['string', ['--test=2', '--test=3']],
+          ['2', '3']
+        ],
+        [
+          ['string', ['--test', '2', '--test', '3']],
+          ['2', '3']
+        ],
+        [
+          ['string', ['--test', '2', '3']],
+          ['2', '3']
+        ]
+      ]
+    );
+  });
+
+  it('supports equal-sign bindings for flags', () => {
+    checkConversion<[ScalarFlag['type'], string], unknown>(
+      ([type, arg], parsed) => {
+        const { flags } = useWorkingDir(
+          '/',
+          () => checkFlag('test', { type }, [arg])
+        );
+
+        assert.strictEqual(
+          flags.test.value,
+          parsed,
+          `Unexpected value for ${type} flag for args: ${arg}`
+        );
+      },
+      [
+        [['number', '--test=1'], 1],
+        [['number', '--test=2'], 2],
+        [['number', '--test="3"'], 3],
+        [['path', '--test=alfa'], '/alfa'],
+        [['path', '--test=bravo'], '/bravo'],
+        [['path', '--test="alfa"'], '/alfa'],
+        [['path', '--test="alfa bravo"'], '/alfa bravo'],
+        [['string', '--test=1'], '1'],
+        [['string', '--test=2'], '2'],
+        [['string', '--test="3"'], '3'],
+        [['string', '--test="3 4"'], '3 4']
+      ]
+    );
+  });
+
+  it('can apply default values to all supported types', () => {
+    checkConversion<[Flag['type'], SupportedValue], SupportedValue>(
+      ([type, value], parsed) => {
+        const { flags } = checkFlag(
+          'test',
+          { default: value, type } as Flag,
+          []
+        );
+
+        assert.strictEqual(
+          flags.test.value,
+          parsed,
+          `Default value for ${type} flag not applied: ${inspect(value)}`
+        );
+      },
+      [
+        [['boolean', true], true],
+        [['boolean', false], false],
+        [['number', 0], 0],
+        [['number', 1], 1],
+        [['number', 2], 2],
+        [['path', '1'], '1'],
+        [['path', '2'], '2'],
+        [['string', '1'], '1'],
+        [['string', '2'], '2']
+      ]
+    );
+  });
+
+  it('allows flags to override their default values', () => {
+    checkConversion<[Flag['type'], SupportedValue, string[]], SupportedValue>(
+      ([type, value, args], parsed) => {
+        const { flags } = useWorkingDir(
+          '/',
+          () => checkFlag('test', { default: value, type } as Flag, args)
+        );
+
+        assert.strictEqual(
+          flags.test.value,
+          parsed,
+          `Default value for ${type} flag not overridden: ${inspect(value)}`
+        );
+      },
+      [
+        [['boolean', true, ['--no-test']], false],
+        [['number', 1, ['--test', '2']], 2],
+        [['path', 'alfa', ['--test', 'bravo']], '/bravo'],
+        [['string', '1', ['--test', '2']], '2']
+      ]
+    );
+  });
+
+  it('throws an error if a required flag lacks a value', () => {
+    scalarTypes.forEach((type) => {
+      const message = `Missing value allowed for ${type} flag`;
+
+      throwsWith(
+        () => checkFlag('test', { required: true, type }, []),
+        error => {
+          assert.equal(
+            error.message,
+            'Missing value for required flag: test',
+            message
+          );
+        },
+        message
+      );
+    });
+  });
+
+  it('throws an error if a required multi-value flag lacks a value', () => {
+    scalarTypes.forEach((type) => {
+      const message = `Missing value allowed for ${type} flag`;
+
+      throwsWith(
+        () =>
+          checkFlag(
+            'test',
+            {
+              allowMany: true,
+              required: true,
+              type
+            },
+            []
+          ),
+        error => {
+          assert.equal(
+            error.message,
+            'Missing value for required flag: test',
+            message
+          );
+        },
+        message
+      );
+    });
+  });
+
+  it('allows defaults to provide values for missing required flags', () => {
+    checkConversion<[Flag['type'], SupportedValue], SupportedValue>(
+      ([type, value], output) => {
+        const { flags } = checkFlag(
+          'test',
+          { default: value, required: true, type } as Flag,
+          []
+        );
+
+        assert.strictEqual(
+          flags.test.value,
+          output,
+          `Default value for ${type} flag not applied: ${inspect(value)}`
+        );
+      },
+      [
+        [['boolean', true], true],
+        [['number', 1], 1],
+        [['path', '1'], '1'],
+        [['string', '1'], '1']
+      ]
+    );
+  });
+
+  it('expands all paths', () => {
+    checkConversion<string, string>(
+      (arg, parsed, message) => {
+        const { flags } = useWorkingDir(
+          '/',
+          () => checkFlag('test', { type: 'path' }, ['--test', arg])
+        );
+
+        assert.strictEqual(flags.test.value, parsed, message);
+      },
+      [
+        ['/tmp', '/tmp'],
+        ['/tmp/../var', '/var'],
+        ['tmp', '/tmp'],
+        ['~/bin', path.join(os.homedir(), 'bin')]
+      ]
+    );
+  });
+
+  it('throws an error if a scalar flag lacks a value', () => {
+    const cases: Array<[ScalarFlag['type'], string[]]> = [
+      ['number', ['--alfa']],
+      ['number', ['--alfa', '--bravo']],
+      ['path', ['--alfa']],
+      ['path', ['--alfa', '--bravo']],
+      ['string', ['--alfa']],
+      ['string', ['--alfa', '--bravo']]
+    ];
+
+    cases.forEach(([type, args]) => {
+      const message = `Incomplete value allowed for ${type} flag with args: ${
+        args.join(' ')
+      }`;
+
+      throwsWith(
+        () =>
+          parse(args, {
+            alfa: {
+              description,
+              type
+            },
+            bravo: {
+              description,
+              type: 'boolean'
+            }
+          }),
+        e => {
+          assert.equal(e.message, 'Missing value for flag: alfa', message);
+        },
+        message
+      );
+    });
+  });
+
+  it('throws an error if an unknown flag is provided', () => {
+    const cases: Array<string[]> = [
+      ['--invalid'],
+      ['--valid', 'value', '--invalid']
+    ];
+
+    cases.forEach((args) => {
+      throwsWith(
+        () =>
+          parse(args, {
+            valid: {
+              description,
+              type: 'string'
+            }
+          }),
+        'Unknown flag: --invalid',
+        `Invalid flag allowed with args: ${args.join(' ')}`
+      );
+    });
+  });
+
+  it('throws an error if extra flag values are provided', () => {
+    const cases: Array<string[]> = [
+      ['--value', 'alfa', 'charlie'],
+      ['--value', 'bravo', 'charlie']
+    ];
+
+    cases.forEach((args) => {
+      throwsWith(
+        () =>
+          parse(args, {
+            value: {
+              description,
+              type: 'string'
+            }
+          }),
+        'Unused argument: charlie',
+        `Invalid argument allowed with args: ${args.join(' ')}`
+      );
+    });
+  });
+
+  it('can allow unknown flags', () => {
+    const cases: Array<[string[], Record<string, SupportedValue>]> = [
+      [['--alfa'], { boolean: false }],
+      [['--alfa', '--bravo'], { boolean: false }],
+      [['--alfa', '--bravo', '--boolean'], { boolean: true }],
+      [
+        ['--alfa', '--bravo', '--boolean', '--string', 'value'],
+        { boolean: true, string: 'value' }
+      ]
+    ];
+
+    cases.forEach(([args, values]) => {
+      const parsed = parse(
+        args,
+        {
+          boolean: { description, type: 'boolean' },
+          string: { description, type: 'string' }
+        },
+        { allowUnused: true }
+      );
+
+      assert.deepEqual(
+        flagValues(parsed.flags),
+        values,
+        `Unexpected parsed flags for args: ${args.join(' ')}`
+      );
+
+      assert.sameOrderedMembers(
+        parsed.args.all,
+        args,
+        `Incorrect arguments reported for input args: ${args.join(' ')}`
+      );
+    });
+  });
+
+  it('validates known flags when allowing unknown flags', () => {
+    const cases: Array<string[]> = [
+      [],
+      ['--required'],
+      ['--optional'],
+      ['--other'],
+      ['--other', '--required'],
+      ['--other', '--optional']
+    ];
+
+    cases.forEach((args) => {
+      throwsWith(
+        () =>
+          parse(
+            args,
+            {
+              optional: { description, type: 'string' },
+              required: { description, required: true, type: 'string' }
+            },
+            { allowUnused: true }
+          ),
+        'Missing value',
+        `Failed to run validation against args: ${args.join(' ')}`
+      );
+    });
+  });
+
+  it('throws an error if multiple values are provided for a flag', () => {
+    const cases: Record<Flag['type'], string[]> = {
+      boolean: ['--no-test', '--test'],
+      number: ['--test', '1', '--test', '2'],
+      path: ['--test', '1', '--test', '2'],
+      string: ['--test', '1', '--test', '2']
+    };
+
+    Object.entries(cases).forEach(([type, args]) => {
+      throwsWith(
+        () => checkFlag('test', { type: type as Flag['type'] }, args),
+        'Multiple values provided for flag: test',
+        `Multiple values allowed for ${type} flag`
+      );
+    });
+  });
+
+  it('throws an error if a value is not in the set of choices', () => {
+    const cases: Array<[Flag['type'], string[], string, string]> = [
+      ['string', ['1'], '1', '2']
+    ];
+
+    cases.forEach(([type, choices, valid, invalid]) => {
+      throwsWith(
+        () => checkFlag('test', { choices, type }, ['--test', invalid]),
+        'Invalid value',
+        `A ${type} value outside the set of choices was allowed`
+      );
+
+      assert.isDefined(
+        checkFlag('test', { choices, type }, ['--test', valid]).flags.test,
+        `A ${type} value in the set of choices was rejected`
+      );
+    });
+  });
+
+  it('throws an error if a custom validator function returns false', () => {
+    const cases: Array<
+      [
+        Flag['type'],
+        ScalarValidator<ScalarValue, ScalarValue>,
+        string,
+        string
+      ]
+    > = [
+      ['number', v => v === 1, '1', '2'],
+      ['path', v => v === '/alfa', '/alfa', '/bravo'],
+      ['string', v => v === '1', '1', '2']
+    ];
+
+    cases.forEach(([type, isValid, valid, invalid]) => {
+      throwsWith(
+        () => checkFlag('test', { isValid, type }, ['--test', invalid]),
+        'Unsupported value',
+        `An invalid ${type} value was allowed`
+      );
+
+      assert.isDefined(
+        checkFlag('test', { isValid, type }, ['--test', valid]).flags.test,
+        `A valid ${type} value was rejected`
+      );
+    });
+  });
+
+  it('throws an error if an invalid value type is provided for a flag', () => {
+    const cases: Array<[Flag['type'], string[]]> = [
+      ['number', ['--test', '']],
+      ['number', ['--test', 'test']]
+    ];
+
+    cases.forEach(([type, args]) => {
+      throwsWith(
+        () => checkFlag('test', { type }, args),
+        'Invalid value',
+        `Invalid value allowed for ${type} flag with args: ${args.join(' ')}`
+      );
+    });
+  });
+
+  it('includes a flag’s invalid value in its error message', () => {
+    const cases: Array<[Flag['type'], string[]]> = [
+      ['number', ['--test', 'alfa']],
+      ['number', ['--test', 'bravo']]
+    ];
+
+    cases.forEach(([type, args]) => {
+      throwsWith(
+        () => checkFlag('test', { type }, args),
+        args.join(' '),
+        `Invalid value not shown for ${type} flag with args: ${args.join(' ')}`
+      );
+    });
+  });
+});
