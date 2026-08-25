@@ -1,5 +1,6 @@
 import { assert } from 'vitest';
 
+import { coerceError } from './errors.js';
 import type { Flag } from './flags/types.js';
 
 /**
@@ -7,21 +8,6 @@ import type { Flag } from './flags/types.js';
  */
 function addAssertionMessage(assertion: string, message?: string): string {
   return message ? `${message} (${assertion})` : assertion;
-}
-
-/**
- * Coerce a value to an error
- */
-function coerceError(value: unknown): Error {
-  if (value instanceof Error) {
-    return value;
-  } else if (typeof value === 'string') {
-    return new Error(value);
-  } else if (value === null || value === undefined) {
-    return new Error('Unknown error');
-  } else {
-    return new Error(JSON.stringify(value));
-  }
 }
 
 /**
