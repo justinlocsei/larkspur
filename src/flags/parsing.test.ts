@@ -149,11 +149,6 @@ describe('parseFlags', () => {
           ['number', ['--test', '2', '--test', '3']],
           [2, 3]
         ],
-        [
-          // TODO: I don't think I want to support this
-          ['number', ['--test', '2', '3']],
-          [2, 3]
-        ],
         [['path', ['--test=alfa']], ['/alfa']],
         [['path', ['--test', 'alfa']], ['/alfa']],
         [
@@ -162,10 +157,6 @@ describe('parseFlags', () => {
         ],
         [
           ['path', ['--test', 'alfa', '--test', 'bravo']],
-          ['/alfa', '/bravo']
-        ],
-        [
-          ['path', ['--test', 'alfa', 'bravo']],
           ['/alfa', '/bravo']
         ],
         [['string', ['--test=1']], ['1']],
@@ -177,13 +168,25 @@ describe('parseFlags', () => {
         [
           ['string', ['--test', '2', '--test', '3']],
           ['2', '3']
-        ],
-        [
-          ['string', ['--test', '2', '3']],
-          ['2', '3']
         ]
       ]
     );
+  });
+
+  it('throws an error if multiple values are provided without restating the flag name', () => {
+    const cases: Array<[ScalarFlag['type'], string[]]> = [
+      ['number', ['--test', '2', '3']],
+      ['path', ['--test', 'alfa', 'bravo']],
+      ['string', ['--test', '2', '3']]
+    ];
+
+    cases.forEach(([type, args]) => {
+      throwsWith(
+        () => checkFlag('test', { allowMany: true, type }, args),
+        'Unused argument',
+        `Multiple values allowed ${type} flag`
+      );
+    });
   });
 
   it('supports equal-sign bindings for flags', () => {

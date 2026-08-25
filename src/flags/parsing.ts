@@ -240,7 +240,7 @@ function parseNumberFlag(
   return parseScalarInputs(
     flag,
     context,
-    extractScalarInputs(context, flag.allowMany),
+    extractScalarInputs(context),
     v => parseInt(v, 10),
     value => {
       if (!Number.isFinite(value)) {
@@ -283,7 +283,7 @@ function parseStringInputs(
   return parseScalarInputs(
     stringFlag,
     context,
-    extractScalarInputs(context, stringFlag.allowMany),
+    extractScalarInputs(context),
     process,
     v => validateScalarValue(stringFlag, v)
   );
@@ -299,10 +299,7 @@ function forbidDuplicates(context: ParsingContext): never {
 /**
  * Extract the text being used to set a scalar flag's values
  */
-function extractScalarInputs(
-  context: ParsingContext,
-  allowMany = false
-): ScalarInputs {
+function extractScalarInputs(context: ParsingContext): ScalarInputs {
   const { args, name } = context;
   const setter = flagToSetter(name);
   const values: string[] = [];
@@ -334,7 +331,7 @@ function extractScalarInputs(
       } else {
         consumedValues++;
         values.push(nextArg);
-        parsing = allowMany;
+        parsing = false;
       }
     }
 
