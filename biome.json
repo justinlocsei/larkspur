@@ -32,7 +32,7 @@
               ":PATH:",
               ":BLANK_LINE:"
             ],
-            "identifierOrder": "lexicographic"
+            "identifierOrder": "natural"
           }
         }
       }
