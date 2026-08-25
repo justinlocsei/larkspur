@@ -4,6 +4,14 @@
 export type AnyArray<T> = T[] | readonly T[];
 
 /**
+ * Remove a set of fields from all members of a union
+ */
+export type DistributiveOmit<
+  T extends object,
+  K extends keyof T
+> = T extends unknown ? Omit<T, K> : never;
+
+/**
  * Accept a single item or a collection of items
  */
 export type OneOrMany<T> = T | T[];
