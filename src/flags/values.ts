@@ -10,13 +10,9 @@ import type {
   NumberFlag,
   PathFlag,
   ScalarFlag,
-  StringFlag
+  StringFlag,
+  SupportedValue
 } from './types.ts';
-
-/**
- * The most inclusive value for all supported flags
- */
-type SupportedValue = NonNullable<Flag['default']>;
 
 /**
  * Flag fields that describe an implicit or explicit default value

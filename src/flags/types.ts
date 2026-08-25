@@ -85,6 +85,11 @@ export type IsRequired<T extends Flag> = T & { required: true };
 export type ScalarValue = number | string;
 
 /**
+ * The most inclusive value for all supported flags
+ */
+export type SupportedValue = NonNullable<Flag['default']>;
+
+/**
  * Extracted choices for a flag
  */
 export type FlagChoices = undefined | string[];
