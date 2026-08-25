@@ -39,7 +39,7 @@ type NamesOf<T extends Flags, U> = Extract<
 /**
  * Determine the most specific value for a flag
  */
-type GetValue<T extends Flag> = T extends BooleanFlag ? boolean
+export type SpecificValueOf<T extends Flag> = T extends BooleanFlag ? boolean
   : T extends NumberFlag ? number
   : T extends PathFlag ? string
   : T extends StringFlag
@@ -57,10 +57,10 @@ export type ValueOf<
   TFlag extends Flag,
   TContext extends FlagContext = 'wide'
 > = TFlag extends ScalarFlag
-  ? TContext extends 'wide' ? OneOrMany<GetValue<TFlag>>
-  : TFlag extends { allowMany: true } ? GetValue<TFlag>[]
-  : GetValue<TFlag>
-  : GetValue<TFlag>;
+  ? TContext extends 'wide' ? OneOrMany<SpecificValueOf<TFlag>>
+  : TFlag extends { allowMany: true } ? SpecificValueOf<TFlag>[]
+  : SpecificValueOf<TFlag>
+  : SpecificValueOf<TFlag>;
 
 /**
  * Convert named flag specifications to values
