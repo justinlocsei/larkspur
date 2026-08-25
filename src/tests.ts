@@ -3,7 +3,7 @@ import type { Flag } from './flags/types.js';
 /**
  * Produce a readable representation of an object
  */
-function inspect(value: unknown): string {
+export function inspect(value: unknown): string {
   return JSON.stringify(value, null, 2);
 }
 
