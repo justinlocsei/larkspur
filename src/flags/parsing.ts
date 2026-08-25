@@ -118,7 +118,7 @@ export function parseFlags(
   flags: Flags,
   { allowUnused = false }: ParsingOptions = {}
 ): FlagParsing {
-  const args = fromArgs.normalized;
+  const args = fromArgs.args;
 
   const consumed: number[] = [];
   const providedFlags: string[] = [];

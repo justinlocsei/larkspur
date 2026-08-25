@@ -6,8 +6,7 @@ import { checkConversion } from './tests.js';
 describe('normalizeArgs', () => {
   it('preserves simple args', () => {
     checkConversion<string[], string[]>(
-      (i, o, m) =>
-        assert.sameOrderedMembers(new NormalizedArgs(i).normalized, o, m),
+      (i, o, m) => assert.sameOrderedMembers(new NormalizedArgs(i).args, o, m),
       [
         [[], []],
         [['alfa'], ['alfa']],
@@ -25,8 +24,7 @@ describe('normalizeArgs', () => {
 
   it('normalizes flags that use the equals sign', () => {
     checkConversion<string[], string[]>(
-      (i, o, m) =>
-        assert.sameOrderedMembers(new NormalizedArgs(i).normalized, o, m),
+      (i, o, m) => assert.sameOrderedMembers(new NormalizedArgs(i).args, o, m),
       [
         [['--alfa=value'], ['--alfa', 'value']],
         [
@@ -39,8 +37,7 @@ describe('normalizeArgs', () => {
 
   it('handles quoted values in equals-sign bindings', () => {
     checkConversion<string[], string[]>(
-      (i, o, m) =>
-        assert.sameOrderedMembers(new NormalizedArgs(i).normalized, o, m),
+      (i, o, m) => assert.sameOrderedMembers(new NormalizedArgs(i).args, o, m),
       [
         [['--alfa="value"'], ['--alfa', 'value']],
         [

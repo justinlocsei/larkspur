@@ -4,13 +4,13 @@ const QUOTED = /^['"]([^'"]*)['"]$/;
 const COMBINED_FLAG = new RegExp(`^${SETTER_PREFIX}(.+)=(.*)`);
 
 export class NormalizedArgs {
-  normalized: string[];
+  args: string[];
 
   /**
    * Create a wrapper that exposes a normalized version of CLI args
    */
   constructor(raw: string[]) {
-    this.normalized = this.normalize(raw);
+    this.args = this.normalize(raw);
   }
 
   /**
