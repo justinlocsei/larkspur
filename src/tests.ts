@@ -52,7 +52,7 @@ export function checkConversion<I, O>(
 /**
  * Assert that a function throws an error matching the given check
  */
-export function throwsWith(
+export function mustThrow(
   check: () => void,
   checkError: string | ((error: Error) => void),
   message?: string
