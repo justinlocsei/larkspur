@@ -1,5 +1,4 @@
 import type { AnyArray } from '../types/utils.js';
-import type { NestedLines } from '../types.js';
 
 /**
  * Define a flag
@@ -18,7 +17,7 @@ type IsScalarFlag<
   TSpecific extends TGeneric = TGeneric
 > = {
   allowMany?: boolean;
-  completionScript?: NestedLines;
+  completionScript?: string;
   isValid?: ScalarValidator<TGeneric, TSpecific>;
   required?: boolean;
 };
