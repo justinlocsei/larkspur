@@ -1,6 +1,6 @@
 import { assert, describe, it } from 'vitest';
 
-import { defineCommand } from './commands.js';
+import { defineCommandHandler } from './commands.js';
 import { OperationalError } from './errors.js';
 import type { Logger, LogLevel, RunRequest } from './runner.js';
 import { runCLI } from './runner.js';
@@ -46,7 +46,7 @@ describe('runCLI', () => {
     let value: string | undefined;
 
     const commands = {
-      command: defineCommand({
+      command: defineCommandHandler({
         description,
         flags: {
           flag: {
@@ -101,7 +101,7 @@ describe('runCLI', () => {
     const { error, output } = await testCLI({
       args: ['command', '--key', 'error'],
       commands: {
-        command: defineCommand({
+        command: defineCommandHandler({
           description,
           handler,
           flags: {
@@ -133,7 +133,7 @@ describe('runCLI', () => {
     const { error, output } = await testCLI({
       args: ['command'],
       commands: {
-        command: defineCommand({
+        command: defineCommandHandler({
           description,
           handler: async () => {
             throw new OperationalError('@handler');
@@ -154,7 +154,7 @@ describe('runCLI', () => {
     const { error, output } = await testCLI({
       args: ['command'],
       commands: {
-        command: defineCommand({
+        command: defineCommandHandler({
           description,
           handler: async () => {
             throw new Error('@handler');

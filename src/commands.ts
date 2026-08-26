@@ -70,10 +70,7 @@ type CommandGroup = IsCommand<'group', {
 /**
  * A command
  */
-export type Command<
-  TFlags extends Flags = Flags,
-  TContext extends FlagContext = 'narrow'
-> = CommandHandler<TFlags, TContext> | CommandGroup;
+export type Command = CommandHandler | CommandGroup;
 
 /**
  * A tree of named commands
@@ -282,12 +279,21 @@ export function extractCommands(root: Command): FlattenedCommand[] {
 }
 
 /**
- * Define a CLI command
+ * Define a command handler
  */
-export function defineCommand<T extends Flags>(
-  command: Command<T, 'narrow'>
-): Command<Flags, 'wide'> {
-  return command as Command<Flags, 'wide'>;
+export function defineCommandHandler<T extends Flags>(
+  command: Omit<CommandHandler<T>, 'type'>
+): CommandHandler<T> {
+  return { ...command, type: 'handler' };
+}
+
+/**
+ * Define a command group
+ */
+export function defineCommandGroup(
+  group: Omit<CommandGroup, 'type'>
+): CommandGroup {
+  return { ...group, type: 'group' };
 }
 
 /**

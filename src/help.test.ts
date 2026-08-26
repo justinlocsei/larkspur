@@ -1,6 +1,6 @@
 import { assert, describe, it } from 'vitest';
 
-import { defineCommand } from './commands.js';
+import { defineCommandGroup, defineCommandHandler } from './commands.js';
 import { buildHelp } from './help.js';
 import type { CLIMetadata } from './types.js';
 
@@ -14,11 +14,11 @@ describe('buildHelp', () => {
       cli,
       scope: {
         commands: {
-          alfa: defineCommand({
+          alfa: defineCommandHandler({
             description: '@alfa',
             handler
           }),
-          bravo: defineCommand({
+          bravo: defineCommandHandler({
             description: '@bravo',
             handler
           })
@@ -46,14 +46,14 @@ describe('buildHelp', () => {
       cli,
       scope: {
         commands: {
-          alfa: defineCommand({
+          alfa: defineCommandHandler({
             description: '@alfa',
             handler
           }),
-          bravo: defineCommand({
+          bravo: defineCommandGroup({
             description: '@bravo',
             subcommands: {
-              charlie: defineCommand({
+              charlie: defineCommandHandler({
                 description: '@charlie',
                 handler
               })
@@ -83,7 +83,7 @@ describe('buildHelp', () => {
       cli: { description: '@description', name: 'testing' },
       scope: {
         commands: {
-          command: defineCommand({
+          command: defineCommandHandler({
             description: '@command',
             handler
           })
@@ -111,19 +111,19 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        group: {
+        group: defineCommandGroup({
           description: '@parent',
           subcommands: {
-            alfa: defineCommand({
+            alfa: defineCommandHandler({
               description: '@alfa',
               handler
             }),
-            bravo: defineCommand({
+            bravo: defineCommandHandler({
               description: '@bravo',
               handler
             })
           }
-        },
+        }),
         flags: {},
         path: ['parent'],
         type: 'group'
@@ -149,10 +149,10 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        command: {
+        command: defineCommandHandler({
           description: '@command',
           handler
-        },
+        }),
         flags: {},
         path: ['command'],
         type: 'command'
@@ -166,10 +166,10 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        command: {
+        command: defineCommandHandler({
           description: '@command',
           handler
-        },
+        }),
         flags: {},
         path: ['parent', 'command'],
         type: 'command'
@@ -187,10 +187,10 @@ describe('buildHelp', () => {
       cli,
       scope: {
         commands: {
-          command: {
+          command: defineCommandHandler({
             description: '@command',
             handler
-          }
+          })
         },
         flags: {
           alfa: {
@@ -227,7 +227,7 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        command: {
+        command: defineCommandHandler({
           description: '@command',
           handler,
           flags: {
@@ -236,7 +236,7 @@ describe('buildHelp', () => {
               type: 'boolean'
             }
           }
-        },
+        }),
         flags: {
           alfa: {
             description: '@alfa',
@@ -267,10 +267,10 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        command: {
+        command: defineCommandHandler({
           description: '@command',
           handler
-        },
+        }),
         flags: {
           alfa: {
             description: '@alfa',
@@ -310,10 +310,10 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        command: {
+        command: defineCommandHandler({
           description: '@command',
           handler
-        },
+        }),
         flags: {
           alfa: {
             allowMany: true,
@@ -357,10 +357,10 @@ describe('buildHelp', () => {
       cli,
       scope: {
         commands: {
-          command: {
+          command: defineCommandHandler({
             description: '@command',
             handler
-          }
+          })
         },
         flags: {
           alfa: {
@@ -400,10 +400,10 @@ describe('buildHelp', () => {
       cli,
       scope: {
         commands: {
-          command: {
+          command: defineCommandHandler({
             description: '@command',
             handler
-          }
+          })
         },
         flags: {
           alfa: {
@@ -444,10 +444,10 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        command: {
+        command: defineCommandHandler({
           description: '@command',
           handler
-        },
+        }),
         flags: {
           alfa: {
             default: false,
@@ -506,10 +506,10 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        command: {
+        command: defineCommandHandler({
           description: '@command',
           handler
-        },
+        }),
         flags: {
           alfa: {
             default: 1,
