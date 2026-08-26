@@ -36,6 +36,22 @@ export function checkConversion<I, O>(
 }
 
 /**
+ * Asynchronously run assertions on a set of inputs with expected outputs
+ */
+export async function checkConversionAsync<I, O>(
+  check: (input: I, output: O, message: string) => Promise<void>,
+  cases: Array<[I, O]>
+): Promise<void> {
+  for (const [input, output] of cases) {
+    await check(
+      input,
+      output,
+      `Unexpected output for input: ${inspect(input)}`
+    );
+  }
+}
+
+/**
  * Assert that a function throws an error matching the given check
  */
 export function mustThrow(
