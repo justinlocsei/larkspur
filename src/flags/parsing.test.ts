@@ -2,7 +2,7 @@ import { assert, describe, it } from 'vitest';
 
 import { NormalizedArgs } from '../args.js';
 import { useFlags } from '../flags.js';
-import { checkConversion, inspect, mustThrow } from '../tests.js';
+import { checkConversion, ensure, inspect } from '../tests.js';
 import type { DistributiveOmit } from '../types/utils.js';
 import type { FlagParsing, ParsingOptions } from './parsing.js';
 import { extractValues, parseFlags } from './parsing.js';
@@ -191,7 +191,7 @@ describe('parseFlags', () => {
     ];
 
     cases.forEach(([type, args]) => {
-      mustThrow(
+      ensure.throws(
         () => checkFlag('test', { allowMany: true, type }, args),
         'Unused argument',
         `Multiple values allowed ${type} flag`
@@ -285,7 +285,7 @@ describe('parseFlags', () => {
     scalarTypes.forEach((type) => {
       const message = `Missing value allowed for ${type} flag`;
 
-      mustThrow(
+      ensure.throws(
         () => checkFlag('test', { required: true, type }, []),
         error => {
           assert.equal(
@@ -303,7 +303,7 @@ describe('parseFlags', () => {
     scalarTypes.forEach((type) => {
       const message = `Missing value allowed for ${type} flag`;
 
-      mustThrow(
+      ensure.throws(
         () =>
           checkFlag(
             'test',
@@ -384,7 +384,7 @@ describe('parseFlags', () => {
         args.join(' ')
       }`;
 
-      mustThrow(
+      ensure.throws(
         () =>
           parse(args, {
             alfa: {
@@ -411,7 +411,7 @@ describe('parseFlags', () => {
     ];
 
     cases.forEach((args) => {
-      mustThrow(
+      ensure.throws(
         () =>
           parse(args, {
             valid: {
@@ -432,7 +432,7 @@ describe('parseFlags', () => {
     ];
 
     cases.forEach((args) => {
-      mustThrow(
+      ensure.throws(
         () =>
           parse(args, {
             value: {
@@ -492,7 +492,7 @@ describe('parseFlags', () => {
     ];
 
     cases.forEach((args) => {
-      mustThrow(
+      ensure.throws(
         () =>
           parse(
             args,
@@ -517,7 +517,7 @@ describe('parseFlags', () => {
     };
 
     Object.entries(cases).forEach(([type, args]) => {
-      mustThrow(
+      ensure.throws(
         () => checkFlag('test', { type: type as Flag['type'] }, args),
         'Multiple values provided for flag: test',
         `Multiple values allowed for ${type} flag`
@@ -531,7 +531,7 @@ describe('parseFlags', () => {
     ];
 
     cases.forEach(([type, choices, valid, invalid]) => {
-      mustThrow(
+      ensure.throws(
         () => checkFlag('test', { choices, type }, ['--test', invalid]),
         'Invalid value',
         `A ${type} value outside the set of choices was allowed`
@@ -559,7 +559,7 @@ describe('parseFlags', () => {
     ];
 
     cases.forEach(([type, isValid, valid, invalid]) => {
-      mustThrow(
+      ensure.throws(
         () => checkFlag('test', { isValid, type }, ['--test', invalid]),
         'Unsupported value',
         `An invalid ${type} value was allowed`
@@ -579,7 +579,7 @@ describe('parseFlags', () => {
     ];
 
     cases.forEach(([type, args]) => {
-      mustThrow(
+      ensure.throws(
         () => checkFlag('test', { type }, args),
         'Invalid value',
         `Invalid value allowed for ${type} flag with args: ${args.join(' ')}`
@@ -594,7 +594,7 @@ describe('parseFlags', () => {
     ];
 
     cases.forEach(([type, args]) => {
-      mustThrow(
+      ensure.throws(
         () => checkFlag('test', { type }, args),
         args.join(' '),
         `Invalid value not shown for ${type} flag with args: ${args.join(' ')}`

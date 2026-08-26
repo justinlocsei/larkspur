@@ -1,14 +1,6 @@
-import { assert } from 'vitest';
-
-import { coerceError } from './errors.js';
 import type { Flag } from './flags/types.js';
 
-/**
- * Add a message to an assertion error
- */
-function addAssertionMessage(assertion: string, message?: string): string {
-  return message ? `${message} (${assertion})` : assertion;
-}
+export * as ensure from './tests/ensure.js';
 
 /**
  * Produce a readable representation of an object
@@ -49,35 +41,6 @@ export async function checkConversionAsync<I, O>(
       `Unexpected output for input: ${inspect(input)}`
     );
   }
-}
-
-/**
- * Assert that a function throws an error matching the given check
- */
-export function mustThrow(
-  check: () => void,
-  checkError: string | ((error: Error) => void),
-  message?: string
-): void {
-  try {
-    check();
-  } catch (reason) {
-    const error = coerceError(reason);
-
-    if (typeof checkError === 'string') {
-      assert.include(
-        error.toString(),
-        checkError,
-        addAssertionMessage('Unexpected error text', message)
-      );
-    } else {
-      checkError(error);
-    }
-
-    return;
-  }
-
-  assert.fail(addAssertionMessage('Expected an error to be thrown', message));
 }
 
 /**
