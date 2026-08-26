@@ -180,10 +180,16 @@ class HelpMessage {
 
     const entries = transformValues(
       commands,
-      ({ description, subcommands }, id) => ({
-        description,
-        label: compact([id, subcommands && '<command>']).join(' ')
-      })
+      (command, id) => {
+        const { description } = command;
+
+        return {
+          description,
+          label: compact([id, command.type === 'group' && '<command>']).join(
+            ' '
+          )
+        };
+      }
     );
 
     const offset = Math.max(...Object.values(entries).map(c => c.label.length));

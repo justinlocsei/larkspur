@@ -14,8 +14,9 @@ import type { DistributiveOmit } from './types/utils.js';
 /**
  * The fields shared by all commands
  */
-type BaseCommand = {
+type IsCommand<T extends string, U> = U & {
   description: string;
+  type: T;
 };
 
 /**
@@ -24,12 +25,11 @@ type BaseCommand = {
 export type CommandHandler<
   TFlags extends Flags = Flags,
   TContext extends FlagContext = 'narrow'
-> = BaseCommand & {
+> = IsCommand<'handler', {
   allowUnknownFlags?: boolean;
   flags?: TFlags;
   handler: CommmandHandlerFn<TFlags, TContext>;
-  subcommands?: undefined;
-};
+}>;
 
 /**
  * A command's handler function
@@ -63,14 +63,12 @@ type ArgParsingDetails = {
 /**
  * A group of subcommands
  */
-type CommandGroup = BaseCommand & {
-  flags?: undefined;
-  handler?: undefined;
+type CommandGroup = IsCommand<'group', {
   subcommands: CommandTree;
-};
+}>;
 
 /**
- * A node in a tree of commands
+ * A command
  */
 export type Command<
   TFlags extends Flags = Flags,
@@ -269,20 +267,11 @@ function getCoreFlagValue(
 }
 
 /**
- * Determine whether a command is a group
- */
-export function isCommandGroup(
-  command: Command
-): command is CommandGroup {
-  return command.subcommands !== undefined;
-}
-
-/**
  * Extract all commands contained in a node
  */
 export function extractCommands(root: Command): FlattenedCommand[] {
   function extract(command: Command, path: string[]): FlattenedCommand[] {
-    return isCommandGroup(command)
+    return command.type === 'group'
       ? Object.entries(command.subcommands).flatMap(([id, subcommand]) =>
         extract(subcommand, [...path, id])
       )
@@ -431,7 +420,7 @@ function parseCommand(
 
   const remainingArgs = new NormalizedArgs(args.slice(1));
 
-  if (isCommandGroup(command)) {
+  if (command.type === 'group') {
     return parseCommand(remainingArgs, command.subcommands, {
       group: command,
       parentPath: path

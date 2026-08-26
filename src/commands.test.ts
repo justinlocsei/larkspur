@@ -1,12 +1,7 @@
 import { assert, describe, it } from 'vitest';
 
 import type { CommandTree } from './commands.js';
-import {
-  defineCommand,
-  extractCommands,
-  isCommandGroup,
-  parse
-} from './commands.js';
+import { defineCommand, extractCommands, parse } from './commands.js';
 import { OperationalError } from './errors.js';
 import { extractValues } from './flags/parsing.js';
 import type { Flag, SupportedValue } from './flags/types.js';
@@ -370,20 +365,6 @@ describe('extractCommands', () => {
         ['bravo', 'bravo'],
         ['delta', 'charlie.delta']
       ]
-    );
-  });
-});
-
-describe('isCommandGroup', () => {
-  it('detects command groups', () => {
-    assert.isTrue(
-      isCommandGroup(defineCommand({ description, subcommands: {} }))
-    );
-  });
-
-  it('rejects command handlers', () => {
-    assert.isFalse(
-      isCommandGroup(defineCommand({ description, handler }))
     );
   });
 });
