@@ -72,7 +72,7 @@ type CommandGroup = BaseCommand & {
 /**
  * A node in a tree of commands
  */
-export type CommandNode<
+export type Command<
   TFlags extends Flags = Flags,
   TContext extends FlagContext = 'narrow'
 > = CommandHandler<TFlags, TContext> | CommandGroup;
@@ -80,7 +80,7 @@ export type CommandNode<
 /**
  * A tree of named commands
  */
-export type CommandTree<T extends string = string> = Record<T, CommandNode>;
+export type CommandTree<T extends string = string> = Record<T, Command>;
 
 /**
  * A command extracted from a tree
@@ -272,7 +272,7 @@ function getCoreFlagValue(
  * Determine whether a command is a group
  */
 export function isCommandGroup(
-  command: CommandNode
+  command: Command
 ): command is CommandGroup {
   return command.subcommands !== undefined;
 }
@@ -280,8 +280,8 @@ export function isCommandGroup(
 /**
  * Extract all commands contained in a node
  */
-export function extractCommands(root: CommandNode): FlattenedCommand[] {
-  function extract(command: CommandNode, path: string[]): FlattenedCommand[] {
+export function extractCommands(root: Command): FlattenedCommand[] {
+  function extract(command: Command, path: string[]): FlattenedCommand[] {
     return isCommandGroup(command)
       ? Object.entries(command.subcommands).flatMap(([id, subcommand]) =>
         extract(subcommand, [...path, id])
@@ -296,9 +296,9 @@ export function extractCommands(root: CommandNode): FlattenedCommand[] {
  * Define a CLI command
  */
 export function defineCommand<T extends Flags>(
-  command: CommandNode<T, 'narrow'>
-): CommandNode<Flags, 'wide'> {
-  return command as CommandNode<Flags, 'wide'>;
+  command: Command<T, 'narrow'>
+): Command<Flags, 'wide'> {
+  return command as Command<Flags, 'wide'>;
 }
 
 /**
