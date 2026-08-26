@@ -75,7 +75,7 @@ describe('runCLI', () => {
   it('can show help', async () => {
     const { error, output } = await testCLI({
       args: ['--help'],
-      commands: { command: { description, handler } }
+      commands: { command: defineCommandHandler({ description, handler }) }
     });
 
     assert.isUndefined(error);
@@ -86,7 +86,7 @@ describe('runCLI', () => {
   it('handles parsing errors', async () => {
     const { error, output } = await testCLI({
       args: ['invalid-command'],
-      commands: { command: { description, handler } }
+      commands: { command: defineCommandHandler({ description, handler }) }
     });
 
     assert.instanceOf(error, OperationalError);
