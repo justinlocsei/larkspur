@@ -1,3 +1,12 @@
+import type { Masked } from './types/utils.ts';
+
+/**
+ * Exclude falsy values from a list
+ */
+export function compact<T>(values: Masked<T>[]): T[] {
+  return values.filter(v => v) as T[];
+}
+
 /**
  * Transform the values of an object by a given function
  */

@@ -1,7 +1,30 @@
 import { assert, describe, it } from 'vitest';
 
 import * as T from './tests/types.js';
-import { transformValues } from './utils.js';
+import { compact, transformValues } from './utils.js';
+
+describe('compact', () => {
+  it('removes falsy values from an array', () => {
+    assert.sameOrderedMembers(
+      compact(['a', 1, 0, true, false, null, undefined, '']),
+      ['a', 1, true]
+    );
+  });
+
+  it('preserves an empty array', () => {
+    assert.deepEqual(compact([]), []);
+  });
+
+  it('preserves the type of the input array', () => {
+    const numbers = compact([1, null]);
+    const strings = compact(['a', null]);
+    const booleans = compact([true, false]);
+
+    T.assert<T.Equivalent<typeof numbers, number[]>>(true);
+    T.assert<T.Assignable<typeof strings, string[]>>(true);
+    T.assert<T.Assignable<typeof booleans, boolean[]>>(true);
+  });
+});
 
 describe('transformValues', () => {
   const input = {
