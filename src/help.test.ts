@@ -107,11 +107,11 @@ describe('buildHelp', () => {
     );
   });
 
-  it('can show help for a command namespace', () => {
+  it('can show help for a command group', () => {
     const help = buildHelp({
       cli,
       scope: {
-        namespace: {
+        group: {
           description: '@parent',
           subcommands: {
             alfa: defineCommand({
@@ -126,7 +126,7 @@ describe('buildHelp', () => {
         },
         flags: {},
         path: ['parent'],
-        type: 'namespace'
+        type: 'group'
       }
     });
 
@@ -162,7 +162,7 @@ describe('buildHelp', () => {
     assert.equal(help, ['Usage: testing command', '', '@command'].join('\n'));
   });
 
-  it('can show help for a namespaced command', () => {
+  it('can show help for a grouped command', () => {
     const help = buildHelp({
       cli,
       scope: {

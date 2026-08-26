@@ -90,11 +90,11 @@ function scopeToContext(
         title: scope.command.description
       };
 
-    case 'namespace':
+    case 'group':
       return {
-        commands: scope.namespace.subcommands,
+        commands: scope.group.subcommands,
         path: scope.path,
-        title: scope.namespace.description
+        title: scope.group.description
       };
 
     case 'root':

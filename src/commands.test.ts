@@ -4,7 +4,7 @@ import type { CommandTree } from './commands.js';
 import {
   defineCommand,
   extractCommands,
-  isCommandNamespace,
+  isCommandGroup,
   parse
 } from './commands.js';
 import { OperationalError } from './errors.js';
@@ -26,8 +26,8 @@ describe('defineCommand', () => {
     assert.isFunction(command.handler);
   });
 
-  it('can define a command namespace', () => {
-    const namespace = defineCommand({
+  it('can define a command group', () => {
+    const group = defineCommand({
       description,
       subcommands: {
         child: defineCommand({
@@ -37,10 +37,10 @@ describe('defineCommand', () => {
       }
     });
 
-    assert.equal(namespace.description, description);
-    assert.isDefined(namespace.subcommands);
+    assert.equal(group.description, description);
+    assert.isDefined(group.subcommands);
 
-    const { subcommands } = namespace;
+    const { subcommands } = group;
 
     assert.isDefined(subcommands.child);
     assert.equal(subcommands.child.description, 'Child');
@@ -345,7 +345,7 @@ describe('extractCommands', () => {
     assert.equal(command.command.description, 'testing');
   });
 
-  it('returns all command handlers in a namespace', () => {
+  it('returns all command handlers in a group', () => {
     const commands = defineCommand({
       description: 'root',
       subcommands: {
@@ -374,16 +374,16 @@ describe('extractCommands', () => {
   });
 });
 
-describe('isCommandNamespace', () => {
-  it('detects command namespaces', () => {
+describe('isCommandGroup', () => {
+  it('detects command groups', () => {
     assert.isTrue(
-      isCommandNamespace(defineCommand({ description, subcommands: {} }))
+      isCommandGroup(defineCommand({ description, subcommands: {} }))
     );
   });
 
   it('rejects command handlers', () => {
     assert.isFalse(
-      isCommandNamespace(defineCommand({ description, handler }))
+      isCommandGroup(defineCommand({ description, handler }))
     );
   });
 });
@@ -431,7 +431,7 @@ describe('parse', () => {
     );
   });
 
-  it('can extract namespaced commands', () => {
+  it('can extract grouped commands', () => {
     const commands = {
       alfa: defineCommand({
         description,
@@ -499,7 +499,7 @@ describe('parse', () => {
     });
   });
 
-  it('returns an error when a command namespace is requested', () => {
+  it('returns an error when a command group is requested', () => {
     const result = parse(['alfa', 'bravo'], {
       alfa: defineCommand({
         description,
@@ -518,7 +518,7 @@ describe('parse', () => {
     });
 
     assert(result.type === 'error', 'Error not returned');
-    assert.equal(result.help?.type, 'namespace');
+    assert.equal(result.help?.type, 'group');
 
     assert.deepInclude(result, {
       code: 'invalid-command',
@@ -973,7 +973,7 @@ describe('parse', () => {
     );
   });
 
-  it('can request help for a namespaced command', () => {
+  it('can request help for a grouped command', () => {
     const result = parse(['alfa', 'bravo', '--help'], {
       alfa: {
         description: 'alfa',
@@ -989,7 +989,7 @@ describe('parse', () => {
     assert(result.type === 'help', 'Help not requested');
     const { scope } = result;
 
-    assert(scope.type === 'command', 'Namespaced command help not requested');
+    assert(scope.type === 'command', 'Grouped command help not requested');
 
     assert.equal(
       scope.command.description,
@@ -1004,7 +1004,7 @@ describe('parse', () => {
     );
   });
 
-  it('can request help for a namespace', () => {
+  it('can request help for a group', () => {
     const result = parse(['alfa', '--help'], {
       alfa: {
         description,
@@ -1018,10 +1018,10 @@ describe('parse', () => {
     assert(result.type === 'help', 'Help not requested');
     const { scope } = result;
 
-    assert(scope.type === 'namespace', 'Namespace help not requested');
+    assert(scope.type === 'group', 'Group help not requested');
 
     assert.sameMembers(
-      Object.keys(scope.namespace.subcommands),
+      Object.keys(scope.group.subcommands),
       ['bravo', 'charlie'],
       'Incorrect commands shown'
     );

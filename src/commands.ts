@@ -61,9 +61,9 @@ type ArgParsingDetails = {
 };
 
 /**
- * A namespace that contains subcommands
+ * A group of subcommands
  */
-type CommandNamespace = BaseCommand & {
+type CommandGroup = BaseCommand & {
   flags?: undefined;
   handler?: undefined;
   subcommands: CommandTree;
@@ -75,7 +75,7 @@ type CommandNamespace = BaseCommand & {
 export type CommandNode<
   TFlags extends Flags = Flags,
   TContext extends FlagContext = 'narrow'
-> = Command<TFlags, TContext> | CommandNamespace;
+> = Command<TFlags, TContext> | CommandGroup;
 
 /**
  * A tree of named commands
@@ -192,10 +192,10 @@ type RootHelpScope = IsHelpScope<'root', {
 }>;
 
 /**
- * Help for namespaced commands
+ * Help for grouped commands
  */
-type NamespaceHelpScope = IsHelpScope<'namespace', {
-  namespace: CommandNamespace;
+type GroupHelpScope = IsHelpScope<'group', {
+  group: CommandGroup;
   path: string[];
 }>;
 
@@ -212,7 +212,7 @@ type CommandHelpScope = IsHelpScope<'command', {
  */
 export type HelpScope =
   | CommandHelpScope
-  | NamespaceHelpScope
+  | GroupHelpScope
   | RootHelpScope;
 
 /**
@@ -269,11 +269,11 @@ function getCoreFlagValue(
 }
 
 /**
- * Determine whether a command is a namespace
+ * Determine whether a command is a group
  */
-export function isCommandNamespace(
+export function isCommandGroup(
   command: CommandNode
-): command is CommandNamespace {
+): command is CommandGroup {
   return command.subcommands !== undefined;
 }
 
@@ -282,7 +282,7 @@ export function isCommandNamespace(
  */
 export function extractCommands(root: CommandNode): FlattenedCommand[] {
   function extract(command: CommandNode, path: string[]): FlattenedCommand[] {
-    return isCommandNamespace(command)
+    return isCommandGroup(command)
       ? Object.entries(command.subcommands).flatMap(([id, subcommand]) =>
         extract(subcommand, [...path, id])
       )
@@ -388,10 +388,10 @@ function parseCommand(
   normalized: NormalizedArgs,
   commands: CommandTree,
   {
-    namespace,
+    group,
     parentPath = []
   }: {
-    namespace?: CommandNamespace;
+    group?: CommandGroup;
     parentPath?: string[];
   } = {}
 ): ParsedCommand {
@@ -405,8 +405,8 @@ function parseCommand(
     ? [undefined, parentPath]
     : [commands[name], [...parentPath, name]];
 
-  const commandHelp: HelpRequestScope = namespace
-    ? { namespace, path: parentPath, type: 'namespace' }
+  const commandHelp: HelpRequestScope = group
+    ? { group, path: parentPath, type: 'group' }
     : { commands, type: 'root' };
 
   if (showHelp && (!name || !command)) {
@@ -431,9 +431,9 @@ function parseCommand(
 
   const remainingArgs = new NormalizedArgs(args.slice(1));
 
-  if (isCommandNamespace(command)) {
+  if (isCommandGroup(command)) {
     return parseCommand(remainingArgs, command.subcommands, {
-      namespace: command,
+      group: command,
       parentPath: path
     });
   } else if (showHelp) {
