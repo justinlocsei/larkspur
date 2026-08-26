@@ -1,7 +1,7 @@
 import { assert, describe, it } from 'vitest';
 
 import * as T from './tests/types.js';
-import { compact, transformValues } from './utils.js';
+import { compact, isEmpty, transformValues } from './utils.js';
 
 describe('compact', () => {
   it('removes falsy values from an array', () => {
@@ -23,6 +23,13 @@ describe('compact', () => {
     T.assert<T.Equivalent<typeof numbers, number[]>>(true);
     T.assert<T.Assignable<typeof strings, string[]>>(true);
     T.assert<T.Assignable<typeof booleans, boolean[]>>(true);
+  });
+});
+
+describe('isEmpty', () => {
+  it('reports whether an object lacks properties', () => {
+    assert.equal(isEmpty({}), true);
+    assert.equal(isEmpty({ a: 1 }), false);
   });
 });
 

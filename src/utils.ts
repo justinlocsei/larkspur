@@ -8,6 +8,13 @@ export function compact<T>(values: Masked<T>[]): T[] {
 }
 
 /**
+ * Report whether an object lacks properties
+ */
+export function isEmpty(object: Record<string, unknown>): boolean {
+  return Object.keys(object).length === 0;
+}
+
+/**
  * Transform the values of an object by a given function
  */
 export function transformValues<
