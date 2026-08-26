@@ -111,6 +111,17 @@ export type ParsingOptions = {
 };
 
 /**
+ * Extract the values from a set of parsed flags
+ */
+export function extractValues(
+  flags: ParsedFlags
+): { [K in T]?: ValueOf<Flag> } {
+  return Object.fromEntries(
+    Object.entries(flags).map(([name, parsed]) => [name, parsed.value])
+  );
+}
+
+/**
  * Extract flags from a list of arguments
  */
 export function parseFlags(

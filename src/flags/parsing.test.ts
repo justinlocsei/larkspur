@@ -4,8 +4,8 @@ import { NormalizedArgs } from '../args.js';
 import { useFlags } from '../flags.js';
 import { checkConversion, inspect, mustThrow } from '../tests.js';
 import type { DistributiveOmit } from '../types/utils.js';
-import type { FlagParsing, ParsedFlags, ParsingOptions } from './parsing.js';
-import { parseFlags } from './parsing.js';
+import type { FlagParsing, ParsingOptions } from './parsing.js';
+import { extractValues, parseFlags } from './parsing.js';
 import type {
   Flag,
   Flags,
@@ -21,21 +21,31 @@ import path from 'node:path';
 const description = 'description';
 const scalarTypes: ScalarFlag['type'][] = ['number', 'path', 'string'];
 
-describe('parseFlags', () => {
-  function parse(
-    args: string[],
-    flags: Flags,
-    options?: ParsingOptions
-  ) {
-    return parseFlags(new NormalizedArgs(args), flags, options);
-  }
+function parse(
+  args: string[],
+  flags: Flags,
+  options?: ParsingOptions
+) {
+  return parseFlags(new NormalizedArgs(args), flags, options);
+}
 
-  function flagValues(flags: ParsedFlags) {
-    return Object.fromEntries(
-      Object.entries(flags).map(([name, parsed]) => [name, parsed.value])
+describe('extractValues', () => {
+  it('extracts the values from a set of parsed flags', () => {
+    const flags = useFlags({
+      alfa: { description, type: 'string' },
+      bravo: { description, type: 'number' }
+    });
+
+    const parsed = parse(['--alfa', '1', '--bravo', '2'], flags);
+
+    assert.deepEqual(
+      extractValues(parsed.flags),
+      { alfa: '1', bravo: 2 }
     );
-  }
+  });
+});
 
+describe('parseFlags', () => {
   function useWorkingDir<T>(absPath: string, useDir: () => T): T {
     const cwd = process.cwd();
 
@@ -104,7 +114,7 @@ describe('parseFlags', () => {
     checkConversion<string[], object>(
       (args, value, message) => {
         assert.deepEqual(
-          flagValues(parse(args, flags).flags),
+          extractValues(parse(args, flags).flags),
           value,
           message
         );
@@ -458,7 +468,7 @@ describe('parseFlags', () => {
       );
 
       assert.deepEqual(
-        flagValues(parsed.flags),
+        extractValues(parsed.flags),
         values,
         `Unexpected parsed flags for args: ${args.join(' ')}`
       );
