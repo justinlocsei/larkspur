@@ -70,12 +70,12 @@ type CommandGroup = IsCommand<'group', {
 /**
  * A command
  */
-export type Command = CommandHandler | CommandGroup;
+export type Command = CommandHandler<Flags, 'wide'> | CommandGroup;
 
 /**
  * A tree of named commands
  */
-export type CommandTree<T extends string = string> = Record<T, Command>;
+export type CommandTree = Partial<Record<string, Command>>;
 
 /**
  * A command extracted from a tree
@@ -270,7 +270,7 @@ export function extractCommands(root: Command): FlattenedCommand[] {
   function extract(command: Command, path: string[]): FlattenedCommand[] {
     return command.type === 'group'
       ? Object.entries(command.subcommands).flatMap(([id, subcommand]) =>
-        extract(subcommand, [...path, id])
+        subcommand ? extract(subcommand, [...path, id]) : []
       )
       : [{ command, path }];
   }
