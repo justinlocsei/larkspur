@@ -13,7 +13,7 @@ const handler = async () => {};
 
 type LogOutput = Record<LogLevel, string>;
 
-async function testCLI(options: Omit<RunRequest, 'name'>): Promise<{
+async function testCLI(options: Omit<RunRequest, 'meta'>): Promise<{
   error?: Error | undefined;
   output: LogOutput;
 }> {
@@ -25,8 +25,8 @@ async function testCLI(options: Omit<RunRequest, 'name'>): Promise<{
   };
 
   await runCLI({
-    name: 'testing',
     ...options,
+    meta: { name: 'testing' },
     logging: transformValues(output, (_, l): Logger => m => {
       output[l] += `${m}\n`;
     }),

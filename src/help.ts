@@ -1,6 +1,7 @@
 import type { CommandTree, HelpScope } from './commands.ts';
 import { choicesForFlag, flagToSetter } from './flags/data.js';
 import type { Flag, Flags } from './flags/types.ts';
+import type { CLIMetadata } from './types.js';
 import { compact, isEmpty, transformValues } from './utils.js';
 
 /**
@@ -36,9 +37,8 @@ const DEFAULT_FORMATTING: HelpFormatting = {
  * A request to display a help message
  */
 type HelpDisplayRequest = {
-  cliName: string;
+  cli: CLIMetadata;
   config?: HelpFormatting;
-  description?: string;
   scope: HelpScope;
 };
 
@@ -46,9 +46,8 @@ type HelpDisplayRequest = {
  * Build the text of a CLI's help message
  */
 export function buildHelp({
-  cliName,
+  cli,
   config = DEFAULT_FORMATTING,
-  description = '',
   scope
 }: HelpDisplayRequest): string {
   const flags: Flags = {
@@ -57,10 +56,9 @@ export function buildHelp({
   };
 
   const message = new HelpMessage({
-    cliName,
+    cli,
     config,
-    context: scopeToContext(scope, description),
-    description,
+    context: scopeToContext(scope, cli.description),
     flags,
     scope
   });
@@ -160,12 +158,12 @@ class HelpMessage {
    * Build the usage message
    */
   private buildUsage(): string {
-    const { cliName, context: { path }, scope, flags } = this.config;
+    const { cli, context: { path }, scope, flags } = this.config;
 
     const needsCommand = scope.type !== 'command';
 
     const usage = compact([
-      cliName,
+      cli.name,
       ...path,
       needsCommand && '<command>',
       (needsCommand || !isEmpty(flags)) && '[flags]'

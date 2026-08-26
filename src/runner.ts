@@ -7,6 +7,7 @@ import type {
 } from './commands.ts';
 import { coerceError, OperationalError } from './errors.js';
 import { buildHelp } from './help.js';
+import type { CLIMetadata } from './types.js';
 
 /**
  * A logging function
@@ -29,9 +30,8 @@ type LoggingHandlers = Record<LogLevel, Logger>;
 export type RunRequest = {
   args: string[];
   commands: CommandTree;
-  description?: string;
   logging?: LoggingHandlers;
-  name: string;
+  meta: CLIMetadata;
   onError?: (error: Error) => void;
 };
 
@@ -41,12 +41,11 @@ export type RunRequest = {
 export async function runCLI({
   args,
   commands,
-  description,
   logging: logger = {
     error: m => console.error(m),
     info: m => console.info(m)
   },
-  name,
+  meta,
   onError = () => (process.exitCode = 1)
 }: RunRequest): Promise<void> {
   let parsing: ParsingResult;
@@ -66,8 +65,7 @@ export async function runCLI({
 
   function showHelp(scope: HelpScope): void {
     const help = buildHelp({
-      cliName: name,
-      description,
+      cli: meta,
       scope
     });
 

@@ -2,13 +2,16 @@ import { assert, describe, it } from 'vitest';
 
 import { defineCommand } from './commands.js';
 import { buildHelp } from './help.js';
+import type { CLIMetadata } from './types.js';
 
 async function handler() {}
+
+const cli: CLIMetadata = { name: 'testing' };
 
 describe('buildHelp', () => {
   it('can show help for a CLI’s root commands', () => {
     const help = buildHelp({
-      cliName: 'testing',
+      cli,
       scope: {
         commands: {
           alfa: defineCommand({
@@ -40,7 +43,7 @@ describe('buildHelp', () => {
 
   it('can show help for a CLI’s root commands', () => {
     const help = buildHelp({
-      cliName: 'testing',
+      cli,
       scope: {
         commands: {
           alfa: defineCommand({
@@ -77,8 +80,7 @@ describe('buildHelp', () => {
 
   it('can include a description for the root help', () => {
     const help = buildHelp({
-      cliName: 'testing',
-      description: '@description',
+      cli: { description: '@description', name: 'testing' },
       scope: {
         commands: {
           command: defineCommand({
@@ -107,7 +109,7 @@ describe('buildHelp', () => {
 
   it('can show help for a command namespace', () => {
     const help = buildHelp({
-      cliName: 'testing',
+      cli,
       scope: {
         namespace: {
           description: '@parent',
@@ -145,7 +147,7 @@ describe('buildHelp', () => {
 
   it('can show help for a top-level command', () => {
     const help = buildHelp({
-      cliName: 'testing',
+      cli,
       scope: {
         command: {
           description: '@command',
@@ -162,7 +164,7 @@ describe('buildHelp', () => {
 
   it('can show help for a namespaced command', () => {
     const help = buildHelp({
-      cliName: 'testing',
+      cli,
       scope: {
         command: {
           description: '@command',
@@ -182,7 +184,7 @@ describe('buildHelp', () => {
 
   it('can list flags', () => {
     const help = buildHelp({
-      cliName: 'testing',
+      cli,
       scope: {
         commands: {
           command: {
@@ -223,7 +225,7 @@ describe('buildHelp', () => {
 
   it('combines command and core flags', () => {
     const help = buildHelp({
-      cliName: 'testing',
+      cli,
       scope: {
         command: {
           description: '@command',
@@ -263,7 +265,7 @@ describe('buildHelp', () => {
 
   it('shows placeholders for scalar flags', () => {
     const help = buildHelp({
-      cliName: 'testing',
+      cli,
       scope: {
         command: {
           description: '@command',
@@ -306,7 +308,7 @@ describe('buildHelp', () => {
 
   it('shows placeholders for multi-value scalar flags', () => {
     const help = buildHelp({
-      cliName: 'testing',
+      cli,
       scope: {
         command: {
           description: '@command',
@@ -352,7 +354,7 @@ describe('buildHelp', () => {
 
   it('shows required flags', () => {
     const help = buildHelp({
-      cliName: 'testing',
+      cli,
       scope: {
         commands: {
           command: {
@@ -395,7 +397,7 @@ describe('buildHelp', () => {
 
   it('shows required and optional flags', () => {
     const help = buildHelp({
-      cliName: 'testing',
+      cli,
       scope: {
         commands: {
           command: {
@@ -440,7 +442,7 @@ describe('buildHelp', () => {
 
   it('shows default values for flags', () => {
     const help = buildHelp({
-      cliName: 'testing',
+      cli,
       scope: {
         command: {
           description: '@command',
@@ -502,7 +504,7 @@ describe('buildHelp', () => {
 
   it('shows choices for flags', () => {
     const help = buildHelp({
-      cliName: 'testing',
+      cli,
       scope: {
         command: {
           description: '@command',
