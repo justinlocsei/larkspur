@@ -137,7 +137,7 @@ type FailureRunResult = IsRunResult<'failure', {
 /**
  * The result of running a command
  */
-type RunResult = SuccessRunResult | FailureRunResult;
+export type RunResult = SuccessRunResult | FailureRunResult;
 
 /**
  * A function that runs a command
