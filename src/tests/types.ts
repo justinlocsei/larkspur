@@ -9,6 +9,12 @@ export type Never<T> = [T] extends [never] ? true : false;
 export type NonNever<T> = [T] extends [never] ? false : true;
 
 /**
+ * Report whether a given type is assignable to another
+ */
+export type Assignable<Input, Target> = Never<Exclude<Input, Target>> extends
+  true ? true : never;
+
+/**
  * Report whether two types are equivalent
  */
 export type Equivalent<Left, Right> = Exclude<Left, Right> extends
