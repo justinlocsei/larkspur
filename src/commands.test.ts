@@ -44,7 +44,6 @@ describe('defineCommand', () => {
 
     assert.isDefined(subcommands.child);
     assert.equal(subcommands.child.description, 'Child');
-    assert.isFunction(subcommands.child.handler);
   });
 
   it('defines handlers that can access typed flags', () => {
@@ -858,10 +857,10 @@ describe('parse', () => {
     cases.forEach((args) => {
       assert.deepInclude(
         parse(args, {
-          parent: {
+          parent: defineCommandGroup({
             description,
             subcommands: {
-              child: {
+              child: defineCommandHandler({
                 description,
                 handler,
                 flags: {
@@ -870,9 +869,9 @@ describe('parse', () => {
                     type: 'string'
                   }
                 }
-              }
+              })
             }
-          }
+          })
         }),
         {
           code: 'invalid-command',
