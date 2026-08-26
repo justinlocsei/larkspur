@@ -115,7 +115,7 @@ export type ParsingOptions = {
  */
 export function extractValues(
   flags: ParsedFlags
-): { [K in T]?: ValueOf<Flag> } {
+): { [K in string]?: ValueOf<Flag> } {
   return Object.fromEntries(
     Object.entries(flags).map(([name, parsed]) => [name, parsed.value])
   );
