@@ -283,8 +283,11 @@ export function extractCommands(root: Command): FlattenedCommand[] {
  */
 export function defineCommandHandler<T extends Flags>(
   command: Omit<CommandHandler<T>, 'type'>
-): CommandHandler<T> {
-  return { ...command, type: 'handler' };
+): CommandHandler<Flags, 'wide'> {
+  return { ...command, type: 'handler' } as unknown as CommandHandler<
+    Flags,
+    'wide'
+  >;
 }
 
 /**
