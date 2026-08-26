@@ -27,14 +27,14 @@ export type Command<
 > = BaseCommand & {
   allowUnknownFlags?: boolean;
   flags?: TFlags;
-  handler: CommmandHandler<TFlags, TContext>;
+  handler: CommmandHandlerFn<TFlags, TContext>;
   subcommands?: undefined;
 };
 
 /**
  * A command's handler function
  */
-export type CommmandHandler<
+type CommmandHandlerFn<
   TFlags extends Flags = Flags,
   TContext extends FlagContext = 'narrow'
 > = (
