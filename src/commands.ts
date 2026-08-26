@@ -19,9 +19,9 @@ type BaseCommand = {
 };
 
 /**
- * A single command
+ * A command handler
  */
-export type Command<
+export type CommandHandler<
   TFlags extends Flags = Flags,
   TContext extends FlagContext = 'narrow'
 > = BaseCommand & {
@@ -75,7 +75,7 @@ type CommandGroup = BaseCommand & {
 export type CommandNode<
   TFlags extends Flags = Flags,
   TContext extends FlagContext = 'narrow'
-> = Command<TFlags, TContext> | CommandGroup;
+> = CommandHandler<TFlags, TContext> | CommandGroup;
 
 /**
  * A tree of named commands
@@ -86,7 +86,7 @@ export type CommandTree<T extends string = string> = Record<T, CommandNode>;
  * A command extracted from a tree
  */
 type FlattenedCommand = {
-  command: Command;
+  command: CommandHandler;
   path: string[];
 };
 
@@ -95,7 +95,7 @@ type FlattenedCommand = {
  */
 type ParsedCommand = {
   args: ArgParsingDetails;
-  command: Command<Flags>;
+  command: CommandHandler<Flags>;
   flags: ParsedFlags;
   path: string[];
   providedFlags: string[];
@@ -203,7 +203,7 @@ type GroupHelpScope = IsHelpScope<'group', {
  * Help for a specific command
  */
 type CommandHelpScope = IsHelpScope<'command', {
-  command: Command;
+  command: CommandHandler;
   path: string[];
 }>;
 
