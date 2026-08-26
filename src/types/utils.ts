@@ -12,6 +12,11 @@ export type DistributiveOmit<
 > = T extends unknown ? Omit<T, K> : never;
 
 /**
+ * Allow a value to be nulled out by a subset of falsy values
+ */
+export type Masked<T> = T | false | null | undefined;
+
+/**
  * Accept a single item or a collection of items
  */
 export type OneOrMany<T> = T | T[];
