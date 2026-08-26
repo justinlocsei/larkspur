@@ -1,5 +1,6 @@
 {
   "typescript": {
+    "importDeclaration.sortNamedImports": "maintain",
     "lineWidth": 80,
     "module.sortImportDeclarations": "maintain",
     "quoteStyle": "preferSingle",
