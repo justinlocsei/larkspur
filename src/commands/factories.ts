@@ -13,19 +13,19 @@ import type {
 /**
  * Build a command handler
  */
-function buildCommandHandler(
+export function buildCommandHandler(
   description: string,
   handler: CommmandHandlerFn
 ): CommandHandler<Flags, 'wide'>;
-function buildCommandHandler<T extends Flags>(
+export function buildCommandHandler<T extends Flags>(
   description: string,
   flags: T,
   handler: CommmandHandlerFn<T>
 ): CommandHandler<Flags, 'wide'>;
-function buildCommandHandler<T extends Flags>(
+export function buildCommandHandler<T extends Flags>(
   command: CommandHandlerRequest<T>
 ): CommandHandler<Flags, 'wide'>;
-function buildCommandHandler<T extends Flags>(
+export function buildCommandHandler<T extends Flags>(
   description: string | CommandHandlerRequest<T>,
   flags?: T | CommmandHandlerFn<T>,
   handler?: CommmandHandlerFn<T>
@@ -50,14 +50,14 @@ function buildCommandHandler<T extends Flags>(
 /**
  * Build a command group
  */
-function buildCommandGroup(
+export function buildCommandGroup(
   description: string,
   subcommands: CommandTree
 ): ReturnType<typeof defineCommandGroup>;
-function buildCommandGroup(
+export function buildCommandGroup(
   group: CommandGroupRequest
 ): ReturnType<typeof defineCommandGroup>;
-function buildCommandGroup(
+export function buildCommandGroup(
   description: string | CommandGroupRequest,
   subcommands: CommandTree = {}
 ): ReturnType<typeof defineCommandGroup> {
@@ -65,15 +65,3 @@ function buildCommandGroup(
     ? defineCommandGroup({ description, subcommands })
     : defineCommandGroup(description);
 }
-
-/**
- * A factory for all command types
- */
-type CommandFactory = typeof buildCommandHandler & {
-  group: typeof buildCommandGroup;
-};
-
-const factory = buildCommandHandler as CommandFactory;
-factory.group = buildCommandGroup;
-
-export default factory;

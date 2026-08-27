@@ -1,7 +1,7 @@
 import { assert, describe, it } from 'vitest';
 
-import C from './commands/factory.js';
 import { OperationalError } from './errors.js';
+import C from './factory.js';
 import type { Logger, LogLevel, RunRequest } from './runner.js';
 import { runCLI } from './runner.js';
 import { transformValues } from './utils.js';

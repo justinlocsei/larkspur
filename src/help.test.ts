@@ -1,6 +1,6 @@
 import { assert, describe, it } from 'vitest';
 
-import C from './commands/factory.js';
+import C from './factory.js';
 import { buildHelp } from './help.js';
 import type { CLIMetadata } from './types.js';
 

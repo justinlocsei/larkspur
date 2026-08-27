@@ -1,14 +1,14 @@
 import { assert, describe, it } from 'vitest';
 
 import * as T from '../tests/types.js';
-import C from './factory.js';
+import { buildCommandGroup, buildCommandHandler } from './factories.js';
 
 const description = 'description';
 const handler = async () => {};
 
-describe('C', () => {
+describe('buildCommandHandler', () => {
   it('can define a command handler from a request object', () => {
-    const command = C({ description, handler });
+    const command = buildCommandHandler({ description, handler });
 
     assert.equal(command.description, description);
     assert.equal(command.type, 'handler');
@@ -16,7 +16,7 @@ describe('C', () => {
   });
 
   it('can define a command handler from a description and handler', () => {
-    const command = C(description, handler);
+    const command = buildCommandHandler(description, handler);
 
     assert.equal(command.description, description);
     assert.equal(command.type, 'handler');
@@ -24,7 +24,7 @@ describe('C', () => {
   });
 
   it('can define a command handler from a description, flags, and handler', () => {
-    const command = C(
+    const command = buildCommandHandler(
       description,
       { string: { description, type: 'string' } },
       handler
@@ -37,7 +37,7 @@ describe('C', () => {
   });
 
   it('provides handlers with narrow type information for flags', () => {
-    C({
+    buildCommandHandler({
       description,
       flags: {
         boolean: { description, type: 'boolean' },
@@ -60,7 +60,7 @@ describe('C', () => {
   });
 
   it('guarantees the presence of required flags in handlers', () => {
-    C(
+    buildCommandHandler(
       description,
       {
         boolean: { description, type: 'boolean' },
@@ -83,12 +83,12 @@ describe('C', () => {
   });
 });
 
-describe('C.group', () => {
+describe('buildCommandGroup', () => {
   it('can define a command group from a request object', () => {
-    const group = C.group({
+    const group = buildCommandGroup({
       description,
       subcommands: {
-        child: C(description, handler)
+        child: buildCommandHandler(description, handler)
       }
     });
 
@@ -98,8 +98,8 @@ describe('C.group', () => {
   });
 
   it('can define a command group from a description and subcommands', () => {
-    const group = C.group(description, {
-      child: C(description, handler)
+    const group = buildCommandGroup(description, {
+      child: buildCommandHandler(description, handler)
     });
 
     assert.equal(group.description, description);

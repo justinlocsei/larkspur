@@ -1,13 +1,13 @@
 import { assert, describe, it } from 'vitest';
 
 import { OperationalError } from '../errors.js';
+import C from '../factory.js';
 import { extractValues } from '../flags/parsing.js';
 import type { Flag, SupportedValue } from '../flags/types.js';
 import * as T from '../tests/types.js';
 import { checkConversionAsync, ensure } from '../tests.js';
 import type { DistributiveOmit } from '../types/utils.js';
 import { transformValues } from '../utils.js';
-import C from './factory.js';
 import { extractCommands, parseCommand } from './parsing.js';
 import type { CommandTree } from './types.js';
 
