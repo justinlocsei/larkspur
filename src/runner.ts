@@ -4,7 +4,7 @@ import type {
   RunResult
 } from './commands/parsing.js';
 import { parseCommand } from './commands/parsing.js';
-import type { CommandTree } from './commands/types.js';
+import type { EntryPoint } from './commands/types.js';
 import { coerceError, OperationalError } from './errors.js';
 import { buildHelp } from './help.js';
 import type { CLIMetadata } from './types.js';
@@ -29,7 +29,7 @@ type LoggingHandlers = Record<LogLevel, Logger>;
  */
 export type RunRequest = {
   args: string[];
-  commands: CommandTree;
+  entry: EntryPoint;
   logging?: LoggingHandlers;
   meta: CLIMetadata;
   onError?: (error: Error) => void;
@@ -40,7 +40,7 @@ export type RunRequest = {
  */
 export async function runCLI({
   args,
-  commands,
+  entry,
   logging: logger = {
     error: m => console.error(m),
     info: m => console.info(m)
@@ -73,7 +73,7 @@ export async function runCLI({
   }
 
   try {
-    parsing = parseCommand(args, commands);
+    parsing = parseCommand(args, entry);
   } catch (error) {
     return handleOperationalError(
       OperationalError.wrap(error, 'Could not parse CLI arguments')

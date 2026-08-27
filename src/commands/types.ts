@@ -55,6 +55,11 @@ export type Command = GenericCommandHandler | CommandGroup;
 export type CommandTree = Partial<Record<string, Command>>;
 
 /**
+ * An entry point for a CLI
+ */
+export type EntryPoint = CommandTree;
+
+/**
  * Details on how a command was parsed
  */
 export type CommandParsingDetails<T extends Flags = Flags> = {
