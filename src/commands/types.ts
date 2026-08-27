@@ -40,9 +40,14 @@ export type CommandGroup = IsCommand<'group', {
 }>;
 
 /**
+ * The widest shape for a command handler
+ */
+export type GenericCommandHandler = CommandHandler<Flags, 'wide'>;
+
+/**
  * A command
  */
-export type Command = CommandHandler<Flags, 'wide'> | CommandGroup;
+export type Command = GenericCommandHandler | CommandGroup;
 
 /**
  * A tree of named commands
