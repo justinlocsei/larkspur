@@ -705,7 +705,6 @@ describe('parse', () => {
     cases.forEach(([input, extra, parsed]) => {
       const result = parse(input, {
         command: defineCommandHandler({
-          allowUnknownFlags: true,
           description,
           handler,
           flags: {
@@ -713,7 +712,7 @@ describe('parse', () => {
             string: { description, type: 'string' }
           }
         })
-      });
+      }, { allowUnknownFlags: true });
 
       assert(
         result.type === 'command',
@@ -744,7 +743,6 @@ describe('parse', () => {
           description,
           subcommands: {
             command: defineCommandHandler({
-              allowUnknownFlags: true,
               description,
               flags: {
                 absent: { description, type: 'string' },
@@ -759,7 +757,8 @@ describe('parse', () => {
             })
           }
         })
-      }
+      },
+      { allowUnknownFlags: true }
     );
 
     assert(result.type === 'command', 'Command not parsed');

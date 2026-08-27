@@ -26,7 +26,6 @@ export type CommandHandler<
   TFlags extends Flags = Flags,
   TContext extends FlagContext = 'narrow'
 > = IsCommand<'handler', {
-  allowUnknownFlags?: boolean;
   flags?: TFlags;
   handler: CommmandHandlerFn<TFlags, TContext>;
 }>;
@@ -301,11 +300,17 @@ export function defineCommandGroup(
 /**
  * Attempt to find a command invocation in user-provided CLI args
  */
-export function parse(args: string[], commands: CommandTree): ParsingResult {
+export function parse(args: string[], commands: CommandTree, {
+  allowUnknownFlags
+}: {
+  allowUnknownFlags?: boolean;
+} = {}): ParsingResult {
   let command: ParsedCommand;
 
   try {
-    command = parseCommand(new NormalizedArgs(args), commands);
+    command = parseCommand(new NormalizedArgs(args), commands, {
+      allowUnknownFlags
+    });
   } catch (signal) {
     if (signal instanceof AbortRequest) {
       const { help } = signal;
@@ -385,9 +390,11 @@ function parseCommand(
   normalized: NormalizedArgs,
   commands: CommandTree,
   {
+    allowUnknownFlags = false,
     group,
     parentPath = []
   }: {
+    allowUnknownFlags?: boolean;
     group?: CommandGroup;
     parentPath?: string[];
   } = {}
@@ -430,6 +437,7 @@ function parseCommand(
 
   if (command.type === 'group') {
     return parseCommand(remainingArgs, command.subcommands, {
+      allowUnknownFlags,
       group: command,
       parentPath: path
     });
@@ -442,7 +450,7 @@ function parseCommand(
   } else {
     try {
       const parsedFlags = parseFlags(remainingArgs, command.flags || {}, {
-        allowUnused: command.allowUnknownFlags ?? false
+        allowUnused: allowUnknownFlags
       });
 
       return {
