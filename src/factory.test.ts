@@ -9,7 +9,7 @@ describe('C', () => {
   it('can define a command handler', () => {
     const command = C(
       description,
-      { string: { description, type: 'string' } },
+      { string: C.flag('string', description) },
       handler
     );
 
@@ -17,6 +17,15 @@ describe('C', () => {
     assert.equal(command.type, 'handler');
     assert.isDefined(command.flags);
     assert.isDefined(command.flags?.string);
+  });
+});
+
+describe('C.flag', () => {
+  it('can define a flag', () => {
+    assert.deepEqual(C.flag('boolean', description), {
+      description,
+      type: 'boolean'
+    });
   });
 });
 
