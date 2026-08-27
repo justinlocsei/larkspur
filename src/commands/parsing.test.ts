@@ -7,7 +7,7 @@ import * as T from '../tests/types.js';
 import { checkConversionAsync, ensure } from '../tests.js';
 import type { DistributiveOmit } from '../types/utils.js';
 import { transformValues } from '../utils.js';
-import { defineCommandGroup, defineCommandHandler } from './definition.js';
+import C from './factory.js';
 import { extractCommands, parseCommand } from './parsing.js';
 import type { CommandTree } from './types.js';
 
@@ -17,7 +17,7 @@ const handler = async () => {};
 describe('extractCommands', () => {
   it('returns a single-element list when given a command handler', () => {
     const commands = extractCommands(
-      defineCommandHandler({
+      C({
         description: 'testing',
         handler
       })
@@ -32,15 +32,15 @@ describe('extractCommands', () => {
   });
 
   it('returns all command handlers in a group', () => {
-    const commands = defineCommandGroup({
+    const commands = C.group({
       description: 'root',
       subcommands: {
-        alfa: defineCommandHandler({ description: 'alfa', handler }),
-        bravo: defineCommandHandler({ description: 'bravo', handler }),
-        charlie: defineCommandGroup({
+        alfa: C({ description: 'alfa', handler }),
+        bravo: C({ description: 'bravo', handler }),
+        charlie: C.group({
           description: 'charlie',
           subcommands: {
-            delta: defineCommandHandler({ description: 'delta', handler })
+            delta: C({ description: 'delta', handler })
           }
         })
       }
@@ -63,7 +63,7 @@ describe('extractCommands', () => {
 describe('parseCommand', () => {
   it('extracts a command from args', () => {
     const result = parseCommand(['testing'], {
-      testing: defineCommandHandler({ description, handler })
+      testing: C({ description, handler })
     });
 
     assert(result.type === 'command', 'Command not parsed');
@@ -77,11 +77,11 @@ describe('parseCommand', () => {
 
   it('extracts the requested command from args', () => {
     const commands = {
-      alfa: defineCommandHandler({
+      alfa: C({
         description: 'alfa',
         handler
       }),
-      bravo: defineCommandHandler({
+      bravo: C({
         description: 'bravo',
         handler
       })
@@ -105,17 +105,17 @@ describe('parseCommand', () => {
 
   it('can extract grouped commands', () => {
     const commands = {
-      alfa: defineCommandGroup({
+      alfa: C.group({
         description,
         subcommands: {
-          bravo: defineCommandHandler({
+          bravo: C({
             description,
             handler
           }),
-          charlie: defineCommandGroup({
+          charlie: C.group({
             description,
             subcommands: {
-              delta: defineCommandHandler({
+              delta: C({
                 description,
                 handler
               })
@@ -143,7 +143,7 @@ describe('parseCommand', () => {
 
   it('returns an error when no args are given', () => {
     const result = parseCommand([], {
-      alfa: defineCommandHandler({ description, handler })
+      alfa: C({ description, handler })
     });
 
     assert.deepInclude(result, {
@@ -158,7 +158,7 @@ describe('parseCommand', () => {
 
   it('returns an error when no command matches the given args', () => {
     const result = parseCommand(['alfa'], {
-      bravo: defineCommandHandler({ description, handler })
+      bravo: C({ description, handler })
     });
 
     assert(result.type === 'error', 'Error not returned');
@@ -173,13 +173,13 @@ describe('parseCommand', () => {
 
   it('returns an error when a command group is requested', () => {
     const result = parseCommand(['alfa', 'bravo'], {
-      alfa: defineCommandGroup({
+      alfa: C.group({
         description,
         subcommands: {
-          bravo: defineCommandGroup({
+          bravo: C.group({
             description,
             subcommands: {
-              charlie: defineCommandHandler({
+              charlie: C({
                 description,
                 handler
               })
@@ -214,7 +214,7 @@ describe('parseCommand', () => {
     }
 
     const commands = {
-      alfa: defineCommandHandler({
+      alfa: C({
         description,
         handler,
         flags: {
@@ -224,7 +224,7 @@ describe('parseCommand', () => {
           }
         }
       }),
-      bravo: defineCommandHandler({
+      bravo: C({
         description,
         handler,
         flags: {
@@ -259,7 +259,7 @@ describe('parseCommand', () => {
         let parsedArgs: string[] = [];
 
         const result = parseCommand(['command', ...args], {
-          command: defineCommandHandler({
+          command: C({
             description,
             handler: async (parsed, { args }) => {
               values = parsed as Record<string, SupportedValue>;
@@ -347,7 +347,7 @@ describe('parseCommand', () => {
     cases.forEach((args) => {
       assert.deepInclude(
         parseCommand(args, {
-          command: defineCommandHandler({
+          command: C({
             description,
             handler,
             flags: {
@@ -391,7 +391,7 @@ describe('parseCommand', () => {
 
     cases.forEach(([input, extra, parsed]) => {
       const result = parseCommand(input, {
-        command: defineCommandHandler({
+        command: C({
           description,
           handler,
           flags: {
@@ -426,10 +426,10 @@ describe('parseCommand', () => {
     const result = parseCommand(
       ['parent', 'command', '--string', 'value', '--other'],
       {
-        parent: defineCommandGroup({
+        parent: C.group({
           description,
           subcommands: {
-            command: defineCommandHandler({
+            command: C({
               description,
               flags: {
                 absent: { description, type: 'string' },
@@ -465,7 +465,7 @@ describe('parseCommand', () => {
   });
 
   it('reports whether all supported flags were provided', async () => {
-    const command = defineCommandHandler({
+    const command = C({
       description,
       flags: {
         boolean: { default: false, description, type: 'boolean' },
@@ -515,7 +515,7 @@ describe('parseCommand', () => {
   });
 
   it('uses narrow types for provided flags in parsing details', async () => {
-    defineCommandHandler({
+    C({
       description,
       flags: {
         alfa: { description, type: 'boolean' },
@@ -543,10 +543,10 @@ describe('parseCommand', () => {
     cases.forEach((args) => {
       assert.deepInclude(
         parseCommand(args, {
-          parent: defineCommandGroup({
+          parent: C.group({
             description,
             subcommands: {
-              child: defineCommandHandler({
+              child: C({
                 description,
                 handler,
                 flags: {
@@ -570,7 +570,7 @@ describe('parseCommand', () => {
 
   it('returns an operational error thrown by a handler', async () => {
     const parsed = parseCommand(['command'], {
-      command: defineCommandHandler({
+      command: C({
         description,
         handler: () => {
           throw new OperationalError('@error');
@@ -589,7 +589,7 @@ describe('parseCommand', () => {
 
   it('throws an error when a handler throws a non-operational error', async () => {
     const parsed = parseCommand(['command'], {
-      command: defineCommandHandler({
+      command: C({
         description,
         handler: () => {
           throw new Error('@error');
@@ -603,7 +603,7 @@ describe('parseCommand', () => {
 
   it('can request help', () => {
     const result = parseCommand(['--help'], {
-      command: defineCommandHandler({ description, handler })
+      command: C({ description, handler })
     });
 
     assert(result.type === 'help', 'Help not requested');
@@ -620,7 +620,7 @@ describe('parseCommand', () => {
 
   it('can request help for a top-level command', () => {
     const result = parseCommand(['command', '--help'], {
-      command: defineCommandHandler({
+      command: C({
         description: 'description',
         handler
       })
@@ -646,10 +646,10 @@ describe('parseCommand', () => {
 
   it('can request help for a grouped command', () => {
     const result = parseCommand(['alfa', 'bravo', '--help'], {
-      alfa: defineCommandGroup({
+      alfa: C.group({
         description: 'alfa',
         subcommands: {
-          bravo: defineCommandHandler({
+          bravo: C({
             description: 'bravo',
             handler
           })
@@ -677,11 +677,11 @@ describe('parseCommand', () => {
 
   it('can request help for a group', () => {
     const result = parseCommand(['alfa', '--help'], {
-      alfa: defineCommandGroup({
+      alfa: C.group({
         description,
         subcommands: {
-          bravo: defineCommandHandler({ description, handler }),
-          charlie: defineCommandHandler({ description, handler })
+          bravo: C({ description, handler }),
+          charlie: C({ description, handler })
         }
       })
     });
@@ -702,7 +702,7 @@ describe('parseCommand', () => {
 
   it('respects help requests for otherwise invalid commands', () => {
     const commands: CommandTree = {
-      root: defineCommandHandler({
+      root: C({
         description,
         handler,
         flags: {
@@ -712,10 +712,10 @@ describe('parseCommand', () => {
           }
         }
       }),
-      parent: defineCommandGroup({
+      parent: C.group({
         description,
         subcommands: {
-          child: defineCommandHandler({
+          child: C({
             description,
             handler,
             flags: {
@@ -751,14 +751,14 @@ describe('parseCommand', () => {
 
   it('includes core flags in all help requests', () => {
     const commands = {
-      root: defineCommandHandler({
+      root: C({
         description,
         handler
       }),
-      parent: defineCommandGroup({
+      parent: C.group({
         description,
         subcommands: {
-          child: defineCommandHandler({
+          child: C({
             description,
             handler
           })

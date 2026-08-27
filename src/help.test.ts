@@ -1,9 +1,6 @@
 import { assert, describe, it } from 'vitest';
 
-import {
-  defineCommandGroup,
-  defineCommandHandler
-} from './commands/definition.js';
+import C from './commands/factory.js';
 import { buildHelp } from './help.js';
 import type { CLIMetadata } from './types.js';
 
@@ -17,11 +14,11 @@ describe('buildHelp', () => {
       cli,
       scope: {
         commands: {
-          alfa: defineCommandHandler({
+          alfa: C({
             description: '@alfa',
             handler
           }),
-          bravo: defineCommandHandler({
+          bravo: C({
             description: '@bravo',
             handler
           })
@@ -49,14 +46,14 @@ describe('buildHelp', () => {
       cli,
       scope: {
         commands: {
-          alfa: defineCommandHandler({
+          alfa: C({
             description: '@alfa',
             handler
           }),
-          bravo: defineCommandGroup({
+          bravo: C.group({
             description: '@bravo',
             subcommands: {
-              charlie: defineCommandHandler({
+              charlie: C({
                 description: '@charlie',
                 handler
               })
@@ -86,7 +83,7 @@ describe('buildHelp', () => {
       cli: { description: '@description', name: 'testing' },
       scope: {
         commands: {
-          command: defineCommandHandler({
+          command: C({
             description: '@command',
             handler
           })
@@ -114,14 +111,14 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        group: defineCommandGroup({
+        group: C.group({
           description: '@parent',
           subcommands: {
-            alfa: defineCommandHandler({
+            alfa: C({
               description: '@alfa',
               handler
             }),
-            bravo: defineCommandHandler({
+            bravo: C({
               description: '@bravo',
               handler
             })
@@ -152,7 +149,7 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        command: defineCommandHandler({
+        command: C({
           description: '@command',
           handler
         }),
@@ -169,7 +166,7 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        command: defineCommandHandler({
+        command: C({
           description: '@command',
           handler
         }),
@@ -190,7 +187,7 @@ describe('buildHelp', () => {
       cli,
       scope: {
         commands: {
-          command: defineCommandHandler({
+          command: C({
             description: '@command',
             handler
           })
@@ -230,7 +227,7 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        command: defineCommandHandler({
+        command: C({
           description: '@command',
           handler,
           flags: {
@@ -270,7 +267,7 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        command: defineCommandHandler({
+        command: C({
           description: '@command',
           handler
         }),
@@ -313,7 +310,7 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        command: defineCommandHandler({
+        command: C({
           description: '@command',
           handler
         }),
@@ -360,7 +357,7 @@ describe('buildHelp', () => {
       cli,
       scope: {
         commands: {
-          command: defineCommandHandler({
+          command: C({
             description: '@command',
             handler
           })
@@ -403,7 +400,7 @@ describe('buildHelp', () => {
       cli,
       scope: {
         commands: {
-          command: defineCommandHandler({
+          command: C({
             description: '@command',
             handler
           })
@@ -447,7 +444,7 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        command: defineCommandHandler({
+        command: C({
           description: '@command',
           handler
         }),
@@ -509,7 +506,7 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        command: defineCommandHandler({
+        command: C({
           description: '@command',
           handler
         }),

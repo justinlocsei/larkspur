@@ -1,6 +1,6 @@
 import { assert, describe, it } from 'vitest';
 
-import { defineCommandHandler } from './commands/definition.js';
+import C from './commands/factory.js';
 import { OperationalError } from './errors.js';
 import type { Logger, LogLevel, RunRequest } from './runner.js';
 import { runCLI } from './runner.js';
@@ -46,7 +46,7 @@ describe('runCLI', () => {
     let value: string | undefined;
 
     const commands = {
-      command: defineCommandHandler({
+      command: C({
         description,
         flags: {
           flag: {
@@ -75,7 +75,7 @@ describe('runCLI', () => {
   it('can show help', async () => {
     const { error, output } = await testCLI({
       args: ['--help'],
-      commands: { command: defineCommandHandler({ description, handler }) }
+      commands: { command: C({ description, handler }) }
     });
 
     assert.isUndefined(error);
@@ -86,7 +86,7 @@ describe('runCLI', () => {
   it('handles parsing errors', async () => {
     const { error, output } = await testCLI({
       args: ['invalid-command'],
-      commands: { command: defineCommandHandler({ description, handler }) }
+      commands: { command: C({ description, handler }) }
     });
 
     assert.instanceOf(error, OperationalError);
@@ -101,7 +101,7 @@ describe('runCLI', () => {
     const { error, output } = await testCLI({
       args: ['command', '--key', 'error'],
       commands: {
-        command: defineCommandHandler({
+        command: C({
           description,
           handler,
           flags: {
@@ -133,7 +133,7 @@ describe('runCLI', () => {
     const { error, output } = await testCLI({
       args: ['command'],
       commands: {
-        command: defineCommandHandler({
+        command: C({
           description,
           handler: async () => {
             throw new OperationalError('@handler');
@@ -154,7 +154,7 @@ describe('runCLI', () => {
     const { error, output } = await testCLI({
       args: ['command'],
       commands: {
-        command: defineCommandHandler({
+        command: C({
           description,
           handler: async () => {
             throw new Error('@handler');
