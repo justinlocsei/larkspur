@@ -300,7 +300,7 @@ export function defineCommandGroup(
 /**
  * Attempt to find a command invocation in user-provided CLI args
  */
-export function parse(args: string[], commands: CommandTree, {
+export function parseCommand(args: string[], commands: CommandTree, {
   allowUnknownFlags
 }: {
   allowUnknownFlags?: boolean;
@@ -308,7 +308,7 @@ export function parse(args: string[], commands: CommandTree, {
   let command: ParsedCommand;
 
   try {
-    command = parseCommand(new NormalizedArgs(args), commands, {
+    command = extractCommand(new NormalizedArgs(args), commands, {
       allowUnknownFlags
     });
   } catch (signal) {
@@ -386,7 +386,7 @@ function buildCommandRunner(parsed: ParsedCommand): CommandRunner {
 /**
  * Extract a command from a list of arguments
  */
-function parseCommand(
+function extractCommand(
   normalized: NormalizedArgs,
   commands: CommandTree,
   {
@@ -436,7 +436,7 @@ function parseCommand(
   const remainingArgs = new NormalizedArgs(args.slice(1));
 
   if (command.type === 'group') {
-    return parseCommand(remainingArgs, command.subcommands, {
+    return extractCommand(remainingArgs, command.subcommands, {
       allowUnknownFlags,
       group: command,
       parentPath: path

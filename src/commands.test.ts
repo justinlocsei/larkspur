@@ -5,7 +5,7 @@ import {
   defineCommandGroup,
   defineCommandHandler,
   extractCommands,
-  parse
+  parseCommand
 } from './commands.js';
 import { OperationalError } from './errors.js';
 import { extractValues } from './flags/parsing.js';
@@ -375,7 +375,7 @@ describe('extractCommands', () => {
 
 describe('parse', () => {
   it('extracts a command from args', () => {
-    const result = parse(['testing'], {
+    const result = parseCommand(['testing'], {
       testing: defineCommandHandler({ description, handler })
     });
 
@@ -400,8 +400,8 @@ describe('parse', () => {
       })
     };
 
-    const alfa = parse(['alfa'], commands);
-    const bravo = parse(['bravo'], commands);
+    const alfa = parseCommand(['alfa'], commands);
+    const bravo = parseCommand(['bravo'], commands);
 
     assert.equal(
       alfa.type === 'command' ? alfa.command.command.description : '',
@@ -438,8 +438,8 @@ describe('parse', () => {
       })
     };
 
-    const shallow = parse(['alfa', 'bravo'], commands);
-    const deep = parse(['alfa', 'charlie', 'delta'], commands);
+    const shallow = parseCommand(['alfa', 'bravo'], commands);
+    const deep = parseCommand(['alfa', 'charlie', 'delta'], commands);
 
     assert.sameOrderedMembers(
       shallow.type === 'command' ? shallow.command.path : [],
@@ -455,7 +455,7 @@ describe('parse', () => {
   });
 
   it('returns an error when no args are given', () => {
-    const result = parse([], {
+    const result = parseCommand([], {
       alfa: defineCommandHandler({ description, handler })
     });
 
@@ -470,7 +470,7 @@ describe('parse', () => {
   });
 
   it('returns an error when no command matches the given args', () => {
-    const result = parse(['alfa'], {
+    const result = parseCommand(['alfa'], {
       bravo: defineCommandHandler({ description, handler })
     });
 
@@ -485,7 +485,7 @@ describe('parse', () => {
   });
 
   it('returns an error when a command group is requested', () => {
-    const result = parse(['alfa', 'bravo'], {
+    const result = parseCommand(['alfa', 'bravo'], {
       alfa: defineCommandGroup({
         description,
         subcommands: {
@@ -517,7 +517,7 @@ describe('parse', () => {
       args: string[],
       commands: CommandTree
     ) {
-      const result = parse(args, commands);
+      const result = parseCommand(args, commands);
 
       if (result.type === 'command') {
         return extractValues(result.command.flags);
@@ -571,7 +571,7 @@ describe('parse', () => {
         let values: Record<string, SupportedValue> = {};
         let parsedArgs: string[] = [];
 
-        const result = parse(['command', ...args], {
+        const result = parseCommand(['command', ...args], {
           command: defineCommandHandler({
             description,
             handler: async (parsed, { args }) => {
@@ -659,7 +659,7 @@ describe('parse', () => {
 
     cases.forEach((args) => {
       assert.deepInclude(
-        parse(args, {
+        parseCommand(args, {
           command: defineCommandHandler({
             description,
             handler,
@@ -703,7 +703,7 @@ describe('parse', () => {
     ];
 
     cases.forEach(([input, extra, parsed]) => {
-      const result = parse(input, {
+      const result = parseCommand(input, {
         command: defineCommandHandler({
           description,
           handler,
@@ -736,7 +736,7 @@ describe('parse', () => {
   });
 
   it('provides parsing details to a command’s handler', async () => {
-    const result = parse(
+    const result = parseCommand(
       ['parent', 'command', '--string', 'value', '--other'],
       {
         parent: defineCommandGroup({
@@ -791,7 +791,7 @@ describe('parse', () => {
 
     await checkConversionAsync<string[], string[]>(
       async (flags, provided, message) => {
-        const parsed = parse(['command', ...flags], { command });
+        const parsed = parseCommand(['command', ...flags], { command });
 
         assert(parsed.type === 'command', `Command not parsed: ${message}`);
         const result = await parsed.run();
@@ -855,7 +855,7 @@ describe('parse', () => {
 
     cases.forEach((args) => {
       assert.deepInclude(
-        parse(args, {
+        parseCommand(args, {
           parent: defineCommandGroup({
             description,
             subcommands: {
@@ -882,7 +882,7 @@ describe('parse', () => {
   });
 
   it('returns an operational error thrown by a handler', async () => {
-    const parsed = parse(['command'], {
+    const parsed = parseCommand(['command'], {
       command: defineCommandHandler({
         description,
         handler: () => {
@@ -901,7 +901,7 @@ describe('parse', () => {
   });
 
   it('throws an error when a handler throws a non-operational error', async () => {
-    const parsed = parse(['command'], {
+    const parsed = parseCommand(['command'], {
       command: defineCommandHandler({
         description,
         handler: () => {
@@ -915,7 +915,7 @@ describe('parse', () => {
   });
 
   it('can request help', () => {
-    const result = parse(['--help'], {
+    const result = parseCommand(['--help'], {
       command: defineCommandHandler({ description, handler })
     });
 
@@ -932,7 +932,7 @@ describe('parse', () => {
   });
 
   it('can request help for a top-level command', () => {
-    const result = parse(['command', '--help'], {
+    const result = parseCommand(['command', '--help'], {
       command: defineCommandHandler({
         description: 'description',
         handler
@@ -958,7 +958,7 @@ describe('parse', () => {
   });
 
   it('can request help for a grouped command', () => {
-    const result = parse(['alfa', 'bravo', '--help'], {
+    const result = parseCommand(['alfa', 'bravo', '--help'], {
       alfa: defineCommandGroup({
         description: 'alfa',
         subcommands: {
@@ -989,7 +989,7 @@ describe('parse', () => {
   });
 
   it('can request help for a group', () => {
-    const result = parse(['alfa', '--help'], {
+    const result = parseCommand(['alfa', '--help'], {
       alfa: defineCommandGroup({
         description,
         subcommands: {
@@ -1055,7 +1055,7 @@ describe('parse', () => {
 
     cases.forEach((args) => {
       assert.equal(
-        parse(args, commands).type,
+        parseCommand(args, commands).type,
         'help',
         `Help not requested for args: ${args.join(' ')}`
       );
@@ -1087,7 +1087,7 @@ describe('parse', () => {
     ];
 
     cases.forEach((args) => {
-      const result = parse(args, commands);
+      const result = parseCommand(args, commands);
 
       assert.sameMembers(
         result.type === 'help' ? Object.keys(result.scope.flags) : [],

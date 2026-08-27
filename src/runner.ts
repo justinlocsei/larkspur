@@ -1,4 +1,4 @@
-import { parse } from './commands.js';
+import { parseCommand } from './commands.js';
 import type {
   CommandTree,
   HelpScope,
@@ -73,7 +73,7 @@ export async function runCLI({
   }
 
   try {
-    parsing = parse(args, commands);
+    parsing = parseCommand(args, commands);
   } catch (error) {
     return handleOperationalError(
       OperationalError.wrap(error, 'Could not parse CLI arguments')
