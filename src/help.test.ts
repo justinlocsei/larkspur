@@ -1,6 +1,9 @@
 import { assert, describe, it } from 'vitest';
 
-import { defineCommandGroup, defineCommandHandler } from './commands.js';
+import {
+  defineCommandGroup,
+  defineCommandHandler
+} from './commands/definition.js';
 import { buildHelp } from './help.js';
 import type { CLIMetadata } from './types.js';
 

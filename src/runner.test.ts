@@ -1,6 +1,6 @@
 import { assert, describe, it } from 'vitest';
 
-import { defineCommandHandler } from './commands.js';
+import { defineCommandHandler } from './commands/definition.js';
 import { OperationalError } from './errors.js';
 import type { Logger, LogLevel, RunRequest } from './runner.js';
 import { runCLI } from './runner.js';

@@ -1,10 +1,10 @@
-import { parseCommand } from './commands.js';
 import type {
-  CommandTree,
   HelpScope,
   ParsingResult,
   RunResult
-} from './commands.ts';
+} from './commands/parsing.js';
+import { parseCommand } from './commands/parsing.js';
+import type { CommandTree } from './commands/types.js';
 import { coerceError, OperationalError } from './errors.js';
 import { buildHelp } from './help.js';
 import type { CLIMetadata } from './types.js';

@@ -216,26 +216,6 @@ export function extractCommands(root: Command): FlattenedCommand[] {
 }
 
 /**
- * Define a command handler
- */
-export function defineCommandHandler<T extends Flags>(
-  command: Omit<CommandHandler<T>, 'type'>
-): CommandHandler<Flags, 'wide'> {
-  const narrow: CommandHandler<T, 'narrow'> = { ...command, type: 'handler' };
-
-  return narrow as unknown as CommandHandler<Flags, 'wide'>;
-}
-
-/**
- * Define a command group
- */
-export function defineCommandGroup(
-  group: Omit<CommandGroup, 'type'>
-): CommandGroup {
-  return { ...group, type: 'group' };
-}
-
-/**
  * Attempt to find a command invocation in user-provided CLI args
  */
 export function parseCommand(args: string[], commands: CommandTree, {

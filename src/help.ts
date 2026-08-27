@@ -1,4 +1,5 @@
-import type { CommandTree, HelpScope } from './commands.ts';
+import type { HelpScope } from './commands/parsing.js';
+import type { CommandTree } from './commands/types.js';
 import { choicesForFlag, flagToSetter } from './flags/data.js';
 import type { Flag, Flags } from './flags/types.ts';
 import type { CLIMetadata } from './types.js';
