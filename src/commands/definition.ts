@@ -10,14 +10,22 @@ export type CommandHandlerRequest<T extends Flags> = Omit<
 >;
 
 /**
+ * A generic definition of a command handler
+ */
+export type GenericCommandHandler = CommandHandler<Flags, 'wide'>;
+
+/**
  * Define a command handler
  */
 export function defineCommandHandler<T extends Flags>(
   command: CommandHandlerRequest<T>
-): CommandHandler<Flags, 'wide'> {
-  const narrow: CommandHandler<T, 'narrow'> = { ...command, type: 'handler' };
+): GenericCommandHandler {
+  const narrow: CommandHandler<T, 'narrow'> = {
+    ...command,
+    type: 'handler'
+  };
 
-  return narrow as unknown as CommandHandler<Flags, 'wide'>;
+  return narrow as unknown as GenericCommandHandler;
 }
 
 /**
