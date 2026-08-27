@@ -58,7 +58,7 @@ describe('runCLI', () => {
 
     const { error, output } = await testCLI({
       args: ['command', '--flag', 'testing'],
-      commands
+      entry: commands
     });
 
     assert.isUndefined(error);
@@ -71,7 +71,7 @@ describe('runCLI', () => {
   it('can show help', async () => {
     const { error, output } = await testCLI({
       args: ['--help'],
-      commands: { command: C(description, handler) }
+      entry: { command: C(description, handler) }
     });
 
     assert.isUndefined(error);
@@ -82,7 +82,7 @@ describe('runCLI', () => {
   it('handles parsing errors', async () => {
     const { error, output } = await testCLI({
       args: ['invalid-command'],
-      commands: { command: C(description, handler) }
+      entry: { command: C(description, handler) }
     });
 
     assert.instanceOf(error, OperationalError);
@@ -96,7 +96,7 @@ describe('runCLI', () => {
   it('handles errors in user-provided parsing code', async () => {
     const { error, output } = await testCLI({
       args: ['command', '--key', 'error'],
-      commands: {
+      entry: {
         command: C(description, {
           key: {
             description: 'key',
@@ -124,7 +124,7 @@ describe('runCLI', () => {
   it('handles command failures', async () => {
     const { error, output } = await testCLI({
       args: ['command'],
-      commands: {
+      entry: {
         command: C(description, async () => {
           throw new OperationalError('@handler');
         })
@@ -142,7 +142,7 @@ describe('runCLI', () => {
   it('handles command errors', async () => {
     const { error, output } = await testCLI({
       args: ['command'],
-      commands: {
+      entry: {
         command: C(description, async () => {
           throw new Error('@handler');
         })
