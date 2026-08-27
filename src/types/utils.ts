@@ -34,3 +34,8 @@ export type Optional<T extends object, K extends keyof T> =
 export type Require<T extends object, K extends keyof T> =
   & Omit<T, K>
   & Required<Pick<T, K>>;
+
+/**
+ * Produce a narrower type from a subset of an object's properties
+ */
+export type Subset<T extends object, K extends keyof T> = Pick<T, K>;
