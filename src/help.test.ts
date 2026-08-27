@@ -14,14 +14,8 @@ describe('buildHelp', () => {
       cli,
       scope: {
         commands: {
-          alfa: C({
-            description: '@alfa',
-            handler
-          }),
-          bravo: C({
-            description: '@bravo',
-            handler
-          })
+          alfa: C('@alfa', handler),
+          bravo: C('@bravo', handler)
         },
         flags: {},
         type: 'root'
@@ -46,18 +40,9 @@ describe('buildHelp', () => {
       cli,
       scope: {
         commands: {
-          alfa: C({
-            description: '@alfa',
-            handler
-          }),
-          bravo: C.group({
-            description: '@bravo',
-            subcommands: {
-              charlie: C({
-                description: '@charlie',
-                handler
-              })
-            }
+          alfa: C('@alfa', handler),
+          bravo: C.group('@bravo', {
+            charlie: C('@charlie', handler)
           })
         },
         flags: {},
@@ -83,10 +68,7 @@ describe('buildHelp', () => {
       cli: { description: '@description', name: 'testing' },
       scope: {
         commands: {
-          command: C({
-            description: '@command',
-            handler
-          })
+          command: C('@command', handler)
         },
         flags: {},
         type: 'root'
@@ -111,18 +93,9 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        group: C.group({
-          description: '@parent',
-          subcommands: {
-            alfa: C({
-              description: '@alfa',
-              handler
-            }),
-            bravo: C({
-              description: '@bravo',
-              handler
-            })
-          }
+        group: C.group('@parent', {
+          alfa: C('@alfa', handler),
+          bravo: C('@bravo', handler)
         }),
         flags: {},
         path: ['parent'],
@@ -149,10 +122,7 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        command: C({
-          description: '@command',
-          handler
-        }),
+        command: C('@command', handler),
         flags: {},
         path: ['command'],
         type: 'command'
@@ -166,10 +136,7 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        command: C({
-          description: '@command',
-          handler
-        }),
+        command: C('@command', handler),
         flags: {},
         path: ['parent', 'command'],
         type: 'command'
@@ -187,10 +154,7 @@ describe('buildHelp', () => {
       cli,
       scope: {
         commands: {
-          command: C({
-            description: '@command',
-            handler
-          })
+          command: C('@command', handler)
         },
         flags: {
           alfa: {
@@ -227,16 +191,12 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        command: C({
-          description: '@command',
-          handler,
-          flags: {
-            bravo: {
-              description: '@bravo',
-              type: 'boolean'
-            }
+        command: C('@command', {
+          bravo: {
+            description: '@bravo',
+            type: 'boolean'
           }
-        }),
+        }, handler),
         flags: {
           alfa: {
             description: '@alfa',
@@ -267,10 +227,7 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        command: C({
-          description: '@command',
-          handler
-        }),
+        command: C('@command', handler),
         flags: {
           alfa: {
             description: '@alfa',
@@ -310,10 +267,7 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        command: C({
-          description: '@command',
-          handler
-        }),
+        command: C('@command', handler),
         flags: {
           alfa: {
             allowMany: true,
@@ -357,10 +311,7 @@ describe('buildHelp', () => {
       cli,
       scope: {
         commands: {
-          command: C({
-            description: '@command',
-            handler
-          })
+          command: C('@command', handler)
         },
         flags: {
           alfa: {
@@ -400,10 +351,7 @@ describe('buildHelp', () => {
       cli,
       scope: {
         commands: {
-          command: C({
-            description: '@command',
-            handler
-          })
+          command: C('@command', handler)
         },
         flags: {
           alfa: {
@@ -444,10 +392,7 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        command: C({
-          description: '@command',
-          handler
-        }),
+        command: C('@command', handler),
         flags: {
           alfa: {
             default: false,
@@ -506,10 +451,7 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        command: C({
-          description: '@command',
-          handler
-        }),
+        command: C('@command', handler),
         flags: {
           alfa: {
             default: 1,

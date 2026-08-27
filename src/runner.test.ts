@@ -46,17 +46,13 @@ describe('runCLI', () => {
     let value: string | undefined;
 
     const commands = {
-      command: C({
-        description,
-        flags: {
-          flag: {
-            description,
-            type: 'string'
-          }
-        },
-        handler: async (flags) => {
-          value = flags.flag;
+      command: C(description, {
+        flag: {
+          description,
+          type: 'string'
         }
+      }, async (flags) => {
+        value = flags.flag;
       })
     };
 
@@ -75,7 +71,7 @@ describe('runCLI', () => {
   it('can show help', async () => {
     const { error, output } = await testCLI({
       args: ['--help'],
-      commands: { command: C({ description, handler }) }
+      commands: { command: C(description, handler) }
     });
 
     assert.isUndefined(error);
@@ -86,7 +82,7 @@ describe('runCLI', () => {
   it('handles parsing errors', async () => {
     const { error, output } = await testCLI({
       args: ['invalid-command'],
-      commands: { command: C({ description, handler }) }
+      commands: { command: C(description, handler) }
     });
 
     assert.instanceOf(error, OperationalError);
@@ -101,23 +97,19 @@ describe('runCLI', () => {
     const { error, output } = await testCLI({
       args: ['command', '--key', 'error'],
       commands: {
-        command: C({
-          description,
-          handler,
-          flags: {
-            key: {
-              description: 'key',
-              isValid: (value) => {
-                if (value === 'error') {
-                  throw new Error('@parsing');
-                } else {
-                  return true;
-                }
-              },
-              type: 'string'
-            }
+        command: C(description, {
+          key: {
+            description: 'key',
+            isValid: (value) => {
+              if (value === 'error') {
+                throw new Error('@parsing');
+              } else {
+                return true;
+              }
+            },
+            type: 'string'
           }
-        })
+        }, handler)
       }
     });
 
@@ -133,11 +125,8 @@ describe('runCLI', () => {
     const { error, output } = await testCLI({
       args: ['command'],
       commands: {
-        command: C({
-          description,
-          handler: async () => {
-            throw new OperationalError('@handler');
-          }
+        command: C(description, async () => {
+          throw new OperationalError('@handler');
         })
       }
     });
@@ -154,11 +143,8 @@ describe('runCLI', () => {
     const { error, output } = await testCLI({
       args: ['command'],
       commands: {
-        command: C({
-          description,
-          handler: async () => {
-            throw new Error('@handler');
-          }
+        command: C(description, async () => {
+          throw new Error('@handler');
         })
       }
     });
