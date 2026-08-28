@@ -1,7 +1,7 @@
 import { assert, describe, it } from 'vitest';
 
 import * as T from './tests/types.js';
-import { compact, isEmpty, transformValues } from './utils.js';
+import { compact, isEmpty, sortEntries, transformValues } from './utils.js';
 
 describe('compact', () => {
   it('removes falsy values from an array', () => {
@@ -30,6 +30,15 @@ describe('isEmpty', () => {
   it('reports whether an object lacks properties', () => {
     assert.equal(isEmpty({}), true);
     assert.equal(isEmpty({ a: 1 }), false);
+  });
+});
+
+describe('sortEntries', () => {
+  it('sorts the entries of an object by key', () => {
+    assert.deepEqual(
+      sortEntries({ b: 2, a: 1 }),
+      [['a', 1], ['b', 2]]
+    );
   });
 });
 

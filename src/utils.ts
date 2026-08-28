@@ -15,6 +15,18 @@ export function isEmpty(object: Record<string, unknown>): boolean {
 }
 
 /**
+ * Get the typed entries of an object, sorted by key
+ */
+export function sortEntries<T extends object>(
+  object: T
+): Array<[keyof T, T[keyof T]]> {
+  return Object
+    .keys(object)
+    .sort()
+    .map(k => [k as keyof T, object[k as keyof T]]);
+}
+
+/**
  * Transform the values of an object by a given function
  */
 export function transformValues<
