@@ -17,7 +17,7 @@ type IsScalarFlag<
   TSpecific extends TGeneric = TGeneric
 > = {
   allowMany?: boolean;
-  completionScript?: string;
+  completion?: string;
   isValid?: ScalarValidator<TGeneric, TSpecific>;
   required?: boolean;
 };
