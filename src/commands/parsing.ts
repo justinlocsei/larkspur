@@ -25,7 +25,7 @@ type FlattenedCommand = {
 /**
  * An executable command extracted from CLI args
  */
-type ParsedCommand = {
+export type ParsedCommand = {
   args: ArgParsingDetails;
   command: CommandHandler<Flags>;
   flags: ParsedFlags;
