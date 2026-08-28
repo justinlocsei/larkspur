@@ -100,7 +100,7 @@ function inferName(argv: string[]): string {
   const file = argv[1];
 
   if (!file) {
-    throw new Error('No file name was found');
+    throw new Error('Could not infer the CLI name from the received arguments');
   }
 
   return path.basename(file, path.extname(file));
