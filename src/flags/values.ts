@@ -1,5 +1,6 @@
 import { quote } from '../shell.js';
 import type { AnyArray, OneOrMany, Optional, Require } from '../types/utils.js';
+import { sortEntries } from '../utils.js';
 import { flagToSetter } from './data.js';
 import type {
   BooleanFlag,
@@ -135,11 +136,10 @@ function applyValues(
   flags: Flags,
   values: ApplicableValues<Flags>
 ): string[] {
-  return Object.keys(flags).sort().flatMap(name => {
-    const flag = flags[name];
+  return sortEntries(flags).flatMap(([name, flag]) => {
     const value = values[name];
 
-    if (!flag || value === undefined) {
+    if (value === undefined) {
       return [];
     } else if (flag.type === 'boolean') {
       return [flagToSetter(value ? name : `no-${name}`)];

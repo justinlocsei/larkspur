@@ -3,7 +3,7 @@ import type { CommandTree } from './commands/types.js';
 import { choicesForFlag, flagToSetter } from './flags/data.js';
 import type { Flag, Flags } from './flags/types.ts';
 import type { CLIMetadata } from './types.js';
-import { compact, isEmpty, transformValues } from './utils.js';
+import { compact, isEmpty, sortEntries, transformValues } from './utils.js';
 
 /**
  * Configuration for formatting help messages
@@ -195,22 +195,15 @@ class HelpMessage {
 
     const offset = Math.max(...Object.values(entries).map(c => c.label.length));
 
-    return Object
-      .keys(entries)
-      .sort()
-      .map(id => {
-        const entry = entries[id];
-
-        return entry
-          ? [
-            this.indent,
-            entry.label.padEnd(offset),
-            this.gutter,
-            entry.description
-          ]
-            .join('')
-          : '';
-      })
+    return sortEntries(entries)
+      .map(([_, entry]) =>
+        [
+          this.indent,
+          entry.label.padEnd(offset),
+          this.gutter,
+          entry.description
+        ].join('')
+      )
       .filter(Boolean)
       .join('\n');
   }
@@ -277,13 +270,8 @@ class HelpMessage {
 
     const offset = Math.max(...setters.map(f => f.length));
 
-    return Object
-      .keys(flags)
-      .sort()
-      .flatMap(id => {
-        const flag = flags[id];
-        return flag ? this.showFlag(flag, offset) : [];
-      })
+    return sortEntries(flags)
+      .flatMap(([_, flag]) => this.showFlag(flag, offset))
       .join('\n');
   }
 

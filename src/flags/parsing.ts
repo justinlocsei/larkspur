@@ -1,6 +1,7 @@
 import type { NormalizedArgs } from '../args.js';
 import { expandPath } from '../paths.js';
 import type { OneOrMany } from '../types/utils.js';
+import { sortEntries } from '../utils.js';
 import {
   choicesForFlag,
   flagToSetter,
@@ -134,16 +135,10 @@ export function parseFlags(
   const consumed: number[] = [];
   const providedFlags: string[] = [];
 
-  const parsedFlags = Object.keys(flags).sort().reduce((
-    previous: ParsedFlags,
-    name
+  const parsedFlags = sortEntries(flags).reduce<ParsedFlags>((
+    previous,
+    [name, flag]
   ) => {
-    const flag = flags[name];
-
-    if (flag === undefined) {
-      return previous;
-    }
-
     const context: ParsingContext = { args, name };
     const { consumedIndices, provided, value } = parseFlag(flag, context);
 
