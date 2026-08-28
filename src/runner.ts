@@ -1,5 +1,5 @@
 import type {
-  HelpScope,
+  ParsedCommand,
   ParsingResult,
   RunResult
 } from './commands/parsing.js';
@@ -10,30 +10,57 @@ import { buildHelp } from './help.js';
 import type { CLIMetadata } from './types.js';
 
 /**
- * A logging function
- */
-export type Logger = (message?: string) => void;
-
-/**
- * A log level used when running a CLI
- */
-export type LogLevel = 'info' | 'error';
-
-/**
- * Logging handlers for a CLI
- */
-type LoggingHandlers = Record<LogLevel, Logger>;
-
-/**
  * A request to run a CLI
  */
 export type RunRequest = {
   args: string[];
   entry: EntryPoint;
-  logging?: LoggingHandlers;
   meta: CLIMetadata;
-  onError?: (error: Error) => void;
 };
+
+/**
+ * Define a response to a request to run a CLI
+ */
+type IsRunResponse<T extends string, U> = U & {
+  type: T;
+};
+
+/**
+ * A CLI run that completed successfully
+ */
+type SuccessRunResponse = IsRunResponse<'success', {
+  command: ParsedCommand;
+}>;
+
+/**
+ * A CLI run that returned early with a help message
+ */
+type HelpRunResponse = IsRunResponse<'help', {
+  message: string;
+}>;
+
+/**
+ * A CLI run that failed with an error
+ */
+export type ErrorRunResponse = IsRunResponse<'error', {
+  error: Error;
+  help?: string;
+}>;
+
+/**
+ * The result of running a CLI
+ */
+export type RunResponse =
+  | ErrorRunResponse
+  | HelpRunResponse
+  | SuccessRunResponse;
+
+/**
+ * Report a CLI failure
+ */
+function failWith(error: Error, help?: string): ErrorRunResponse {
+  return { error, help, type: 'error' };
+}
 
 /**
  * Run a CLI
@@ -41,63 +68,41 @@ export type RunRequest = {
 export async function runCLI({
   args,
   entry,
-  logging: logger = {
-    error: m => console.error(m),
-    info: m => console.info(m)
-  },
-  meta,
-  onError = () => (process.exitCode = 1)
-}: RunRequest): Promise<void> {
+  meta
+}: RunRequest): Promise<RunResponse> {
   let parsing: ParsingResult;
-  let execution: RunResult;
-
-  function handleError<T extends Error>(
-    error: T,
-    format: (error: T) => string
-  ): void {
-    logger.error(format(error));
-    onError(error);
-  }
-
-  function handleOperationalError(error: OperationalError): void {
-    handleError(error, e => e.format());
-  }
-
-  function showHelp(scope: HelpScope): void {
-    const help = buildHelp({
-      cli: meta,
-      scope
-    });
-
-    logger.info(help);
-  }
 
   try {
     parsing = parseCommand(args, entry);
   } catch (error) {
-    return handleOperationalError(
+    return failWith(
       OperationalError.wrap(error, 'Could not parse CLI arguments')
     );
   }
 
   if (parsing.type === 'error') {
-    if (parsing.help) {
-      showHelp(parsing.help);
-      logger.info();
-    }
-
-    return handleOperationalError(new OperationalError(parsing.message));
+    return failWith(
+      new OperationalError(parsing.message),
+      parsing.help
+        ? buildHelp({ cli: meta, scope: parsing.help })
+        : undefined
+    );
   } else if (parsing.type === 'help') {
-    return showHelp(parsing.scope);
+    return {
+      message: buildHelp({ cli: meta, scope: parsing.scope }),
+      type: 'help'
+    };
   }
+
+  let execution: RunResult;
 
   try {
     execution = await parsing.run();
   } catch (error) {
-    return handleError(coerceError(error), e => e.stack || e.message);
+    return failWith(coerceError(error));
   }
 
-  if (execution.type === 'failure') {
-    return handleOperationalError(execution.error);
-  }
+  return execution.type === 'failure'
+    ? failWith(execution.error)
+    : { command: execution.command, type: 'success' };
 }

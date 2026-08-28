@@ -2,43 +2,17 @@ import { assert, describe, it } from 'vitest';
 
 import { OperationalError } from './errors.js';
 import C from './factory.js';
-import type { Logger, LogLevel, RunRequest } from './runner.js';
+import type { RunRequest } from './runner.js';
 import { runCLI } from './runner.js';
-import { transformValues } from './utils.js';
-
-const filename = import.meta.filename;
 
 const description = 'description';
 const handler = async () => {};
 
-type LogOutput = Record<LogLevel, string>;
-
-async function testCLI(options: Omit<RunRequest, 'meta'>): Promise<{
-  error?: Error | undefined;
-  output: LogOutput;
-}> {
-  let error: Error | undefined;
-
-  const output: LogOutput = {
-    error: '',
-    info: ''
-  };
-
-  await runCLI({
+function testCLI(options: Omit<RunRequest, 'meta'>) {
+  return runCLI({
     ...options,
-    meta: { name: 'testing' },
-    logging: transformValues(output, (_, l): Logger => m => {
-      output[l] += `${m}\n`;
-    }),
-    onError: (cause) => {
-      error = cause;
-    }
+    meta: { name: 'testing' }
   });
-
-  return {
-    error,
-    output
-  };
 }
 
 describe('runCLI', () => {
@@ -56,73 +30,84 @@ describe('runCLI', () => {
       })
     };
 
-    const { error, output } = await testCLI({
+    const response = await testCLI({
       args: ['command', '--flag', 'testing'],
       entry: commands
     });
 
-    assert.isUndefined(error);
-    assert.isEmpty(output.error);
-    assert.isEmpty(output.info);
-
+    assert(response.type === 'success', 'command failed');
     assert.equal(value, 'testing');
+
+    const { command } = response;
+
+    assert.sameOrderedMembers(command.path, ['command']);
+    assert.sameOrderedMembers(command.providedFlags, ['flag']);
   });
 
   it('can show help', async () => {
-    const { error, output } = await testCLI({
+    const response = await testCLI({
       args: ['--help'],
       entry: { command: C(description, handler) }
     });
 
-    assert.isUndefined(error);
-    assert.isEmpty(output.error);
-    assert.include(output.info, 'Show help');
+    assert(response.type === 'help', 'help not returned');
+    assert.include(response.message, 'Show help');
   });
 
   it('handles parsing errors', async () => {
-    const { error, output } = await testCLI({
+    const response = await testCLI({
       args: ['invalid-command'],
-      entry: { command: C(description, handler) }
+      entry: { command: C('@description', handler) }
     });
 
-    assert.instanceOf(error, OperationalError);
-    assert.include(output.info, '--help');
+    assert(response.type === 'error', 'error not returned');
+    const { error, help = '' } = response;
 
-    const errors = output.error;
-    assert.include(errors, 'invalid-command');
-    assert.notInclude(errors, filename);
+    assert.include(help, '--help');
+    assert.include(help, '@description');
+
+    assert.instanceOf(error, OperationalError);
+    assert.equal(error.message, 'Unknown command: invalid-command');
   });
 
   it('handles errors in user-provided parsing code', async () => {
-    const { error, output } = await testCLI({
-      args: ['command', '--key', 'error'],
-      entry: {
-        command: C(description, {
-          key: {
-            description: 'key',
-            isValid: (value) => {
-              if (value === 'error') {
-                throw new Error('@parsing');
-              } else {
-                return true;
-              }
-            },
-            type: 'string'
-          }
-        }, handler)
-      }
+    const entry = {
+      command: C(description, {
+        key: {
+          description: 'key',
+          isValid: (value) => {
+            if (value === 'error') {
+              throw new Error('@parsing');
+            } else {
+              return true;
+            }
+          },
+          type: 'string'
+        }
+      }, handler)
+    };
+
+    const success = await testCLI({
+      args: ['command', '--key', 'valid'],
+      entry
     });
 
-    assert.isDefined(error);
-    assert.isEmpty(output.info);
+    assert(success.type === 'success', 'valid key failed');
 
-    const text = output.error;
-    assert.include(text, '@parsing');
-    assert.include(text, filename);
+    const failure = await testCLI({
+      args: ['command', '--key', 'error'],
+      entry
+    });
+
+    assert(failure.type === 'error', 'error not returned');
+    const { message } = failure.error;
+
+    assert.include(message, 'Could not parse CLI arguments');
+    assert.include(message, '@parsing');
   });
 
   it('handles command failures', async () => {
-    const { error, output } = await testCLI({
+    const response = await testCLI({
       args: ['command'],
       entry: {
         command: C(description, async () => {
@@ -131,16 +116,16 @@ describe('runCLI', () => {
       }
     });
 
-    assert.instanceOf(error, OperationalError);
-    assert.isEmpty(output.info);
+    assert(response.type === 'error', 'error not returned');
+    const { error } = response;
 
-    const text = output.error;
-    assert.include(text, '@handler');
-    assert.notInclude(text, filename);
+    assert.instanceOf(error, OperationalError);
+    assert.equal(error.message, '@handler');
+    assert.isUndefined(response.help);
   });
 
   it('handles command errors', async () => {
-    const { error, output } = await testCLI({
+    const response = await testCLI({
       args: ['command'],
       entry: {
         command: C(description, async () => {
@@ -149,11 +134,10 @@ describe('runCLI', () => {
       }
     });
 
-    assert.isDefined(error);
-    assert.isEmpty(output.info);
+    assert(response.type === 'error', 'error not returned');
+    const { error } = response;
 
-    const text = output.error;
-    assert.include(text, '@handler');
-    assert.include(text, filename);
+    assert.include(error.message, '@handler');
+    assert.isUndefined(response.help);
   });
 });
