@@ -1,4 +1,9 @@
 /**
+ * Details for an operational error
+ */
+type ErrorDetails = OperationalError | string | Error;
+
+/**
  * Coerce a value to an error
  */
 export function coerceError(value: unknown): Error {
@@ -14,19 +19,6 @@ export function coerceError(value: unknown): Error {
 }
 
 export class OperationalError extends Error {
-  details?: string;
-
-  /**
-   * Force a value to be an operational error
-   */
-  static coerce(value: unknown): OperationalError {
-    const error = coerceError(value);
-
-    return error instanceof OperationalError
-      ? error
-      : new OperationalError(error.message);
-  }
-
   /**
    * Treat a value as details for an operational error
    */
@@ -37,44 +29,36 @@ export class OperationalError extends Error {
   /**
    * Create an operational error with optional details
    */
-  constructor(
-    message: string,
-    details?: string | Error
-  ) {
-    super(message);
+  constructor(message: string, details?: ErrorDetails) {
+    super(addDetails(message, formatDetails(details)));
     Object.setPrototypeOf(this, OperationalError.prototype);
-
-    if (details instanceof OperationalError) {
-      this.details = details.toString();
-    } else if (details instanceof Error) {
-      this.details = details.stack || details.message;
-    } else {
-      this.details = details;
-    }
   }
 
   /**
-   * Format the error
-   */
-  format(): string {
-    return this.addDetails(this.message);
-  }
-
-  /**
-   * Include the optional details in the printed form
+   * Include the error name in the printed form
    */
   toString(): string {
-    return this.addDetails(`OperationalError: ${this.message}`);
+    return `OperationalError: ${this.message}`;
   }
-
-  /**
-   * Add the error's details to an existing message
-   */
-  private addDetails(message: string): string {
-    const { details = '' } = this;
-
-    return details
-      ? `${message}${details.split('\n').length > 1 ? '\n\n' : '\n'}${details}`
-      : message;
+}
+/**
+ * Format error details
+ */
+function formatDetails(details?: ErrorDetails): string | undefined {
+  if (details instanceof OperationalError) {
+    return details.toString();
+  } else if (details instanceof Error) {
+    return details.stack || details.message;
+  } else {
+    return details;
   }
+}
+
+/**
+ * Add details to a message
+ */
+function addDetails(message: string, details: string = ''): string {
+  return details
+    ? `${message}${details.split('\n').length > 1 ? '\n\n' : '\n'}${details}`
+    : message;
 }
