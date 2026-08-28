@@ -11,9 +11,14 @@ import path from 'node:path';
 type Logger = (message?: string) => void;
 
 /**
+ * A supported log level
+ */
+export type LogLevel = 'error' | 'info';
+
+/**
  * Logging handlers for a CLI
  */
-export type LoggingHandlers = Record<'error' | 'info', Logger>;
+type LoggingHandlers = Record<LogLevel, Logger>;
 
 /**
  * A provider for a CLI's entry point
