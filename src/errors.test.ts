@@ -107,21 +107,5 @@ describe('OperationalError', () => {
         ]
       );
     });
-
-    it('can format the error’s components', () => {
-      checkConversion<OperationalError, string>(
-        (input, output, message) => {
-          assert.equal(
-            input.format(m => `${m}!`),
-            output,
-            message
-          );
-        },
-        [
-          [new OperationalError('message'), 'message!'],
-          [new OperationalError('message', 'details'), 'message!\ndetails']
-        ]
-      );
-    });
   });
 });

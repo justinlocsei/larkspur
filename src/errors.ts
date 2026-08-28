@@ -56,8 +56,8 @@ export class OperationalError extends Error {
   /**
    * Format the error
    */
-  format(formatMessage: (message: string) => string = m => m): string {
-    return this.addDetails(formatMessage(this.message));
+  format(): string {
+    return this.addDetails(this.message);
   }
 
   /**
