@@ -8,7 +8,7 @@ export type ScriptLines = Array<string | ScriptLines>;
  */
 export function formatScript(
   lines: ScriptLines,
-  indent: number
+  indent: number = 2
 ): string {
   function format(ls: ScriptLines, level: number) {
     const nesting = ' '.repeat(indent * level);

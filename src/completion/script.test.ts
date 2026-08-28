@@ -4,7 +4,7 @@ import { formatScript } from './script.js';
 
 describe('formatScript', () => {
   it('flattens lines', () => {
-    assert.deepEqual(formatScript(['alfa', 'bravo'], 2), 'alfa\nbravo');
+    assert.deepEqual(formatScript(['alfa', 'bravo']), 'alfa\nbravo');
   });
 
   it('applies indentation to nested groups', () => {
