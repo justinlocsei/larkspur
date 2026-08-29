@@ -5,6 +5,7 @@ import type {
 } from './commands/parsing.js';
 import { parseCommand } from './commands/parsing.js';
 import type { EntryPoint } from './commands/types.js';
+import { buildCompletions } from './completion.js';
 import { coerceError, OperationalError } from './errors.js';
 import { buildHelp } from './help.js';
 import type { CLIMetadata } from './types.js';
@@ -40,6 +41,13 @@ type HelpRunResponse = IsRunResponse<'help', {
 }>;
 
 /**
+ * A completion script generated for a CLI
+ */
+type CompletionRunResponse = IsRunResponse<'completion', {
+  script: string;
+}>;
+
+/**
  * A CLI run that failed with an error
  */
 export type ErrorRunResponse = IsRunResponse<'error', {
@@ -51,6 +59,7 @@ export type ErrorRunResponse = IsRunResponse<'error', {
  * The result of running a CLI
  */
 export type RunResponse =
+  | CompletionRunResponse
   | ErrorRunResponse
   | HelpRunResponse
   | SuccessRunResponse;
@@ -91,6 +100,14 @@ export async function runCLI({
     return {
       message: buildHelp({ cli: meta, scope: parsing.scope }),
       type: 'help'
+    };
+  } else if (parsing.type === 'completion') {
+    return {
+      script: buildCompletions(parsing.shell, {
+        commands: entry,
+        name: meta.name
+      }),
+      type: 'completion'
     };
   }
 

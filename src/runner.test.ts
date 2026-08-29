@@ -54,6 +54,16 @@ describe('runCLI', () => {
     assert.include(response.message, 'Show help');
   });
 
+  it('can generate completions', async () => {
+    const response = await testCLI({
+      args: ['--complete', 'bash'],
+      entry: { command: C(description, handler) }
+    });
+
+    assert(response.type === 'completion', 'completion not returned');
+    assert.include(response.script, 'testing');
+  });
+
   it('handles parsing errors', async () => {
     const response = await testCLI({
       args: ['invalid-command'],
