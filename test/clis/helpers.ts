@@ -55,7 +55,7 @@ export type TestActions = {
 /**
  * Custom tests for a CLI
  */
-type CustomTests = Partial<Record<string, (api: TestActions) => void>>;
+type CustomTests = Partial<Record<string, (actions: TestActions) => void>>;
 
 /**
  * Define tests for a CLI
@@ -76,7 +76,7 @@ export function test(
     return result.stdout;
   };
 
-  const api: TestActions = { checkOutput, run };
+  const actions: TestActions = { checkOutput, run };
 
   describe(description, () => {
     it('shows help', () => {
@@ -92,7 +92,7 @@ export function test(
     Object.entries(tests).forEach(([name, test]) => {
       if (test) {
         it(name, () => {
-          test(api);
+          test(actions);
         });
       }
     });
