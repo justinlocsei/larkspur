@@ -3,9 +3,10 @@ import { OperationalError } from '../errors.js';
 import type { ParsedFlags } from '../flags/parsing.js';
 import { extractValues, ParsingError, parseFlags } from '../flags/parsing.js';
 import type { Flags } from '../flags/types.js';
-import type { ValuesOf } from '../flags/values.js';
+import type { SpecificValueOf, ValuesOf } from '../flags/values.js';
 import { useFlags } from '../flags.js';
 import type { DistributiveOmit } from '../types/utils.js';
+import { COMPLETION_SHELLS } from '../types.js';
 import type {
   ArgParsingDetails,
   Command,
@@ -183,6 +184,11 @@ class HelpRequest {
 }
 
 export const CORE_FLAGS = useFlags({
+  complete: {
+    choices: COMPLETION_SHELLS,
+    description: 'Generate completions for the given shell',
+    type: 'string'
+  },
   help: {
     default: false,
     description: 'Show help',

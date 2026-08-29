@@ -674,7 +674,7 @@ describe('parseCommand', () => {
 
       assert.sameMembers(
         result.type === 'help' ? Object.keys(result.scope.flags) : [],
-        ['help'],
+        ['complete', 'help'],
         `Core flags not present for args: ${args.join(' ')}`
       );
     });
