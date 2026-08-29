@@ -57,7 +57,6 @@ export class BashCompletionProvider extends CompletionProvider {
     return {
       entryPoint: fn.entry.name,
       script: [
-        '',
         ...this.renderCompletions(fn, completions),
         '',
         `complete -o default -F ${fn.entry.name} ${cli.name}`
