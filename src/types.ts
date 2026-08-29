@@ -9,6 +9,6 @@ export type CLIMetadata = {
 export const SUPPORTED_SHELLS = ['bash'] as const;
 
 /**
- * A supported shell
+ * A shell with full support for all Larkspur features
  */
 export type SupportedShell = (typeof SUPPORTED_SHELLS)[number];
