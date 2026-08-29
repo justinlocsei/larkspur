@@ -22,16 +22,22 @@ export type CompletionScript<T = ScriptLines> = {
   script: T;
 };
 
+/**
+ * The CLI for which to generate completions
+ */
+export type CompletionSource = {
+  commands: CommandTree;
+  name: string;
+};
+
 export abstract class CompletionProvider {
-  protected commandName: string;
-  protected commands: CommandTree;
+  protected cli: CompletionSource;
 
   /**
    * Create a generator for completions of a CLI's commands
    */
-  constructor(commandName: string, commands: CommandTree) {
-    this.commandName = commandName;
-    this.commands = commands;
+  constructor(cli: CompletionSource) {
+    this.cli = cli;
   }
 
   /**

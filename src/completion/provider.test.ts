@@ -19,7 +19,10 @@ class TestCompletionProvider extends CompletionProvider {
 describe('CompletionProvider', () => {
   describe('buildScript', () => {
     function testScript() {
-      return new TestCompletionProvider('test-cli', {}).buildScript();
+      return new TestCompletionProvider({
+        name: 'test-cli',
+        commands: {}
+      }).buildScript();
     }
 
     it('exposes the script entry point', () => {
