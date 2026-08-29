@@ -3,6 +3,7 @@ import { assert, describe, it } from 'vitest';
 import type { CommandTree } from '../../commands/types.js';
 import C from '../../factory.js';
 import { checkConversionAsync, useTempDir, useTempFile } from '../../tests.js';
+import { COMPLETION_SHELLS } from '../../types.js';
 import { compact } from '../../utils.js';
 import { formatScript } from '../script.js';
 import { BashCompletionProvider } from './bash.js';
@@ -110,7 +111,7 @@ describe('BashCompletionProvider', () => {
         ],
         [['parent', 'al'], ['alfa']],
         [['parent', 'br'], ['bravo']],
-        [['parent', '--'], ['--help']],
+        [['parent', '--'], ['--complete', '--help']],
         [['parent', 'ch'], []]
       ]
     ));
@@ -158,7 +159,7 @@ describe('BashCompletionProvider', () => {
       [
         [
           ['command', ' '],
-          ['--alfa-one', '--alfa-two', '--bravo-one', '--help']
+          ['--alfa-one', '--alfa-two', '--bravo-one', '--complete', '--help']
         ],
         [
           ['command', '--al'],
@@ -211,22 +212,22 @@ describe('BashCompletionProvider', () => {
       [
         [
           ['root', ' '],
-          ['--for-root', '--help']
+          ['--complete', '--for-root', '--help']
         ],
         [
           ['parent', 'alfa', ' '],
-          ['--for-alfa', '--help']
+          ['--complete', '--for-alfa', '--help']
         ],
         [
           ['parent', 'bravo', ' '],
-          ['--for-bravo', '--help']
+          ['--complete', '--for-bravo', '--help']
         ]
       ]
     ));
 
   it('includes core flags in all commands', () =>
     checkCompletions({ command: command }, [
-      [['command', ' '], ['--help']],
+      [['command', ' '], ['--complete', '--help']],
       [['command', '--he'], ['--help']],
       [['command', '--x'], []]
     ]));
@@ -246,13 +247,19 @@ describe('BashCompletionProvider', () => {
       [
         [
           ['command', ' '],
-          ['--bravo', '--help', '--no-alfa']
+          ['--bravo', '--complete', '--help', '--no-alfa']
         ],
         [['command', '--no'], ['--no-alfa']],
         [['command', '--br'], ['--bravo']],
         [['command', '--ch'], []]
       ]
     ));
+
+  it('lists supported shells for completions', () =>
+    checkCompletions({ command: command }, [
+      [['command', '--complete', ' '], [...COMPLETION_SHELLS]],
+      [['command', '--complete', 'b'], ['bash']]
+    ]));
 
   it('lists choices for scalar flags', () =>
     checkCompletions(
