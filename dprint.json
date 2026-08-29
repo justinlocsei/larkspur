@@ -15,7 +15,8 @@
   ],
   "excludes": [
     "dist",
-    "node_modules"
+    "node_modules",
+    "test/.build"
   ],
   "plugins": [
     "https://plugins.dprint.dev/json-0.23.0.wasm",
