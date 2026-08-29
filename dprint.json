@@ -11,7 +11,7 @@
     "trailingCommas": "never"
   },
   "includes": [
-    "**/*.{json,ts}"
+    "**/*.{json,mjs,ts}"
   ],
   "excludes": [
     "dist",
