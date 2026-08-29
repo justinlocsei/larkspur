@@ -37,25 +37,25 @@ export function testCLI(name: string, args: string[] = []): TestResult {
 /**
  * A function that invokes a CLI
  */
-type CLIRunner = (...args: string[]) => TestResult;
+type RunCLI = (...args: string[]) => TestResult;
 
 /**
  * A function that gets the output of a successful CLI run
  */
-type OutputChecker = (...args: string[]) => string;
+type CheckOutput = (...args: string[]) => string;
 
 /**
- * The API available for custom tests
+ * The actions available for custom tests
  */
-type TestAPI = {
-  checkOutput: OutputChecker;
-  run: CLIRunner;
+export type TestActions = {
+  checkOutput: CheckOutput;
+  run: RunCLI;
 };
 
 /**
  * Custom tests for a CLI
  */
-type CustomTests = Partial<Record<string, (api: TestAPI) => void>>;
+type CustomTests = Partial<Record<string, (api: TestActions) => void>>;
 
 /**
  * Define tests for a CLI
@@ -65,9 +65,9 @@ export function test(
   description: string,
   tests: CustomTests = {}
 ): void {
-  const run: CLIRunner = (...args: string[]) => testCLI(file, args);
+  const run: RunCLI = (...args: string[]) => testCLI(file, args);
 
-  const checkOutput: OutputChecker = (...args: string[]) => {
+  const checkOutput: CheckOutput = (...args: string[]) => {
     const result = run(...args);
 
     assert.equal(result.status, 0);
@@ -76,7 +76,7 @@ export function test(
     return result.stdout;
   };
 
-  const api: TestAPI = { checkOutput, run };
+  const api: TestActions = { checkOutput, run };
 
   describe(description, () => {
     it('shows help', () => {
