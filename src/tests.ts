@@ -1,5 +1,9 @@
 import type { Flag } from './flags/types.js';
 
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+
 export * as ensure from './tests/ensure.js';
 
 /**
@@ -44,6 +48,22 @@ export async function checkConversionAsync<I, O>(
 }
 
 /**
+ * Create a temporary directory
+ */
+export async function createTempDir(): Promise<string> {
+  let prefix = await fs.realpath(os.tmpdir());
+
+  if (!prefix.endsWith(path.sep)) {
+    prefix += path.sep;
+  }
+
+  const tmpDir = await fs.mkdtemp(prefix);
+  await fs.chmod(tmpDir, 0o700);
+
+  return tmpDir;
+}
+
+/**
  * Define a basic flag
  */
 export function flag(
@@ -61,4 +81,29 @@ export function flag(
     required,
     type
   };
+}
+
+/**
+ * Allow a caller to use a temporary directory
+ */
+export async function useTempDir<T>(
+  useDir: (path: string) => Promise<T>
+): Promise<T> {
+  const tmpDir = await createTempDir();
+
+  try {
+    return await useDir(tmpDir);
+  } finally {
+    await fs.rm(tmpDir, { recursive: true });
+  }
+}
+
+/**
+ * Allow a caller to use a temporary file
+ */
+export function useTempFile<T>(
+  useFile: (path: string) => Promise<T>,
+  { name = 'file' }: { name?: string } = {}
+): Promise<T> {
+  return useTempDir(d => useFile(path.join(d, name)));
 }
