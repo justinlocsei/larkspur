@@ -226,7 +226,7 @@ describe('BashCompletionProvider', () => {
     ));
 
   it('includes core flags in all commands', () =>
-    checkCompletions({ command: command }, [
+    checkCompletions({ command }, [
       [['command', ' '], ['--complete', '--help']],
       [['command', '--he'], ['--help']],
       [['command', '--x'], []]
@@ -256,7 +256,7 @@ describe('BashCompletionProvider', () => {
     ));
 
   it('lists supported shells for completions', () =>
-    checkCompletions({ command: command }, [
+    checkCompletions({ command }, [
       [['command', '--complete', ' '], [...COMPLETION_SHELLS]],
       [['command', '--complete', 'b'], ['bash']]
     ]));
