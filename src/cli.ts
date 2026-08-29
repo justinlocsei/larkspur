@@ -64,6 +64,10 @@ export async function run(
   });
 
   switch (response.type) {
+    case 'completion':
+      logging.info(response.script);
+      break;
+
     case 'error': {
       const { error, help = '' } = response;
 
