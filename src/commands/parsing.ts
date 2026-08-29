@@ -193,11 +193,11 @@ export const CORE_FLAGS = useFlags({
 /**
  * Get the value of a core flag
  */
-function getCoreFlagValue(
+function getCoreFlagValue<T extends keyof typeof CORE_FLAGS>(
   flags: ParsedFlags,
-  id: keyof typeof CORE_FLAGS
-): unknown {
-  return flags[id]?.value;
+  id: T
+) {
+  return flags[id]?.value as SpecificValueOf<typeof CORE_FLAGS[T]> | undefined;
 }
 
 /**
