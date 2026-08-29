@@ -679,4 +679,37 @@ describe('parseCommand', () => {
       );
     });
   });
+
+  it('supports completion requests', () => {
+    const commands = { command: C(description, handler) };
+
+    assert.equal(
+      parseCommand(['--complete', 'bash'], commands).type,
+      'completion'
+    );
+
+    assert.equal(
+      parseCommand(['command', '--complete', 'bash'], commands).type,
+      'completion'
+    );
+  });
+
+  it('prefers help over completions', () => {
+    const commands = { command: C(description, handler) };
+
+    const cases: Array<string[]> = [
+      ['--help', '--complete', 'bash'],
+      ['--complete', 'bash', '--help'],
+      ['command', '--help', '--complete', 'bash'],
+      ['command', '--complete', 'bash', '--help']
+    ];
+
+    cases.forEach((args) => {
+      assert.equal(
+        parseCommand(args, commands).type,
+        'help',
+        `Help not preferred for args: ${args.join(' ')}`
+      );
+    });
+  });
 });

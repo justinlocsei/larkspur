@@ -6,6 +6,7 @@ import type { Flags } from '../flags/types.js';
 import type { SpecificValueOf, ValuesOf } from '../flags/values.js';
 import { useFlags } from '../flags.js';
 import type { DistributiveOmit } from '../types/utils.js';
+import type { CompletionShell } from '../types.js';
 import { COMPLETION_SHELLS } from '../types.js';
 import type {
   ArgParsingDetails,
@@ -95,10 +96,17 @@ type ErrorParsingResult = IsParsingResult<'error', {
 }>;
 
 /**
- * A request for help in the parsed args
+ * A request for help
  */
 type HelpParsingResult = IsParsingResult<'help', {
   scope: HelpScope;
+}>;
+
+/**
+ * A request for shell completions
+ */
+type CompletionParsingResult = IsParsingResult<'completion', {
+  shell: CompletionShell;
 }>;
 
 /**
@@ -106,6 +114,7 @@ type HelpParsingResult = IsParsingResult<'help', {
  */
 export type ParsingResult =
   | CommandParsingResult
+  | CompletionParsingResult
   | ErrorParsingResult
   | HelpParsingResult;
 
@@ -183,6 +192,17 @@ class HelpRequest {
   }
 }
 
+class CompletionRequest {
+  shell: CompletionShell;
+
+  /**
+   * Create a completion request
+   */
+  constructor(shell: CompletionShell) {
+    this.shell = shell;
+  }
+}
+
 export const CORE_FLAGS = useFlags({
   complete: {
     choices: COMPLETION_SHELLS,
@@ -256,6 +276,11 @@ export function parseCommand(args: string[], commands: CommandTree, {
         },
         type: 'help'
       };
+    } else if (signal instanceof CompletionRequest) {
+      return {
+        shell: signal.shell,
+        type: 'completion'
+      };
     } else {
       throw signal;
     }
@@ -325,6 +350,7 @@ function extractCommand(
 ): ParsedCommand {
   const { flags } = parseFlags(normalized, CORE_FLAGS, { allowUnused: true });
   const showHelp = getCoreFlagValue(flags, 'help') === true;
+  const shell = getCoreFlagValue(flags, 'complete');
 
   const { args } = normalized;
   const name = args[0];
@@ -339,6 +365,8 @@ function extractCommand(
 
   if (showHelp && (!name || !command)) {
     throw new HelpRequest(commandHelp);
+  } else if (!showHelp && shell) {
+    throw new CompletionRequest(shell);
   }
 
   if (!name) {
