@@ -1,4 +1,5 @@
-/**
- * Create a CLI
- */
-export function createCLI(): void {}
+import factory from './factory.js';
+
+export { run } from './cli.js';
+
+export default factory;

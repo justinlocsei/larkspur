@@ -1,9 +1,15 @@
 import { assert, describe, it } from 'vitest';
 
-import { createCLI } from './index.js';
+import C, { run } from './index.js';
 
-describe('createCLI', () => {
-  it('creates a CLI', () => {
-    assert.doesNotThrow(() => createCLI());
+describe('the public API', () => {
+  it('exposes command factories', () => {
+    assert.isFunction(C);
+    assert.isFunction(C.flag);
+    assert.isFunction(C.group);
+  });
+
+  it('exposes the CLI runner', () => {
+    assert.isFunction(run);
   });
 });
