@@ -52,10 +52,12 @@ export type StringFlag = IsScalarFlag<'string', string>;
 /**
  * A flag constrained to a limited set of scalar values
  */
-export type ChoiceFlag<T extends ScalarValue = ScalarValue> =
-  & IsFlag<'choice', T>
+export type ChoiceFlag<
+  C extends readonly ScalarValue[] = readonly ScalarValue[]
+> =
+  & IsFlag<'choice', C[number]>
   & ScalarFields
-  & { choices: readonly T[] };
+  & { choices: C };
 
 /**
  * The flags that take a scalar value
