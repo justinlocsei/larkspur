@@ -1,17 +1,27 @@
 import { assert, describe, it } from 'vitest';
 
 import { quote } from './shell.js';
+import { checkConversion } from './tests.js';
 
 describe('quote', () => {
-  it('preserves a value that lacks whitespace', () => {
-    assert.equal(quote('value'), 'value');
+  function checkQuotes(tests: Array<[string, string]>) {
+    checkConversion(
+      (i, o, m) => assert.equal(quote(i), o, m),
+      tests
+    );
+  }
+
+  it('quotes values with whitespace', () => {
+    checkQuotes([
+      ['alfa', 'alfa'],
+      ['alfa bravo', '"alfa bravo"']
+    ]);
   });
 
-  it('quotes a value with whitespace', () => {
-    assert.equal(quote('alfa bravo'), '"alfa bravo"');
-  });
-
-  it('return an empty quoted string when given an empty string', () => {
-    assert.equal(quote(''), '""');
+  it('handles whitespace-only values', () => {
+    checkQuotes([
+      ['', '""'],
+      [' ', '" "']
+    ]);
   });
 });
