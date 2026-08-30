@@ -36,7 +36,7 @@ type CompletionRunResponse = IsRunResponse<'completion', {
 /**
  * A CLI run that failed with an error
  */
-export type ErrorRunResponse = IsRunResponse<'error', {
+type ErrorRunResponse = IsRunResponse<'error', {
   error: Error;
   help?: string;
 }>;
