@@ -25,9 +25,8 @@
     "check:types": "tsc --noEmit",
     "format": "biome check --write --linter-enabled=false . && dprint fmt",
     "prepublishOnly": "npm run build",
-    "test:integration": "vitest run --project integration --reporter verbose",
-    "test:watch": "vitest",
-    "test": "vitest run --project unit --reporter verbose"
+    "test": "vitest run --project unit --reporter verbose",
+    "test:integration": "vitest run --project integration --reporter verbose"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.9",
