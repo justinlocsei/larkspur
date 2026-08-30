@@ -1,7 +1,7 @@
 import { describe, it } from 'vitest';
 
-import { useFlag, useFlags } from '../flags.js';
 import { T } from '../tests.js';
+import { useFlag, useFlags } from './definition.js';
 import type { ValueOf, ValuesOf } from './values.js';
 
 const description = 'description';

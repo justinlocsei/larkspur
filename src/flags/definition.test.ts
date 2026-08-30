@@ -1,14 +1,9 @@
 import { assert, describe, it } from 'vitest';
 
-import C from './factory.js';
-import type {
-  BooleanFlag,
-  Flags,
-  NumberFlag,
-  StringFlag
-} from './flags/types.js';
-import { useFlag, useFlags } from './flags.js';
-import { T } from './tests.js';
+import C from '../factory.js';
+import { T } from '../tests.js';
+import { useFlag, useFlags } from './definition.js';
+import type { BooleanFlag, Flags, NumberFlag, StringFlag } from './types.js';
 
 const description = 'description';
 

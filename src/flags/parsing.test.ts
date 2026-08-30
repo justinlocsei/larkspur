@@ -1,9 +1,9 @@
 import { assert, describe, it } from 'vitest';
 
 import { NormalizedArgs } from '../args.js';
-import { useFlag, useFlags } from '../flags.js';
 import { checkConversion, ensure, inspect } from '../tests.js';
 import type { DistributiveOmit } from '../types/utils.js';
+import { useFlag, useFlags } from './definition.js';
 import type { FlagParsing, ParsingOptions } from './parsing.js';
 import { extractValues, parseFlags } from './parsing.js';
 import type {
