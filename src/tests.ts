@@ -4,7 +4,7 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 
-export * as ensure from './tests/ensure.js';
+export * as ensure from './tests/assertions.js';
 
 /**
  * Produce a readable representation of an object

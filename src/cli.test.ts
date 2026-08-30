@@ -5,7 +5,7 @@ import { run } from './cli.js';
 import type { EntryPoint } from './commands/types.js';
 import { OperationalError } from './errors.js';
 import C from './factory.js';
-import * as ensure from './tests/ensure.js';
+import * as ensure from './tests/assertions.js';
 
 const filename = import.meta.filename;
 
