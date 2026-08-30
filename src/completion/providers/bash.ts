@@ -346,7 +346,10 @@ export class BashCompletionProvider extends CompletionProvider {
 
         const completion = customFn
           ? this.completeWithFunction(customFn, completeOn)
-          : this.completeWords((choicesForFlag(flag) || []).sort(), completeOn);
+          : this.completeWords(
+            [...(choicesForFlag(flag) || [])].sort().map(String),
+            completeOn
+          );
 
         previous.push(`${forms}) ${completion} ;;`);
 
