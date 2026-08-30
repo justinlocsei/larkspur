@@ -157,14 +157,8 @@ describe('buildHelp', () => {
           command: C('@command', handler)
         },
         flags: {
-          alfa: {
-            description: '@alfa',
-            type: 'boolean'
-          },
-          bravo: {
-            description: '@bravo',
-            type: 'boolean'
-          }
+          alfa: C.flag('boolean', '@alfa'),
+          bravo: C.flag('boolean', '@bravo')
         },
         type: 'root'
       }
@@ -192,16 +186,10 @@ describe('buildHelp', () => {
       cli,
       scope: {
         command: C('@command', {
-          bravo: {
-            description: '@bravo',
-            type: 'boolean'
-          }
+          bravo: C.flag('boolean', '@bravo')
         }, handler),
         flags: {
-          alfa: {
-            description: '@alfa',
-            type: 'boolean'
-          }
+          alfa: C.flag('boolean', '@alfa')
         },
         path: [],
         type: 'command'
@@ -231,11 +219,7 @@ describe('buildHelp', () => {
           command: C('@command', handler)
         },
         flags: {
-          secret: {
-            description: '@secret',
-            hidden: true,
-            type: 'boolean'
-          }
+          secret: C.flag('boolean', '@secret', { hidden: true })
         },
         type: 'root'
       }
@@ -250,18 +234,9 @@ describe('buildHelp', () => {
       scope: {
         command: C('@command', handler),
         flags: {
-          alfa: {
-            description: '@alfa',
-            type: 'string'
-          },
-          bravo: {
-            description: '@bravo',
-            type: 'number'
-          },
-          charlie: {
-            description: '@charlie',
-            type: 'path'
-          }
+          alfa: C.flag('string', '@alfa'),
+          bravo: C.flag('number', '@bravo'),
+          charlie: C.flag('path', '@charlie')
         },
         path: [],
         type: 'command'
@@ -290,21 +265,9 @@ describe('buildHelp', () => {
       scope: {
         command: C('@command', handler),
         flags: {
-          alfa: {
-            allowMany: true,
-            description: '@alfa',
-            type: 'string'
-          },
-          bravo: {
-            allowMany: true,
-            description: '@bravo',
-            type: 'number'
-          },
-          charlie: {
-            allowMany: true,
-            description: '@charlie',
-            type: 'path'
-          }
+          alfa: C.flag('string', '@alfa', { allowMany: true }),
+          bravo: C.flag('number', '@bravo', { allowMany: true }),
+          charlie: C.flag('path', '@charlie', { allowMany: true })
         },
         path: [],
         type: 'command'
@@ -335,16 +298,8 @@ describe('buildHelp', () => {
           command: C('@command', handler)
         },
         flags: {
-          alfa: {
-            description: '@alfa',
-            required: true,
-            type: 'string'
-          },
-          bravo: {
-            description: '@bravo',
-            required: true,
-            type: 'number'
-          }
+          alfa: C.flag('string', '@alfa', { required: true }),
+          bravo: C.flag('number', '@bravo', { required: true })
         },
         type: 'root'
       }
@@ -375,15 +330,8 @@ describe('buildHelp', () => {
           command: C('@command', handler)
         },
         flags: {
-          alfa: {
-            description: '@alfa',
-            required: true,
-            type: 'string'
-          },
-          bravo: {
-            description: '@bravo',
-            type: 'number'
-          }
+          alfa: C.flag('string', '@alfa', { required: true }),
+          bravo: C.flag('number', '@bravo')
         },
         type: 'root'
       }
@@ -415,31 +363,11 @@ describe('buildHelp', () => {
       scope: {
         command: C('@command', handler),
         flags: {
-          alfa: {
-            default: false,
-            description: '@alfa',
-            type: 'boolean'
-          },
-          bravo: {
-            default: true,
-            description: '@bravo',
-            type: 'boolean'
-          },
-          charlie: {
-            default: 1,
-            description: '@charlie',
-            type: 'number'
-          },
-          delta: {
-            default: 'value',
-            description: '@delta',
-            type: 'string'
-          },
-          echo: {
-            default: '/tmp',
-            description: '@echo',
-            type: 'path'
-          }
+          alfa: C.flag('boolean', '@alfa', { default: false }),
+          bravo: C.flag('boolean', '@bravo', { default: true }),
+          charlie: C.flag('number', '@charlie', { default: 1 }),
+          delta: C.flag('string', '@delta', { default: 'value' }),
+          echo: C.flag('path', '@echo', { default: '/tmp' })
         },
         path: [],
         type: 'command'
@@ -474,17 +402,11 @@ describe('buildHelp', () => {
       scope: {
         command: C('@command', handler),
         flags: {
-          alfa: {
-            default: 1,
-            description: '@alfa',
-            type: 'number'
-          },
-          bravo: {
+          alfa: C.flag('number', '@alfa', { default: 1 }),
+          bravo: C.flag('choice', '@bravo', {
             choices: ['one', 'two'],
-            default: 'one',
-            description: '@bravo',
-            type: 'choice'
-          }
+            default: 'one'
+          })
         },
         path: [],
         type: 'command'
