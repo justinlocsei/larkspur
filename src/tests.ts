@@ -1,4 +1,4 @@
-import type { Flag } from './flags/types.js';
+import type { Flag, SimpleFlag } from './flags/types.js';
 
 import fs from 'node:fs/promises';
 import os from 'node:os';
@@ -67,13 +67,13 @@ export async function createTempDir(): Promise<string> {
  * Define a basic flag
  */
 export function flag(
-  type: Flag['type'],
+  type: SimpleFlag['type'],
   {
     description = 'description',
     required
   }: {
     description?: string;
-    required?: boolean;
+    required?: true;
   } = {}
 ): Flag {
   return {
