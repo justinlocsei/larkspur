@@ -1,25 +1,28 @@
 import { assert, describe, it } from 'vitest';
 
 import { NormalizedArgs } from '../args.js';
-import { useFlags } from '../flags.js';
+import { useFlag, useFlags } from '../flags.js';
 import { checkConversion, ensure, inspect } from '../tests.js';
 import type { DistributiveOmit } from '../types/utils.js';
 import type { FlagParsing, ParsingOptions } from './parsing.js';
 import { extractValues, parseFlags } from './parsing.js';
 import type {
-  Flag,
   Flags,
-  ScalarFlag,
   ScalarValidator,
   ScalarValue,
+  SimpleFlag,
+  SimpleScalarFlag,
   SupportedValue
 } from './types.js';
 
 import os from 'node:os';
 import path from 'node:path';
 
+type ScalarType = SimpleScalarFlag['type'];
+type SimpleFlagType = SimpleFlag['type'];
+
 const description = 'description';
-const scalarTypes: ScalarFlag['type'][] = ['number', 'path', 'string'];
+const scalarTypes: ScalarType[] = ['number', 'path', 'string'];
 
 function parse(
   args: string[],
@@ -59,7 +62,7 @@ describe('parseFlags', () => {
 
   function checkFlag<T extends string>(
     name: T,
-    flag: DistributiveOmit<Flag, 'description'>,
+    flag: DistributiveOmit<SimpleFlag, 'description'>,
     args: string[]
   ): FlagParsing<T> {
     return parse(args, {
@@ -71,7 +74,7 @@ describe('parseFlags', () => {
   }
 
   it('can apply values to all supported flag types', () => {
-    checkConversion<[Flag['type'], string[]], unknown>(
+    checkConversion<[SimpleFlagType, string[]], unknown>(
       ([type, args], value) => {
         const { flags } = useWorkingDir(
           '/',
@@ -135,7 +138,7 @@ describe('parseFlags', () => {
   });
 
   it('supports setting multiple values for flags', () => {
-    checkConversion<[ScalarFlag['type'], string[]], ScalarValue[]>(
+    checkConversion<[ScalarType, string[]], ScalarValue[]>(
       ([type, args], value) => {
         const { flags } = useWorkingDir(
           '/',
@@ -184,7 +187,7 @@ describe('parseFlags', () => {
   });
 
   it('throws an error if multiple values are provided without restating the flag name', () => {
-    const cases: Array<[ScalarFlag['type'], string[]]> = [
+    const cases: Array<[ScalarType, string[]]> = [
       ['number', ['--test', '2', '3']],
       ['path', ['--test', 'alfa', 'bravo']],
       ['string', ['--test', '2', '3']]
@@ -200,7 +203,7 @@ describe('parseFlags', () => {
   });
 
   it('supports equal-sign bindings for flags', () => {
-    checkConversion<[ScalarFlag['type'], string], unknown>(
+    checkConversion<[ScalarType, string], unknown>(
       ([type, arg], parsed) => {
         const { flags } = useWorkingDir(
           '/',
@@ -230,11 +233,11 @@ describe('parseFlags', () => {
   });
 
   it('can apply default values to all supported types', () => {
-    checkConversion<[Flag['type'], SupportedValue], SupportedValue>(
+    checkConversion<[SimpleFlagType, SupportedValue], SupportedValue>(
       ([type, value], parsed) => {
         const { flags } = checkFlag(
           'test',
-          { default: value, type } as Flag,
+          { default: value, type } as SimpleFlag,
           []
         );
 
@@ -259,11 +262,14 @@ describe('parseFlags', () => {
   });
 
   it('allows flags to override their default values', () => {
-    checkConversion<[Flag['type'], SupportedValue, string[]], SupportedValue>(
+    checkConversion<
+      [SimpleFlagType, SupportedValue, string[]],
+      SupportedValue
+    >(
       ([type, value, args], parsed) => {
         const { flags } = useWorkingDir(
           '/',
-          () => checkFlag('test', { default: value, type } as Flag, args)
+          () => checkFlag('test', { default: value, type } as SimpleFlag, args)
         );
 
         assert.strictEqual(
@@ -327,11 +333,11 @@ describe('parseFlags', () => {
   });
 
   it('allows defaults to provide values for missing required flags', () => {
-    checkConversion<[Flag['type'], SupportedValue], SupportedValue>(
+    checkConversion<[SimpleFlagType, SupportedValue], SupportedValue>(
       ([type, value], output) => {
         const { flags } = checkFlag(
           'test',
-          { default: value, required: true, type } as Flag,
+          { default: value, required: true, type } as SimpleFlag,
           []
         );
 
@@ -370,7 +376,7 @@ describe('parseFlags', () => {
   });
 
   it('throws an error if a scalar flag lacks a value', () => {
-    const cases: Array<[ScalarFlag['type'], string[]]> = [
+    const cases: Array<[ScalarType, string[]]> = [
       ['number', ['--alfa']],
       ['number', ['--alfa', '--bravo']],
       ['path', ['--alfa']],
@@ -509,7 +515,7 @@ describe('parseFlags', () => {
   });
 
   it('throws an error if multiple values are provided for a flag', () => {
-    const cases: Record<Flag['type'], string[]> = {
+    const cases: Record<SimpleFlagType, string[]> = {
       boolean: ['--no-test', '--test'],
       number: ['--test', '1', '--test', '2'],
       path: ['--test', '1', '--test', '2'],
@@ -518,7 +524,7 @@ describe('parseFlags', () => {
 
     Object.entries(cases).forEach(([type, args]) => {
       ensure.throws(
-        () => checkFlag('test', { type: type as Flag['type'] }, args),
+        () => checkFlag('test', { type: type as SimpleFlagType }, args),
         'Multiple values provided for flag: test',
         `Multiple values allowed for ${type} flag`
       );
@@ -526,29 +532,65 @@ describe('parseFlags', () => {
   });
 
   it('throws an error if a value is not in the set of choices', () => {
-    const cases: Array<[Flag['type'], string[], string, string]> = [
-      ['string', ['1'], '1', '2']
+    const cases: Array<[
+      ScalarValue[],
+      ScalarValue,
+      ScalarValue
+    ]> = [
+      [['1', '2'], '1', '3'],
+      [[1, 2], 1, 3]
     ];
 
-    cases.forEach(([type, choices, valid, invalid]) => {
+    cases.forEach(([choices, valid, invalid]) => {
+      const flag = useFlag({
+        choices,
+        description,
+        type: 'choice'
+      });
+
       ensure.throws(
-        () => checkFlag('test', { choices, type }, ['--test', invalid]),
+        () => parse(['--test', invalid.toString()], { test: flag }),
         'Invalid value',
-        `A ${type} value outside the set of choices was allowed`
+        `Invalid value ${invalid} allowed: ${choices}`
       );
 
       assert.isDefined(
-        checkFlag('test', { choices, type }, ['--test', valid]).flags.test,
-        `A ${type} value in the set of choices was rejected`
+        parse(['--test', valid.toString()], { test: flag }).flags.test,
+        `Valid choice ${valid} rejected: ${choices}`
       );
     });
   });
 
-  it('throws an error if a custom validator function returns false', () => {
+  it('throws an error if a a default value is invalid for a cohice flag', () => {
+    const cases: Array<[
+      ScalarValue[],
+      ScalarValue
+    ]> = [
+      [['1', '2'], '3'],
+      [[1, 2], 3]
+    ];
+
+    cases.forEach(([choices, invalid]) => {
+      const flag = useFlag({
+        choices,
+        default: invalid,
+        description,
+        type: 'choice'
+      });
+
+      ensure.throws(
+        () => parse([], { test: flag }),
+        'Invalid value',
+        `Invalid default choice ${invalid} allowed: ${choices}`
+      );
+    });
+  });
+
+  it('throws an error if a validator function returns false', () => {
     const cases: Array<
       [
-        Flag['type'],
-        ScalarValidator<ScalarValue, ScalarValue>,
+        ScalarType,
+        ScalarValidator<ScalarValue>,
         string,
         string
       ]
@@ -573,7 +615,7 @@ describe('parseFlags', () => {
   });
 
   it('throws an error if an invalid value type is provided for a flag', () => {
-    const cases: Array<[Flag['type'], string[]]> = [
+    const cases: Array<[ScalarType, string[]]> = [
       ['number', ['--test', '']],
       ['number', ['--test', 'test']]
     ];
@@ -588,7 +630,7 @@ describe('parseFlags', () => {
   });
 
   it('includes a flag’s invalid value in its error message', () => {
-    const cases: Array<[Flag['type'], string[]]> = [
+    const cases: Array<[ScalarType, string[]]> = [
       ['number', ['--test', 'alfa']],
       ['number', ['--test', 'bravo']]
     ];

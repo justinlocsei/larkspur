@@ -2,14 +2,10 @@ import type { NormalizedArgs } from '../args.js';
 import { expandPath } from '../paths.js';
 import type { OneOrMany } from '../types/utils.js';
 import { sortEntries } from '../utils.js';
-import {
-  choicesForFlag,
-  flagToSetter,
-  isFlagSetter,
-  isScalarFlag
-} from './data.js';
+import { flagToSetter, isFlagSetter, isScalarFlag } from './data.js';
 import type {
   BooleanFlag,
+  ChoiceFlag,
   ConsumedArgs,
   Flag,
   FlagContext,
@@ -17,6 +13,7 @@ import type {
   NumberFlag,
   PathFlag,
   ScalarFlag,
+  ScalarValue,
   StringFlag
 } from './types.ts';
 import type { SpecificValueOf, ValueOf, ValuesOf } from './values.js';
@@ -193,6 +190,8 @@ function parseFlag(
   switch (flag.type) {
     case 'boolean':
       return parseBooleanFlag(flag, context);
+    case 'choice':
+      return parseChoiceFlag(flag, context);
     case 'number':
       return parseNumberFlag(flag, context);
     case 'path':
@@ -279,11 +278,33 @@ function parseStringFlag(
 }
 
 /**
+ * Parse a choice flag
+ */
+function parseChoiceFlag(
+  flag: ChoiceFlag,
+  context: ParsingContext
+): ScalarParsingResult<ScalarValue> {
+  return typeof flag.choices[0] === 'number'
+    ? parseScalarInputs(
+      flag,
+      context,
+      extractScalarInputs(context),
+      v => parseInt(v, 10),
+      value => validateScalarValue(flag, value)
+    )
+    : parseStringInputs(
+      context,
+      flag as unknown as StringFlag,
+      v => v
+    ) as ScalarParsingResult<ScalarValue>;
+}
+
+/**
  * Parse the inputs for a string or path flag
  */
 function parseStringInputs(
   context: ParsingContext,
-  stringFlag: PathFlag | StringFlag<string>,
+  stringFlag: PathFlag | StringFlag,
   process: (v: string) => string
 ): ScalarParsingResult<string> {
   return parseScalarInputs(
@@ -424,12 +445,15 @@ function validateScalarValue<T extends ScalarFlag>(
   flag: T,
   value: SpecificValueOf<T>
 ): string | undefined {
-  const { isValid } = flag;
-  const choices = choicesForFlag(flag) || [];
+  if (flag.type === 'choice') {
+    if (!flag.choices.includes(value as SpecificValueOf<T>)) {
+      return `Supported values: ${flag.choices.join(', ')}`;
+    }
 
-  if (choices.length && !choices.includes(value as never)) {
-    return `Supported values: ${choices.join(', ')}`;
+    return undefined;
   }
+
+  const { isValid } = flag;
 
   if (isValid && !isValid(value as never)) {
     return `Unsupported value: ${value}`;
