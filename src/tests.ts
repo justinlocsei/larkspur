@@ -1,5 +1,3 @@
-import type { Flag, SimpleFlag } from './flags/types.js';
-
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
@@ -62,26 +60,6 @@ export async function createTempDir(): Promise<string> {
   await fs.chmod(tmpDir, 0o700);
 
   return tmpDir;
-}
-
-/**
- * Define a basic flag
- */
-export function flag(
-  type: SimpleFlag['type'],
-  {
-    description = 'description',
-    required
-  }: {
-    description?: string;
-    required?: true;
-  } = {}
-): Flag {
-  return {
-    description,
-    required,
-    type
-  };
 }
 
 /**

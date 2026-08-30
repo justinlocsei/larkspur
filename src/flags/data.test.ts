@@ -1,6 +1,7 @@
 import { assert, describe, it } from 'vitest';
 
-import { checkConversion, flag } from '../tests.js';
+import C from '../factory.js';
+import { checkConversion } from '../tests.js';
 import {
   choicesForFlag,
   flagToSetter,
@@ -12,15 +13,20 @@ import type { Flag, FlagChoices } from './types.js';
 
 const description = 'description';
 
+const boolean = C.flag('boolean', description);
+const number = C.flag('number', description);
+const path = C.flag('path', description);
+const string = C.flag('string', description);
+
 describe('choicesForFlag', () => {
   it('extracts the list of choices from a choice flag', () => {
     checkConversion<Flag, FlagChoices>(
       (i, o, m) => assert.deepEqual(choicesForFlag(i), o, m),
       [
-        [flag('boolean'), undefined],
-        [flag('number'), undefined],
-        [flag('path'), undefined],
-        [flag('string'), undefined],
+        [boolean, undefined],
+        [number, undefined],
+        [path, undefined],
+        [string, undefined],
         [
           {
             choices: ['alfa', 'bravo'],
@@ -51,12 +57,12 @@ describe('getFlagForms', () => {
     checkConversion<Flag, string>(
       (i, o, m) => assert.sameMembers(getFlagForms('test', i), [o], m),
       [
-        [flag('boolean'), 'test'],
+        [boolean, 'test'],
         [{ default: true, description, type: 'boolean' }, 'no-test'],
         [{ default: false, description, type: 'boolean' }, 'test'],
-        [flag('string'), 'test'],
-        [flag('number'), 'test'],
-        [flag('path'), 'test']
+        [string, 'test'],
+        [number, 'test'],
+        [path, 'test']
       ]
     );
   });
@@ -86,10 +92,10 @@ describe('isScalarFlag', () => {
     checkConversion<Flag, boolean>(
       (i, o, m) => assert.equal(isScalarFlag(i), o, m),
       [
-        [flag('boolean'), false],
-        [flag('string'), true],
-        [flag('number'), true],
-        [flag('path'), true]
+        [boolean, false],
+        [string, true],
+        [number, true],
+        [path, true]
       ]
     );
   });

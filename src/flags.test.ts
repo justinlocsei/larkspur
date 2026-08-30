@@ -1,5 +1,6 @@
 import { assert, describe, it } from 'vitest';
 
+import C from './factory.js';
 import type {
   BooleanFlag,
   Flags,
@@ -7,7 +8,7 @@ import type {
   StringFlag
 } from './flags/types.js';
 import { useFlag, useFlags } from './flags.js';
-import { flag, T } from './tests.js';
+import { T } from './tests.js';
 
 const description = 'description';
 
@@ -33,8 +34,8 @@ describe('useFlag', () => {
 describe('useFlags', () => {
   it('returns the provided flags', () => {
     const flags: Flags = {
-      number: flag('number'),
-      string: flag('string')
+      number: C.flag('number', description),
+      string: C.flag('string', description)
     };
 
     assert.deepEqual(useFlags(flags), flags);
