@@ -270,7 +270,7 @@ describe('BashCompletionProvider', () => {
             closed: {
               choices: ['alfa-one', 'alfa-two', 'bravo-one'],
               description,
-              type: 'string'
+              type: 'choice'
             },
             open: { description, type: 'string' }
           },
@@ -350,7 +350,7 @@ describe('BashCompletionProvider', () => {
               closed: {
                 choices: ['alfa', 'bravo'],
                 description,
-                type: 'string'
+                type: 'choice'
               },
               open: { description, type: 'string' }
             },

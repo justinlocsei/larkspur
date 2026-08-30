@@ -180,8 +180,8 @@ describe('defineCommand', () => {
           T.Equivalent<
             typeof flags,
             {
-              alfa: Alfa;
-              bravo: Bravo;
+              alfa: string;
+              bravo: string;
             }
           >
         >(true);
@@ -206,13 +206,13 @@ describe('defineCommand', () => {
         alfa: {
           choices: alfa,
           description,
-          type: 'string'
+          type: 'choice'
         },
         bravo: {
           choices: bravo,
           default: bravoDefault,
           description,
-          type: 'string'
+          type: 'choice'
         }
       },
       handler: async (flags) => {
@@ -242,14 +242,14 @@ describe('defineCommand', () => {
       description,
       flags: {
         alfa: {
+          choices: alfa,
           description,
-          isValid: (v: string): v is Alfa => alfa.includes(v as Alfa),
-          type: 'string'
+          type: 'choice'
         },
         bravo: {
+          choices: bravo,
           description,
-          isValid: (v: string): v is Bravo => bravo.includes(v as Bravo),
-          type: 'string'
+          type: 'choice'
         }
       },
       handler: async (flags) => {
@@ -287,9 +287,10 @@ describe('defineCommand', () => {
         },
         specials: {
           allowMany: true,
+          choices: ['alfa', 'bravo'] as const,
           default: special,
           description,
-          type: 'string'
+          type: 'choice'
         },
         strings: {
           allowMany: true,
