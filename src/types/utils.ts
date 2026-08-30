@@ -42,13 +42,3 @@ export type Optional<T extends object, K extends keyof T> =
 export type Require<T extends object, K extends keyof T> =
   & Omit<T, K>
   & Required<Pick<T, K>>;
-
-/**
- * Select a subset of union members
- */
-export type Select<T, K extends T> = Extract<T, K>;
-
-/**
- * Produce a narrower type from a subset of an object's properties
- */
-export type Subset<T extends object, K extends keyof T> = Pick<T, K>;
