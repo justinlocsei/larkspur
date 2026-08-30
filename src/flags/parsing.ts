@@ -125,12 +125,10 @@ export function extractValues(
  * Extract flags from a list of arguments
  */
 export function parseFlags(
-  fromArgs: NormalizedArgs,
+  { args }: NormalizedArgs,
   flags: Flags,
   { allowUnused = false }: ParsingOptions = {}
 ): FlagParsing {
-  const args = fromArgs.args;
-
   const consumed: number[] = [];
   const providedFlags: string[] = [];
 
@@ -138,8 +136,10 @@ export function parseFlags(
     previous,
     [name, flag]
   ) => {
-    const context: ParsingContext = { args, name };
-    const { consumedIndices, provided, value } = parseFlag(flag, context);
+    const { consumedIndices, provided, value } = parseFlag(flag, {
+      args,
+      name
+    });
 
     if (provided) {
       providedFlags.push(name);
@@ -178,7 +178,7 @@ export function parseFlags(
 }
 
 /**
- * A value produced when parsing any supported flag
+ * A value produced when parsing a supported flag
  */
 type ParsedFlagValue = ValueOf<Flag> | undefined;
 
@@ -238,7 +238,7 @@ function parseBooleanFlag(
 }
 
 /**
- * Parse a numeric flag
+ * Parse a number flag
  */
 function parseNumberFlag(
   flag: NumberFlag,
@@ -249,13 +249,10 @@ function parseNumberFlag(
     context,
     extractScalarInputs(context),
     v => parseInt(v, 10),
-    value => {
-      if (!Number.isFinite(value)) {
-        return `Invalid number: ${value.toString()}`;
-      } else {
-        return validateScalarValue(flag, value);
-      }
-    }
+    value =>
+      !Number.isFinite(value)
+        ? `Invalid number: ${value.toString()}`
+        : validateScalarValue(flag, value)
   );
 }
 
@@ -295,13 +292,13 @@ function parseChoiceFlag(
     v => typeof choices[0] === 'number' ? parseInt(v, 10) : v,
     value =>
       !choices.includes(value)
-        ? `Supported values: ${flag.choices.join(', ')}`
+        ? `Supported values: ${choices.join(', ')}`
         : undefined
   );
 }
 
 /**
- * Parse the inputs for a string or path flag
+ * Parse the inputs for a string-like flag
  */
 function parseStringInputs(
   context: ParsingContext,
@@ -320,8 +317,8 @@ function parseStringInputs(
 /**
  * Throw an error to forbid duplicate values for a flag
  */
-function forbidDuplicates(context: ParsingContext): never {
-  throw new ParsingError(`Multiple values provided for flag: ${context.name}`);
+function forbidDuplicates({ name }: ParsingContext): never {
+  throw new ParsingError(`Multiple values provided for flag: ${name}`);
 }
 
 /**
@@ -329,6 +326,7 @@ function forbidDuplicates(context: ParsingContext): never {
  */
 function extractScalarInputs(context: ParsingContext): ScalarInputs {
   const { args, name } = context;
+
   const setter = flagToSetter(name);
   const values: string[] = [];
   const consumedIndices: number[] = [];
@@ -348,7 +346,7 @@ function extractScalarInputs(context: ParsingContext): ScalarInputs {
     let consumedValues = 0;
 
     while (parsing) {
-      const nextArg: string | undefined = args[flagIndex + 1 + consumedValues];
+      const nextArg = args[flagIndex + 1 + consumedValues];
 
       if (nextArg === undefined || isFlagSetter(nextArg)) {
         if (consumedValues) {
@@ -382,17 +380,17 @@ function parseScalarInputs<T extends ScalarFlag>(
   context: ParsingContext,
   inputs: ScalarInputs,
   parse: (value: string) => SpecificValueOf<T>,
-  validate: (value: SpecificValueOf<T>) => string | undefined
+  reportError: (value: SpecificValueOf<T>) => string | undefined
 ): ScalarParsingResult<SpecificValueOf<T>> {
   const { name } = context;
-  let provided: boolean;
-  let values: SpecificValueOf<T>[] = [];
 
-  function requireValid(
-    value: SpecificValueOf<T>,
-    source: string
-  ): SpecificValueOf<T> {
-    const message = validate(value);
+  type Value = SpecificValueOf<T>;
+
+  let provided: boolean;
+  let values: Value[] = [];
+
+  function validate(value: Value, source: string): Value {
+    const message = reportError(value);
 
     if (message) {
       throw new ParsingError(
@@ -405,7 +403,7 @@ function parseScalarInputs<T extends ScalarFlag>(
 
   if (inputs.values) {
     for (const input of inputs.values) {
-      values.push(requireValid(parse(input), input));
+      values.push(validate(parse(input), input));
     }
 
     provided = values.length > 0;
@@ -413,12 +411,7 @@ function parseScalarInputs<T extends ScalarFlag>(
     provided = false;
 
     values = flag.default !== undefined
-      ? [
-        requireValid(
-          flag.default as SpecificValueOf<T>,
-          JSON.stringify(flag.default)
-        )
-      ]
+      ? [validate(flag.default as Value, JSON.stringify(flag.default))]
       : [];
   }
 
@@ -426,7 +419,7 @@ function parseScalarInputs<T extends ScalarFlag>(
     forbidDuplicates(context);
   }
 
-  let value: SpecificValueOf<T>[] | SpecificValueOf<T> | undefined;
+  let value: Value[] | Value | undefined;
 
   if (flag.allowMany) {
     if (flagIsRequired(flag) && !values.length) {
