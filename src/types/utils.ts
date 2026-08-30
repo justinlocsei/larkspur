@@ -12,6 +12,11 @@ export type DistributiveOmit<
 > = T extends unknown ? Omit<T, K> : never;
 
 /**
+ * Distribute a readonly modifier to all values
+ */
+export type DistributiveReadonly<T> = T extends T ? readonly T[] : never;
+
+/**
  * Require a provided object to match a schema
  */
 export type Exact<Schema, Provided> =
