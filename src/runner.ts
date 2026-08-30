@@ -27,20 +27,6 @@ type IsRunResponse<T extends string, U> = U & {
 };
 
 /**
- * A CLI run that completed successfully
- */
-type SuccessRunResponse = IsRunResponse<'success', {
-  command: ParsedCommand;
-}>;
-
-/**
- * A CLI run that returned early with a help message
- */
-type HelpRunResponse = IsRunResponse<'help', {
-  message: string;
-}>;
-
-/**
  * A completion script generated for a CLI
  */
 type CompletionRunResponse = IsRunResponse<'completion', {
@@ -53,6 +39,20 @@ type CompletionRunResponse = IsRunResponse<'completion', {
 export type ErrorRunResponse = IsRunResponse<'error', {
   error: Error;
   help?: string;
+}>;
+
+/**
+ * A CLI run that returned early with a help message
+ */
+type HelpRunResponse = IsRunResponse<'help', {
+  message: string;
+}>;
+
+/**
+ * A CLI run that completed successfully
+ */
+type SuccessRunResponse = IsRunResponse<'success', {
+  command: ParsedCommand;
 }>;
 
 /**
