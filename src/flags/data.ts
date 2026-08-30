@@ -1,4 +1,4 @@
-import type { Flag, FlagChoices, ScalarFlag } from './types.js';
+import type { Flag, FlagChoices, Flags, ScalarFlag } from './types.js';
 
 // The text used before a flag name to mark it as a setter
 export const SETTER_PREFIX = '--';
@@ -45,4 +45,13 @@ export function isFlagSetter(text: string): boolean {
  */
 export function isScalarFlag(flag: Flag): flag is ScalarFlag {
   return flag.type !== 'boolean';
+}
+
+/**
+ * Omit hidden flags from a collection
+ */
+export function visibleFlags(flags: Flags): Flags {
+  return Object.fromEntries(
+    Object.entries(flags).filter(([, flag]) => !flag.hidden)
+  );
 }
