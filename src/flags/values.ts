@@ -1,9 +1,10 @@
 import { quote } from '../shell.js';
-import type { AnyArray, OneOrMany, Optional, Require } from '../types/utils.js';
+import type { OneOrMany, Optional, Require } from '../types/utils.js';
 import { sortEntries } from '../utils.js';
 import { flagToSetter } from './data.js';
 import type {
   BooleanFlag,
+  ChoiceFlag,
   Flag,
   FlagContext,
   Flags,
@@ -37,14 +38,10 @@ type NamesOf<T extends Flags, U> = Extract<
  * Determine the most specific value for a flag
  */
 export type SpecificValueOf<T extends Flag> = T extends BooleanFlag ? boolean
+  : T extends ChoiceFlag<infer C> ? C[number]
   : T extends NumberFlag ? number
   : T extends PathFlag ? string
-  : T extends StringFlag
-    ? T extends { choices: AnyArray<unknown> } ? T['choices'][number]
-    : T extends { default: string } ? T['default']
-    : T extends { isValid: (value: string) => value is infer U extends string }
-      ? U
-    : string
+  : T extends StringFlag ? string
   : never;
 
 /**

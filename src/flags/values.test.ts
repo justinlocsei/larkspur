@@ -38,7 +38,6 @@ describe('ApplicableValues', () => {
       boolean: { description, type: 'boolean' },
       optional: {
         description,
-        required: false,
         type: 'number'
       },
       required: {
@@ -274,11 +273,11 @@ describe('ValueOf', () => {
     T.assert<T.Equivalent<string, ValueOf<F['string'], 'narrow'>>>(true);
   });
 
-  it('respects specific choices for string flags', () => {
+  it('respects specific choices for choice flags', () => {
     const subject = useFlag({
       choices: ['alfa', 'bravo'] as const,
       description,
-      type: 'string'
+      type: 'choice'
     });
 
     T.assert<
@@ -289,7 +288,7 @@ describe('ValueOf', () => {
     >(true);
   });
 
-  it('respects specific default types for string flags', () => {
+  it('does not narrow string flags from default values', () => {
     type Choice = 'alfa' | 'bravo';
 
     const subject = useFlag({
@@ -300,24 +299,22 @@ describe('ValueOf', () => {
 
     T.assert<
       T.Equivalent<
-        'alfa' | 'bravo',
+        string,
         ValueOf<typeof subject, 'narrow'>
       >
     >(true);
   });
 
-  it('can use a string validator to determine the type', () => {
-    type Choice = 'alfa' | 'bravo';
-
+  it('does not narrow string flags from validators', () => {
     const subject = useFlag({
       description,
-      isValid: (v: string): v is Choice => true,
+      isValid: (v: string) => v === 'alfa' || v === 'bravo',
       type: 'string'
     });
 
     T.assert<
       T.Equivalent<
-        'alfa' | 'bravo',
+        string,
         ValueOf<typeof subject, 'narrow'>
       >
     >(true);
