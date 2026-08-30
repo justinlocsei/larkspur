@@ -14,22 +14,22 @@ type IsCommand<T extends string, U> = U & {
  * A command handler
  */
 export type CommandHandler<
-  TFlags extends Flags = Flags,
-  TContext extends FlagContext = 'narrow'
+  F extends Flags = Flags,
+  C extends FlagContext = 'narrow'
 > = IsCommand<'handler', {
-  flags?: TFlags;
-  handler: CommmandHandlerFn<TFlags, TContext>;
+  flags?: F;
+  handler: CommmandHandlerFn<F, C>;
 }>;
 
 /**
  * A command's handler function
  */
 export type CommmandHandlerFn<
-  TFlags extends Flags = Flags,
-  TContext extends FlagContext = 'narrow'
+  F extends Flags = Flags,
+  C extends FlagContext = 'narrow'
 > = (
-  flags: ValuesOf<TFlags, TContext>,
-  details: CommandParsingDetails<TFlags>
+  flags: ValuesOf<F, C>,
+  details: CommandParsingDetails<F>
 ) => Promise<void>;
 
 /**
