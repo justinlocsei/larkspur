@@ -207,7 +207,7 @@ export const CORE_FLAGS = useFlags({
   complete: {
     choices: COMPLETION_SHELLS,
     description: 'Generate completions for the given shell',
-    type: 'string'
+    type: 'choice'
   },
   help: {
     default: false,
