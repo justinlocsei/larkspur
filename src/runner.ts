@@ -89,26 +89,29 @@ export async function runCLI({
     );
   }
 
-  if (parsing.type === 'error') {
-    return failWith(
-      new OperationalError(parsing.message),
-      parsing.help
-        ? buildHelp({ cli: meta, scope: parsing.help })
-        : undefined
-    );
-  } else if (parsing.type === 'help') {
-    return {
-      message: buildHelp({ cli: meta, scope: parsing.scope }),
-      type: 'help'
-    };
-  } else if (parsing.type === 'completion') {
-    return {
-      script: buildCompletions(parsing.shell, {
-        commands: entry,
-        name: meta.name
-      }),
-      type: 'completion'
-    };
+  switch (parsing.type) {
+    case 'completion':
+      return {
+        script: buildCompletions(parsing.shell, {
+          commands: entry,
+          name: meta.name
+        }),
+        type: 'completion'
+      };
+
+    case 'error':
+      return failWith(
+        new OperationalError(parsing.message),
+        parsing.help
+          ? buildHelp({ cli: meta, scope: parsing.help })
+          : undefined
+      );
+
+    case 'help':
+      return {
+        message: buildHelp({ cli: meta, scope: parsing.scope }),
+        type: 'help'
+      };
   }
 
   let execution: RunResult;
