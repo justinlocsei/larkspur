@@ -1,5 +1,3 @@
-import type { AnyArray } from '../types/utils.js';
-
 /**
  * Define a flag
  */
@@ -10,25 +8,26 @@ type IsFlag<TType extends string, TValue> = {
 };
 
 /**
- * Define a flag that takes a scalar value
+ * Shared fields for all scalar flags
  */
-type IsScalarFlag<
-  TGeneric extends ScalarValue = ScalarValue,
-  TSpecific extends TGeneric = TGeneric
-> = {
+type ScalarFields = {
   allowMany?: boolean;
   completion?: string;
-  isValid?: ScalarValidator<TGeneric, TSpecific>;
-  required?: boolean;
+  required?: true;
 };
 
 /**
- * A function that returns whether a scalar value is valid or is a subtype of a
- * parent type
+ * Define a basic scalar flag
  */
-export type ScalarValidator<T extends ScalarValue, U extends T> =
-  | ((value: T) => value is U)
-  | ((value: T) => boolean);
+type IsScalarFlag<T extends string, V extends ScalarValue> =
+  & IsFlag<T, V>
+  & ScalarFields
+  & { isValid?: ScalarValidator<V> };
+
+/**
+ * A function that determines whether a scalar value is valid
+ */
+export type ScalarValidator<T extends ScalarValue> = (value: T) => boolean;
 
 /**
  * A boolean flag
@@ -38,27 +37,34 @@ export type BooleanFlag = IsFlag<'boolean', boolean>;
 /**
  * A numeric flag
  */
-export type NumberFlag =
-  & IsFlag<'number', number>
-  & IsScalarFlag<number, number>;
+export type NumberFlag = IsScalarFlag<'number', number>;
 
 /**
  * A flag that takes a filesystem path
  */
-export type PathFlag = IsFlag<'path', string> & IsScalarFlag<string, string>;
+export type PathFlag = IsScalarFlag<'path', string>;
 
 /**
  * A string flag
  */
-export type StringFlag<T extends string = string> =
-  & IsFlag<'string', T>
-  & IsScalarFlag<string, T>
-  & { choices?: AnyArray<T> };
+export type StringFlag = IsScalarFlag<'string', string>;
+
+/**
+ * A flag constrained to a limited set of scalar values
+ */
+export type ChoiceFlag<T extends ScalarValue = ScalarValue> =
+  & IsFlag<'choice', T>
+  & ScalarFields
+  & {
+    choices: readonly T[];
+    isValid: (value: ScalarValue) => value is T;
+  };
 
 /**
  * The flags that take a scalar value
  */
 export type ScalarFlag =
+  | ChoiceFlag
   | NumberFlag
   | PathFlag
   | StringFlag;
@@ -91,7 +97,7 @@ export type SupportedValue = NonNullable<Flag['default']>;
 /**
  * Extracted choices for a flag
  */
-export type FlagChoices = undefined | string[];
+export type FlagChoices = readonly ScalarValue[] | undefined;
 
 /**
  * The context in which a flag's value is being used
