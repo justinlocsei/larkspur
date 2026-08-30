@@ -11,6 +11,7 @@ type CoreFlagFields<T extends string> = {
  */
 type OptionalFlagFields<T> = {
   default?: T;
+  hidden?: true;
 };
 
 /**
