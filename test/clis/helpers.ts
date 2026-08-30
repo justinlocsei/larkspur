@@ -87,6 +87,13 @@ export function test(
     });
   }
 
+  it('validates completion requests', () => {
+    const result = run('--complete', 'fish');
+
+    assert.include(result.stderr, 'fish');
+    assert.equal(result.status, 1);
+  });
+
   Object.entries(tests).forEach(([name, test]) => {
     if (test) {
       it(name, () => {
