@@ -1,11 +1,24 @@
 /**
+ * Core fields shared by all flags
+ */
+type CoreFlagFields<T extends string> = {
+  description: string;
+  type: T;
+};
+
+/**
+ * Optional fields shared by all flags
+ */
+type OptionalFlagFields<T> = {
+  default?: T;
+};
+
+/**
  * Define a flag
  */
-type IsFlag<TType extends string, TValue> = {
-  default?: TValue;
-  description: string;
-  type: TType;
-};
+type IsFlag<TType extends string, TValue> =
+  & CoreFlagFields<TType>
+  & OptionalFlagFields<TValue>;
 
 /**
  * Shared fields for all scalar flags
@@ -17,12 +30,19 @@ type ScalarFields = {
 };
 
 /**
+ * Options for simple scalar flags
+ */
+export type SimpleScalarOptions<T extends ScalarValue> = ScalarFields & {
+  default?: T;
+  isValid?: (value: T) => boolean;
+};
+
+/**
  * Define a simple scalar flag
  */
-type IsScalarFlag<T extends string, V extends ScalarValue> =
+type IsSimpleScalarFlag<T extends string, V extends ScalarValue> =
   & IsFlag<T, V>
-  & ScalarFields
-  & { isValid?: ScalarValidator<V> };
+  & SimpleScalarOptions<V>;
 
 /**
  * A function that determines whether a scalar value is valid
@@ -37,17 +57,17 @@ export type BooleanFlag = IsFlag<'boolean', boolean>;
 /**
  * A numeric flag
  */
-export type NumberFlag = IsScalarFlag<'number', number>;
+export type NumberFlag = IsSimpleScalarFlag<'number', number>;
 
 /**
  * A flag that takes a filesystem path
  */
-export type PathFlag = IsScalarFlag<'path', string>;
+export type PathFlag = IsSimpleScalarFlag<'path', string>;
 
 /**
  * A string flag
  */
-export type StringFlag = IsScalarFlag<'string', string>;
+export type StringFlag = IsSimpleScalarFlag<'string', string>;
 
 /**
  * A flag constrained to a limited set of scalar values
@@ -103,6 +123,14 @@ export type SupportedValue = NonNullable<Flag['default']>;
  * Extracted choices for a flag
  */
 export type FlagChoices = readonly ScalarValue[] | undefined;
+
+/**
+ * Extract options from a flag
+ */
+export type FlagOptions<T extends Flag> = Omit<
+  T,
+  keyof CoreFlagFields<T['type']>
+>;
 
 /**
  * The context in which a flag's value is being used
