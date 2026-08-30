@@ -1,5 +1,6 @@
 import { assert, describe, it } from 'vitest';
 
+import C from '../factory.js';
 import { T } from '../tests.js';
 import { defineCommandGroup, defineCommandHandler } from './definition.js';
 
@@ -38,22 +39,10 @@ describe('defineCommand', () => {
     defineCommandHandler({
       description,
       flags: {
-        boolean: {
-          description,
-          type: 'boolean'
-        },
-        number: {
-          description,
-          type: 'number'
-        },
-        path: {
-          description,
-          type: 'path'
-        },
-        string: {
-          description,
-          type: 'string'
-        }
+        boolean: C.flag('boolean', description),
+        number: C.flag('number', description),
+        path: C.flag('path', description),
+        string: C.flag('string', description)
       },
       handler: async (flags) => {
         T.assert<
@@ -75,31 +64,11 @@ describe('defineCommand', () => {
     defineCommandHandler({
       description,
       flags: {
-        boolean: {
-          default: true,
-          description,
-          type: 'boolean'
-        },
-        number: {
-          default: 1,
-          description,
-          type: 'number'
-        },
-        onumber: {
-          default: undefined,
-          description,
-          type: 'number'
-        },
-        ostring: {
-          default: undefined,
-          description,
-          type: 'string'
-        },
-        string: {
-          default: 'Value',
-          description,
-          type: 'string'
-        }
+        boolean: C.flag('boolean', description, { default: true }),
+        number: C.flag('number', description, { default: 1 }),
+        onumber: C.flag('number', description),
+        ostring: C.flag('string', description),
+        string: C.flag('string', description, { default: 'Value' })
       },
       handler: async (flags) => {
         T.assert<
@@ -122,20 +91,9 @@ describe('defineCommand', () => {
     defineCommandHandler({
       description,
       flags: {
-        boolean: {
-          description,
-          type: 'boolean'
-        },
-        number: {
-          description,
-          required: true,
-          type: 'number'
-        },
-        string: {
-          description,
-          required: true,
-          type: 'string'
-        }
+        boolean: C.flag('boolean', description),
+        number: C.flag('number', description, { required: true }),
+        string: C.flag('string', description, { required: true })
       },
       handler: async (flags) => {
         T.assert<
@@ -152,113 +110,20 @@ describe('defineCommand', () => {
     });
   });
 
-  it('supports specialized string flags using default values', () => {
-    type Alfa = 'alfa' | 'ALFA';
-    type Bravo = 'bravo' | 'BRAVO';
-
-    const asType = <T>(value: T): T => value;
-
-    const alfa = asType<Alfa>('alfa');
-    const bravo = asType<Bravo>('BRAVO');
-
+  it('uses a narrow type for choice flags', () => {
     defineCommandHandler({
       description,
       flags: {
-        alfa: {
-          default: alfa,
-          description,
-          type: 'string'
-        },
-        bravo: {
-          default: bravo,
-          description,
-          type: 'string'
-        }
+        number: C.flag('choice', description, { choices: [1, 2] }),
+        string: C.flag('choice', description, { choices: ['alfa', 'bravo'] })
       },
       handler: async (flags) => {
         T.assert<
           T.Equivalent<
             typeof flags,
             {
-              alfa: string;
-              bravo: string;
-            }
-          >
-        >(true);
-      }
-    });
-  });
-
-  it('supports specialized string values using choice lists', () => {
-    type Alfa = 'alfa' | 'ALFA';
-    type Bravo = 'bravo' | 'BRAVO';
-
-    const asList = <T>(value: T[]): T[] => value;
-
-    const alfa = asList<Alfa>(['alfa']);
-    const bravo = asList<Bravo>(['BRAVO']);
-
-    const bravoDefault: Bravo = 'bravo';
-
-    defineCommandHandler({
-      description,
-      flags: {
-        alfa: {
-          choices: alfa,
-          description,
-          type: 'choice'
-        },
-        bravo: {
-          choices: bravo,
-          default: bravoDefault,
-          description,
-          type: 'choice'
-        }
-      },
-      handler: async (flags) => {
-        T.assert<
-          T.Equivalent<
-            typeof flags,
-            {
-              alfa?: Alfa;
-              bravo: Bravo;
-            }
-          >
-        >(true);
-      }
-    });
-  });
-
-  it('supports specialized strings using validator functions', () => {
-    type Alfa = 'alfa' | 'ALFA';
-    type Bravo = 'bravo' | 'BRAVO';
-
-    const asList = <T>(value: T[]): T[] => value;
-
-    const alfa = asList<Alfa>(['alfa', 'ALFA']);
-    const bravo = asList<Bravo>(['bravo', 'BRAVO']);
-
-    defineCommandHandler({
-      description,
-      flags: {
-        alfa: {
-          choices: alfa,
-          description,
-          type: 'choice'
-        },
-        bravo: {
-          choices: bravo,
-          description,
-          type: 'choice'
-        }
-      },
-      handler: async (flags) => {
-        T.assert<
-          T.Equivalent<
-            typeof flags,
-            {
-              alfa?: Alfa;
-              bravo?: Bravo;
+              number?: 1 | 2;
+              string?: 'alfa' | 'bravo';
             }
           >
         >(true);
@@ -267,37 +132,20 @@ describe('defineCommand', () => {
   });
 
   it('supports lists of values', () => {
-    type Special = 'alfa' | 'bravo';
-
-    const asType = <T>(value: T): T => value;
-    const special = asType<Special>('alfa');
-
     defineCommandHandler({
       description,
       flags: {
-        numbers: {
+        numbers: C.flag('number', description, { allowMany: true }),
+        paths: C.flag('path', description, { allowMany: true }),
+        specials: C.flag('choice', description, {
           allowMany: true,
-          description,
-          type: 'number'
-        },
-        paths: {
+          choices: ['alfa', 'bravo'],
+          default: 'bravo'
+        }),
+        strings: C.flag('string', description, {
           allowMany: true,
-          description,
-          type: 'path'
-        },
-        specials: {
-          allowMany: true,
-          choices: ['alfa', 'bravo'] as const,
-          default: special,
-          description,
-          type: 'choice'
-        },
-        strings: {
-          allowMany: true,
-          description,
-          required: true,
-          type: 'string'
-        }
+          required: true
+        })
       },
       handler: async (flags) => {
         T.assert<
@@ -306,7 +154,7 @@ describe('defineCommand', () => {
             {
               numbers?: number[];
               paths?: string[];
-              specials: Special[];
+              specials: Array<'alfa' | 'bravo'>;
               strings: string[];
             }
           >
