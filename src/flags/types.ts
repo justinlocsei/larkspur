@@ -80,6 +80,11 @@ export type ChoiceFlag<
   & { choices: C };
 
 /**
+ * Get the values for a choice flag
+ */
+export type ChoicesFor<T extends ChoiceFlag> = T['choices'][number];
+
+/**
  * A simple scalar flag
  */
 export type SimpleScalarFlag = NumberFlag | PathFlag | StringFlag;
