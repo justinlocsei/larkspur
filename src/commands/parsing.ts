@@ -127,35 +127,12 @@ type IsHelpScope<T extends string, U> = U & {
 };
 
 /**
- * Help for a specific command
- */
-type CommandHelpScope = IsHelpScope<'command', {
-  command: CommandHandler;
-  path: string[];
-}>;
-
-/**
- * Help for grouped commands
- */
-type GroupHelpScope = IsHelpScope<'group', {
-  group: CommandGroup;
-  path: string[];
-}>;
-
-/**
- * Help for a CLI's root commands
- */
-type RootHelpScope = IsHelpScope<'root', {
-  commands: CommandTree;
-}>;
-
-/**
  * All possible scopes for showing help
  */
 export type HelpScope =
-  | CommandHelpScope
-  | GroupHelpScope
-  | RootHelpScope;
+  | IsHelpScope<'command', { command: CommandHandler; path: string[] }>
+  | IsHelpScope<'group', { group: CommandGroup; path: string[] }>
+  | IsHelpScope<'root', { commands: CommandTree }>;
 
 /**
  * The scope of a help request
