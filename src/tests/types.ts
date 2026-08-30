@@ -1,12 +1,12 @@
 /**
  * Report whether a given type is the never type
  */
-export type Never<T> = [T] extends [never] ? true : false;
+type Never<T> = [T] extends [never] ? true : false;
 
 /**
  * Report whether a given type is not the never type
  */
-export type NonNever<T> = [T] extends [never] ? false : true;
+type NonNever<T> = [T] extends [never] ? false : true;
 
 /**
  * Report whether a given type is assignable to another
