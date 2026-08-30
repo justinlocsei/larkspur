@@ -1,6 +1,6 @@
 import { assert, describe, it } from 'vitest';
 
-import * as T from '../tests/types.js';
+import { T } from '../tests.js';
 import { defineCommandGroup, defineCommandHandler } from './definition.js';
 
 const description = 'description';

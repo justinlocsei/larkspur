@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 export * as ensure from './tests/assertions.js';
+export * as T from './tests/types.js';
 
 /**
  * Produce a readable representation of an object

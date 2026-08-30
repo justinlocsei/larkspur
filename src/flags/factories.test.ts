@@ -1,7 +1,6 @@
 import { assert, describe, it } from 'vitest';
 
-import * as ensure from '../tests/assertions.js';
-import * as T from '../tests/types.js';
+import { ensure, T } from '../tests.js';
 import { buildFlag } from './factories.js';
 import type {
   BooleanFlag,

@@ -1,7 +1,7 @@
 import { assert, describe, it } from 'vitest';
 
 import { useFlag, useFlags } from '../flags.js';
-import * as T from '../tests/types.js';
+import { T } from '../tests.js';
 import type { ApplicableValues, ValueOf, ValuesOf } from './values.js';
 import { setFlagValues } from './values.js';
 

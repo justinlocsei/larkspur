@@ -7,8 +7,7 @@ import type {
   StringFlag
 } from './flags/types.js';
 import { useFlag, useFlags } from './flags.js';
-import * as T from './tests/types.js';
-import { flag } from './tests.js';
+import { flag, T } from './tests.js';
 
 const description = 'description';
 
