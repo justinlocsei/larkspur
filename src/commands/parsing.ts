@@ -55,13 +55,6 @@ type IsRunResult<T extends string, U> = U & {
 };
 
 /**
- * The result of a successful command run
- */
-type SuccessRunResult = IsRunResult<'success', {
-  command: ParsedCommand;
-}>;
-
-/**
  * A failure when running a command
  */
 type FailureRunResult = IsRunResult<'failure', {
@@ -69,9 +62,16 @@ type FailureRunResult = IsRunResult<'failure', {
 }>;
 
 /**
+ * The result of a successful command run
+ */
+type SuccessRunResult = IsRunResult<'success', {
+  command: ParsedCommand;
+}>;
+
+/**
  * The result of running a command
  */
-export type RunResult = SuccessRunResult | FailureRunResult;
+export type RunResult = FailureRunResult | SuccessRunResult;
 
 /**
  * A function that runs a command
@@ -84,6 +84,13 @@ type CommandRunner = () => Promise<RunResult>;
 type CommandParsingResult = IsParsingResult<'command', {
   command: ParsedCommand;
   run: CommandRunner;
+}>;
+
+/**
+ * A request for shell completions
+ */
+type CompletionParsingResult = IsParsingResult<'completion', {
+  shell: CompletionShell;
 }>;
 
 /**
@@ -100,13 +107,6 @@ type ErrorParsingResult = IsParsingResult<'error', {
  */
 type HelpParsingResult = IsParsingResult<'help', {
   scope: HelpScope;
-}>;
-
-/**
- * A request for shell completions
- */
-type CompletionParsingResult = IsParsingResult<'completion', {
-  shell: CompletionShell;
 }>;
 
 /**
@@ -127,10 +127,11 @@ type IsHelpScope<T extends string, U> = U & {
 };
 
 /**
- * Help for a CLI's root commands
+ * Help for a specific command
  */
-type RootHelpScope = IsHelpScope<'root', {
-  commands: CommandTree;
+type CommandHelpScope = IsHelpScope<'command', {
+  command: CommandHandler;
+  path: string[];
 }>;
 
 /**
@@ -142,11 +143,10 @@ type GroupHelpScope = IsHelpScope<'group', {
 }>;
 
 /**
- * Help for a specific command
+ * Help for a CLI's root commands
  */
-type CommandHelpScope = IsHelpScope<'command', {
-  command: CommandHandler;
-  path: string[];
+type RootHelpScope = IsHelpScope<'root', {
+  commands: CommandTree;
 }>;
 
 /**
