@@ -614,6 +614,21 @@ describe('parseFlags', () => {
     });
   });
 
+  it('uses a validator function’s string result as the error message', () => {
+    ensure.throws(
+      () =>
+        checkFlag(
+          'test',
+          {
+            isValid: () => '@alfa',
+            type: 'string'
+          },
+          ['--test', 'bravo']
+        ),
+      '@alfa'
+    );
+  });
+
   it('throws an error if an invalid value type is provided for a flag', () => {
     const cases: Array<[ScalarType, string[]]> = [
       ['number', ['--test', '']],

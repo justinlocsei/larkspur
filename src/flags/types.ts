@@ -34,7 +34,7 @@ type ScalarFields = {
  */
 export type SimpleScalarOptions<T extends ScalarValue> = ScalarFields & {
   default?: T;
-  isValid?: (value: T) => boolean;
+  isValid?: ScalarValidator<T>;
 };
 
 /**
@@ -47,7 +47,9 @@ type IsSimpleScalarFlag<T extends string, V extends ScalarValue> =
 /**
  * A function that determines whether a scalar value is valid
  */
-export type ScalarValidator<T extends ScalarValue> = (value: T) => boolean;
+export type ScalarValidator<T extends ScalarValue> = (
+  value: T
+) => boolean | string;
 
 /**
  * A boolean flag

@@ -451,7 +451,18 @@ function validateScalarValue<T extends SimpleScalarFlag>(
 ): string | undefined {
   const { isValid } = flag;
 
-  return (isValid && !(isValid as ScalarValidator<ScalarValue>)(value))
-    ? `Unsupported value: ${value}`
-    : undefined;
+  if (!isValid) {
+    return undefined;
+  }
+
+  const result = (isValid as ScalarValidator<ScalarValue>)(value);
+
+  switch (result) {
+    case true:
+      return undefined;
+    case false:
+      return `Unsupported value: ${value}`;
+    default:
+      return result;
+  }
 }
