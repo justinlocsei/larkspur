@@ -13,7 +13,7 @@ import type { Flag, FlagChoices } from './types.js';
 const description = 'description';
 
 describe('choicesForFlag', () => {
-  it('extracts the list of choices from a string flag', () => {
+  it('extracts the list of choices from a choice flag', () => {
     checkConversion<Flag, FlagChoices>(
       (i, o, m) => assert.deepEqual(choicesForFlag(i), o, m),
       [
@@ -22,7 +22,11 @@ describe('choicesForFlag', () => {
         [flag('path'), undefined],
         [flag('string'), undefined],
         [
-          { choices: ['alfa', 'bravo'], description, type: 'string' },
+          {
+            choices: ['alfa', 'bravo'],
+            description,
+            type: 'choice'
+          },
           ['alfa', 'bravo']
         ]
       ]
