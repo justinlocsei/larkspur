@@ -307,7 +307,7 @@ function buildCommandRunner(parsed: ParsedCommand): CommandRunner {
 
   const values = extractValues(flags);
 
-  return (async () => {
+  return async function runCommand() {
     try {
       await command.handler(values as ValuesOf<Flags, 'narrow'>, {
         args,
@@ -329,7 +329,7 @@ function buildCommandRunner(parsed: ParsedCommand): CommandRunner {
       command: parsed,
       type: 'success'
     };
-  });
+  };
 }
 
 /**
