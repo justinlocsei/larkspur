@@ -462,7 +462,7 @@ describe('buildHelp', () => {
             choices: ['one', 'two'],
             default: 'one',
             description: '@bravo',
-            type: 'string'
+            type: 'choice'
           }
         },
         path: [],
@@ -481,7 +481,7 @@ describe('buildHelp', () => {
         '',
         '  --alfa <number>   @alfa',
         '                    (Default: 1)',
-        '  --bravo <string>  @bravo',
+        '  --bravo <choice>  @bravo',
         '                    (Choices: one, two)',
         '                    (Default: one)'
       ].join('\n')
