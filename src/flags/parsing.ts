@@ -36,7 +36,7 @@ type ScalarInputs = {
 type ParsedScalarValue<T> = OneOrMany<T> | undefined;
 
 /**
- * The result of extracting scaler values from a stream of inputs
+ * The result of extracting scalar values from a stream of inputs
  */
 type ScalarParsingResult<T> = FlagParsingResult<ParsedScalarValue<T>>;
 
