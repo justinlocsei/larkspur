@@ -316,10 +316,7 @@ function buildCommandRunner(parsed: ParsedCommand): CommandRunner {
       });
     } catch (error) {
       if (error instanceof OperationalError) {
-        return {
-          error,
-          type: 'failure'
-        };
+        return { error, type: 'failure' };
       } else {
         throw error;
       }
