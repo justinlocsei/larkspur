@@ -35,6 +35,13 @@ test('flags', {
     assert.include(result.stderr, 'required');
   },
 
+  'forbids unknown flags': ({ run }) => {
+    const result = run('optional', '--not-a-flag');
+
+    assert.equal(result.status, 1);
+    assert.include(result.stderr, 'not-a-flag');
+  },
+
   'supports required flags': (actions) => {
     checkFlags(actions, [
       [['required', '--number', '1', '--string', 'alfa'], {
