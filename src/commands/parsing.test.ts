@@ -696,17 +696,13 @@ describe('parseCommand', () => {
   it('validates completion shells', () => {
     const commands = { command: C(description, handler) };
 
-    ensure.throws(
-      () => parseCommand(['--complete'], commands),
-      'complete',
-      'Missing shell not rejected'
-    );
+    const missing = parseCommand(['--complete'], commands);
+    assert(missing.type === 'error', 'Missing shell not rejected');
+    assert.include(missing.message, 'complete');
 
-    ensure.throws(
-      () => parseCommand(['--complete', 'fish'], commands),
-      'fish',
-      'Invalid shell not rejected'
-    );
+    const invalid = parseCommand(['--complete', 'fish'], commands);
+    assert(invalid.type === 'error', 'Invalid shell not rejected');
+    assert.include(invalid.message, 'fish');
   });
 
   it('prefers help over completions', () => {

@@ -1,6 +1,6 @@
 import { NormalizedArgs } from '../args.js';
 import { OperationalError } from '../errors.js';
-import type { ParsedFlags } from '../flags/parsing.js';
+import type { FlagParsing, ParsedFlags } from '../flags/parsing.js';
 import { extractValues, ParsingError, parseFlags } from '../flags/parsing.js';
 import type { Flags } from '../flags/types.js';
 import type { SpecificValueOf, ValuesOf } from '../flags/values.js';
@@ -83,7 +83,6 @@ type CommandRunner = () => Promise<RunResult>;
  */
 type CommandParsingResult = IsParsingResult<'command', {
   command: ParsedCommand;
-  run: CommandRunner;
 }>;
 
 /**
@@ -96,23 +95,32 @@ type CompletionParsingResult = IsParsingResult<'completion', {
 /**
  * An error that occurred during parsing
  */
-type ErrorParsingResult = IsParsingResult<'error', {
+type ErrorParsingResult<T = HelpRequestScope> = IsParsingResult<'error', {
   code: ParsingErrorCode;
-  help?: HelpScope;
+  help?: T;
   message: string;
 }>;
 
 /**
  * A request for help
  */
-type HelpParsingResult = IsParsingResult<'help', {
-  scope: HelpScope;
+type HelpParsingResult<T = HelpRequestScope> = IsParsingResult<'help', {
+  scope: T;
 }>;
 
 /**
  * The results of parsing CLI args
  */
 export type ParsingResult =
+  | CommandParsingResult & { run: CommandRunner }
+  | CompletionParsingResult
+  | ErrorParsingResult<HelpScope>
+  | HelpParsingResult<HelpScope>;
+
+/**
+ * An internal parsing result
+ */
+type InternalParsingResult =
   | CommandParsingResult
   | CompletionParsingResult
   | ErrorParsingResult
@@ -139,46 +147,12 @@ export type HelpScope =
  */
 type HelpRequestScope = DistributiveOmit<HelpScope, 'flags'>;
 
-class AbortRequest {
-  code: ParsingErrorCode;
-  help?: HelpRequestScope;
-  message: string;
-
-  /**
-   * Create request to abort the parsing process
-   */
-  constructor(
-    message: string,
-    code: ParsingErrorCode,
-    help?: HelpRequestScope
-  ) {
-    this.code = code;
-    this.message = message;
-    this.help = help;
-  }
-}
-
-class HelpRequest {
-  scope: HelpRequestScope;
-
-  /**
-   * Create a help request
-   */
-  constructor(scope: HelpRequestScope) {
-    this.scope = scope;
-  }
-}
-
-class CompletionRequest {
-  shell: CompletionShell;
-
-  /**
-   * Create a completion request
-   */
-  constructor(shell: CompletionShell) {
-    this.shell = shell;
-  }
-}
+/**
+ * The results of parsing flags
+ */
+type FlagParsingResult =
+  | { type: 'failure'; error: ErrorParsingResult }
+  | { type: 'success'; parsed: FlagParsing };
 
 export const CORE_FLAGS = useFlags({
   complete: {
@@ -226,48 +200,75 @@ export function parseCommand(args: string[], commands: CommandTree, {
 }: {
   allowUnknownFlags?: boolean;
 } = {}): ParsingResult {
-  let command: ParsedCommand;
+  return finalizeParsing(
+    extractCommand(new NormalizedArgs(args), commands, { allowUnknownFlags })
+  );
+}
 
-  try {
-    command = extractCommand(new NormalizedArgs(args), commands, {
-      allowUnknownFlags
-    });
-  } catch (signal) {
-    if (signal instanceof AbortRequest) {
-      const { help } = signal;
+/**
+ * Package the help scope for external consumers
+ */
+function finalizeHelp(scope: HelpRequestScope): HelpScope {
+  return { ...scope, flags: CORE_FLAGS };
+}
 
+/**
+ * Package the internal parsing result for external consumers
+ */
+function finalizeParsing(result: InternalParsingResult): ParsingResult {
+  switch (result.type) {
+    case 'command':
       return {
-        code: signal.code,
-        help: help && {
-          ...help,
-          flags: CORE_FLAGS
-        },
-        message: signal.message,
-        type: 'error'
+        ...result,
+        run: buildCommandRunner(result.command)
       };
-    } else if (signal instanceof HelpRequest) {
+
+    case 'error':
       return {
-        scope: {
-          ...signal.scope,
-          flags: CORE_FLAGS
-        },
-        type: 'help'
+        ...result,
+        help: result.help && finalizeHelp(result.help)
       };
-    } else if (signal instanceof CompletionRequest) {
+
+    case 'help':
       return {
-        shell: signal.shell,
-        type: 'completion'
+        ...result,
+        scope: finalizeHelp(result.scope)
       };
-    } else {
-      throw signal;
-    }
+
+    default:
+      return result;
   }
+}
 
-  return {
-    command,
-    run: buildCommandRunner(command),
-    type: 'command'
-  };
+/**
+ * Attempt to parse flags
+ */
+function tryParseFlags(
+  args: NormalizedArgs,
+  flags: Flags,
+  options: { allowUnused?: boolean },
+  help?: HelpRequestScope
+): FlagParsingResult {
+  try {
+    return {
+      parsed: parseFlags(args, flags, options),
+      type: 'success'
+    };
+  } catch (error) {
+    if (error instanceof ParsingError) {
+      return {
+        error: {
+          code: 'invalid-flag',
+          help,
+          message: error.message,
+          type: 'error'
+        },
+        type: 'failure'
+      };
+    }
+
+    throw error;
+  }
 }
 
 /**
@@ -321,8 +322,16 @@ function extractCommand(
     group?: CommandGroup;
     parentPath?: string[];
   } = {}
-): ParsedCommand {
-  const { flags } = parseFlags(normalized, CORE_FLAGS, { allowUnused: true });
+): InternalParsingResult {
+  const parsedCoreFlags = tryParseFlags(normalized, CORE_FLAGS, {
+    allowUnused: true
+  });
+
+  if (parsedCoreFlags.type === 'failure') {
+    return parsedCoreFlags.error;
+  }
+
+  const { flags } = parsedCoreFlags.parsed;
   const showHelp = getCoreFlagValue(flags, 'help') === true;
   const shell = getCoreFlagValue(flags, 'complete');
 
@@ -338,25 +347,27 @@ function extractCommand(
     : { commands, type: 'root' };
 
   if (showHelp && (!name || !command)) {
-    throw new HelpRequest(commandHelp);
+    return { scope: commandHelp, type: 'help' };
   } else if (!showHelp && shell) {
-    throw new CompletionRequest(shell);
+    return { shell, type: 'completion' };
   }
 
   if (!name) {
-    throw new AbortRequest(
-      parentPath.length
+    return {
+      code: 'invalid-command',
+      help: commandHelp,
+      message: parentPath.length
         ? `You must provide a subcommand: ${parentPath.join(' ')} <subcommand>`
         : 'You must provide a command',
-      'invalid-command',
-      commandHelp
-    );
+      type: 'error'
+    };
   } else if (!command) {
-    throw new AbortRequest(
-      `Unknown command: ${path.join(' ')}`,
-      'invalid-command',
-      commandHelp
-    );
+    return {
+      code: 'invalid-command',
+      help: commandHelp,
+      message: `Unknown command: ${path.join(' ')}`,
+      type: 'error'
+    };
   }
 
   const remainingArgs = new NormalizedArgs(args.slice(1));
@@ -368,34 +379,32 @@ function extractCommand(
       parentPath: path
     });
   } else if (showHelp) {
-    throw new HelpRequest({
+    return {
+      scope: { command, path, type: 'command' },
+      type: 'help'
+    };
+  }
+
+  const parsedCommandFlags = tryParseFlags(
+    remainingArgs,
+    command.flags || {},
+    { allowUnused: allowUnknownFlags },
+    { command, path, type: 'command' }
+  );
+
+  if (parsedCommandFlags.type === 'failure') {
+    return parsedCommandFlags.error;
+  }
+
+  const { parsed } = parsedCommandFlags;
+
+  return {
+    command: {
+      ...parsed,
       command,
       path,
-      type: 'command'
-    });
-  } else {
-    try {
-      const parsedFlags = parseFlags(remainingArgs, command.flags || {}, {
-        allowUnused: allowUnknownFlags
-      });
-
-      return {
-        args: parsedFlags.args,
-        command,
-        flags: parsedFlags.flags,
-        path,
-        providedFlags: parsedFlags.provided
-      };
-    } catch (error) {
-      if (error instanceof ParsingError) {
-        throw new AbortRequest(error.message, 'invalid-flag', {
-          command,
-          path,
-          type: 'command'
-        });
-      } else {
-        throw error;
-      }
-    }
-  }
+      providedFlags: parsed.provided
+    },
+    type: 'command'
+  };
 }
