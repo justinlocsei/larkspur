@@ -41,6 +41,13 @@ test('validation', {
     ]);
   },
 
+  'reports custom validator messages': ({ run }) => {
+    const { stderr, status } = run('fns', '--string', 'bravo');
+
+    assert.equal(status, 1);
+    assert.include(stderr, '@alfa');
+  },
+
   'validates flags by type': actions => {
     checkFlags(actions, [
       [['types', '--number', '1'], true],

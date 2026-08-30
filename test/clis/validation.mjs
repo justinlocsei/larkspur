@@ -16,7 +16,7 @@ await run({
     'Validate flags with validator functions',
     {
       number: C.flag('number', desc, { isValid: v => v === 1 }),
-      string: C.flag('string', desc, { isValid: v => v === 'alfa' })
+      string: C.flag('string', desc, { isValid: v => v === 'alfa' || '@alfa' })
     },
     async () => {}
   ),
