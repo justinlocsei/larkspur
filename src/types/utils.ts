@@ -12,6 +12,14 @@ export type DistributiveOmit<
 > = T extends unknown ? Omit<T, K> : never;
 
 /**
+ * Require a provided object to match a schema
+ */
+export type Exact<Schema, Provided> =
+  & Schema
+  & Provided
+  & { [K in Exclude<keyof Provided, keyof Schema>]?: never };
+
+/**
  * Allow a value to be nulled out by a subset of falsy values
  */
 export type Masked<T> = T | false | null | undefined;
