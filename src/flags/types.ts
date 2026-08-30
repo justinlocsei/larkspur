@@ -75,6 +75,11 @@ export type ScalarFlag = ChoiceFlag | SimpleScalarFlag;
 export type Flag = BooleanFlag | ScalarFlag;
 
 /**
+ * Flags that accept simple values
+ */
+export type SimpleFlag = BooleanFlag | SimpleScalarFlag;
+
+/**
  * Get the flag with a given type
  */
 export type FlagOfType<T extends Flag['type']> = Extract<Flag, { type: T }>;
