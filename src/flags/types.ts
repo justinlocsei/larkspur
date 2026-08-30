@@ -17,7 +17,7 @@ type ScalarFields = {
 };
 
 /**
- * Define a basic scalar flag
+ * Define a simple scalar flag
  */
 type IsScalarFlag<T extends string, V extends ScalarValue> =
   & IsFlag<T, V>
@@ -60,13 +60,14 @@ export type ChoiceFlag<
   & { choices: C };
 
 /**
+ * A simple scalar flag
+ */
+export type SimpleScalarFlag = NumberFlag | PathFlag | StringFlag;
+
+/**
  * The flags that take a scalar value
  */
-export type ScalarFlag =
-  | ChoiceFlag
-  | NumberFlag
-  | PathFlag
-  | StringFlag;
+export type ScalarFlag = ChoiceFlag | SimpleScalarFlag;
 
 /**
  * All possible CLI flags
