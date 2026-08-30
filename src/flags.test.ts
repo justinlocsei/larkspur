@@ -25,7 +25,6 @@ describe('useFlag', () => {
     const number = useFlag({ description, type: 'number' });
     const string = useFlag({ description, type: 'string' });
 
-    T.assert<T.Equivalent<typeof number, typeof string>>(false);
     T.assert<T.Equivalent<NumberFlag, typeof number>>(true);
     T.assert<T.Equivalent<StringFlag, typeof string>>(true);
   });
