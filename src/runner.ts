@@ -77,7 +77,7 @@ function failWith(error: Error, help?: string): ErrorRunResponse {
 export async function runCLI({
   args,
   entry,
-  meta
+  meta: cli
 }: RunRequest): Promise<RunResponse> {
   let parsing: ParsingResult;
 
@@ -94,7 +94,7 @@ export async function runCLI({
       return {
         script: buildCompletions(parsing.shell, {
           commands: entry,
-          name: meta.name
+          name: cli.name
         }),
         type: 'completion'
       };
@@ -103,13 +103,13 @@ export async function runCLI({
       return failWith(
         new OperationalError(parsing.message),
         parsing.help
-          ? buildHelp({ cli: meta, scope: parsing.help })
+          ? buildHelp({ cli, scope: parsing.help })
           : undefined
       );
 
     case 'help':
       return {
-        message: buildHelp({ cli: meta, scope: parsing.scope }),
+        message: buildHelp({ cli, scope: parsing.scope }),
         type: 'help'
       };
   }
