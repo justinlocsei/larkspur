@@ -1,6 +1,6 @@
 import { assert, test } from './helpers.js';
 
-test('named', 'a CLI with a custom name and description', {
+test('named', {
   'shows the custom name': ({ checkOutput }) => {
     const output = checkOutput('--help');
 

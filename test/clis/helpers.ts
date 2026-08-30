@@ -1,4 +1,4 @@
-import { assert, describe, it } from 'vitest';
+import { assert, it } from 'vitest';
 
 import { COMPLETION_SHELLS } from '../../src/types.js';
 
@@ -62,7 +62,6 @@ type CustomTests = Partial<Record<string, (actions: TestActions) => void>>;
  */
 export function test(
   file: string,
-  description: string,
   tests: CustomTests = {}
 ): void {
   const run: RunCLI = (...args: string[]) => testCLI(file, args);
@@ -78,23 +77,21 @@ export function test(
 
   const actions: TestActions = { checkOutput, run };
 
-  describe(description, () => {
-    it('shows help', () => {
-      assert.include(checkOutput('--help'), '--help');
-    });
+  it('shows help', () => {
+    assert.include(checkOutput('--help'), '--help');
+  });
 
-    for (const shell of COMPLETION_SHELLS) {
-      it(`can generate ${shell} completions`, () => {
-        assert.isNotEmpty(checkOutput('--complete', shell));
+  for (const shell of COMPLETION_SHELLS) {
+    it(`can generate ${shell} completions`, () => {
+      assert.isNotEmpty(checkOutput('--complete', shell));
+    });
+  }
+
+  Object.entries(tests).forEach(([name, test]) => {
+    if (test) {
+      it(name, () => {
+        test(actions);
       });
     }
-
-    Object.entries(tests).forEach(([name, test]) => {
-      if (test) {
-        it(name, () => {
-          test(actions);
-        });
-      }
-    });
   });
 }

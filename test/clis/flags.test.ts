@@ -13,7 +13,7 @@ function checkFlags(
   );
 }
 
-test('flags', 'a CLI with flags', {
+test('flags', {
   'allows optional flags to be omitted': (actions) => {
     checkFlags(actions, [
       [['optional'], { boolean: false }],
