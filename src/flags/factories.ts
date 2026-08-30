@@ -1,50 +1,77 @@
-import type { Select, Subset } from '../types/utils.js';
-import type { Flag, FlagOfType, StringFlag } from './types.js';
-import type { SpecificValueOf } from './values.js';
+import type { DistributiveReadonly, Exact } from '../types/utils.js';
+import type {
+  BooleanFlag,
+  ChoiceFlag,
+  Flag,
+  FlagOfType,
+  FlagOptions,
+  NumberFlag,
+  PathFlag,
+  ScalarValue,
+  SimpleFlag,
+  StringFlag
+} from './types.js';
 
 /**
- * Core flag fields for factory requests
+ * Constrain provided options to a flag's known options
  */
-type CoreFields = Select<keyof Flag, 'description' | 'type'>;
-
-/**
- * The types of flags that lack the ability to be narrowly specified
- */
-type SimpleFlagType = Exclude<Flag['type'], 'string'>;
-
-/**
- * Determine the options for a flag of a given type
- */
-type FlagOptions<T extends Flag['type']> = Omit<FlagOfType<T>, CoreFields>;
-
-/**
- * Define a string flag built by the factory
- */
-type FactoryStringFlag<O> =
-  & StringFlag<SpecificValueOf<Subset<StringFlag, CoreFields> & O>>
-  & O;
+type ValidOptions<T extends Flag, O> = Exact<FlagOptions<T>, O>;
 
 /**
  * Build a command flag
  */
-export function buildFlag<T extends SimpleFlagType>(
+export function buildFlag<T extends SimpleFlag['type']>(
   type: T,
   description: string
 ): FlagOfType<T>;
-export function buildFlag<T extends SimpleFlagType, O extends FlagOptions<T>>(
-  type: T,
+export function buildFlag<O>(
+  type: 'boolean',
   description: string,
-  options: FlagOptions<T> & O
-): FlagOfType<T> & O;
-export function buildFlag<O extends FlagOptions<'string'>>(
+  options: ValidOptions<BooleanFlag, O>
+): BooleanFlag & O;
+export function buildFlag<const C extends DistributiveReadonly<ScalarValue>, O>(
+  type: 'choice',
+  description: string,
+  options: ValidOptions<ChoiceFlag<C>, O>
+): ChoiceFlag<C> & O;
+export function buildFlag<O>(
+  type: 'number',
+  description: string,
+  options: ValidOptions<NumberFlag, O>
+): NumberFlag & O;
+export function buildFlag<O>(
+  type: 'path',
+  description: string,
+  options: ValidOptions<PathFlag, O>
+): PathFlag & O;
+export function buildFlag<O>(
   type: 'string',
   description: string,
-  options?: FlagOptions<'string'> & O
-): FactoryStringFlag<O>;
+  options: ValidOptions<StringFlag, O>
+): StringFlag & O;
 export function buildFlag(
   type: Flag['type'],
   description: string,
-  options?: FlagOptions<Flag['type']>
+  options: Record<string, unknown> = {}
 ): Flag {
+  if (type === 'choice') {
+    validateChoices((options as FlagOptions<ChoiceFlag>).choices);
+  }
+
   return { description, type, ...options } as Flag;
+}
+
+/**
+ * Ensure that a choice list is valid
+ */
+function validateChoices(choices: readonly ScalarValue[]): void {
+  if (choices.length === 0) {
+    throw new Error('Choice flags must have at least one choice');
+  }
+
+  const kind = typeof choices[0];
+
+  if (choices.some(c => typeof c !== kind)) {
+    throw new Error('Choice flags must use values of the same type');
+  }
 }
