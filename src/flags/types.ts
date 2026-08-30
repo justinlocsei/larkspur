@@ -55,10 +55,7 @@ export type StringFlag = IsScalarFlag<'string', string>;
 export type ChoiceFlag<T extends ScalarValue = ScalarValue> =
   & IsFlag<'choice', T>
   & ScalarFields
-  & {
-    choices: readonly T[];
-    isValid: (value: ScalarValue) => value is T;
-  };
+  & { choices: readonly T[] };
 
 /**
  * The flags that take a scalar value
