@@ -6,22 +6,23 @@ import { homedir } from 'node:os';
 import path from 'node:path';
 
 describe('expandPath', () => {
+  function checkPath(input: string[], output: string[]) {
+    assert.equal(expandPath(...input), path.join(...output));
+  }
+
   it('joins path components', () => {
-    assert.equal(expandPath('alfa', 'bravo'), path.join('alfa', 'bravo'));
+    checkPath(['alfa', 'bravo'], ['alfa', 'bravo']);
   });
 
   it('normalizes relative path components', () => {
-    assert.equal(
-      expandPath('alfa', 'bravo', '..', 'bravo', '.'),
-      path.join('alfa', 'bravo')
-    );
+    checkPath(['alfa', 'bravo', '..', 'bravo', '.'], ['alfa', 'bravo']);
   });
 
   it('expands references to the home directory', () => {
-    assert.equal(expandPath('~', 'alfa'), path.join(homedir(), 'alfa'));
+    checkPath(['~', 'alfa'], [homedir(), 'alfa']);
   });
 
   it('preserves tildes that are not references to the home directory', () => {
-    assert.equal(expandPath('alfa', '~bravo'), path.join('alfa', '~bravo'));
+    checkPath(['alfa', '~bravo'], ['alfa', '~bravo']);
   });
 });
