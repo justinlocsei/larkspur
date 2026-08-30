@@ -223,6 +223,27 @@ describe('buildHelp', () => {
     );
   });
 
+  it('hides flags marked as hidden', () => {
+    const help = buildHelp({
+      cli,
+      scope: {
+        commands: {
+          command: C('@command', handler)
+        },
+        flags: {
+          secret: {
+            description: '@secret',
+            hidden: true,
+            type: 'boolean'
+          }
+        },
+        type: 'root'
+      }
+    });
+
+    assert.notInclude(help, '--secret');
+  });
+
   it('shows placeholders for scalar flags', () => {
     const help = buildHelp({
       cli,

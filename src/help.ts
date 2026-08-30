@@ -1,6 +1,6 @@
 import type { HelpScope } from './commands/parsing.js';
 import type { CommandTree } from './commands/types.js';
-import { choicesForFlag, flagToSetter } from './flags/data.js';
+import { choicesForFlag, flagToSetter, visibleFlags } from './flags/data.js';
 import type { Flag, Flags } from './flags/types.ts';
 import type { CLIMetadata } from './types.js';
 import { compact, isEmpty, sortEntries, transformValues } from './utils.js';
@@ -51,10 +51,10 @@ export function buildHelp({
   config = DEFAULT_FORMATTING,
   scope
 }: HelpDisplayRequest): string {
-  const flags: Flags = {
+  const flags: Flags = visibleFlags({
     ...scope.flags,
     ...(scope.type === 'command' ? scope.command.flags : {})
-  };
+  });
 
   const message = new HelpMessage({
     cli,
