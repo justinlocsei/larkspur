@@ -1,9 +1,4 @@
 /**
- * Produce the most inclusive type for an array
- */
-export type AnyArray<T> = T[] | readonly T[];
-
-/**
  * Remove a set of fields from all members of a union
  */
 export type DistributiveOmit<
