@@ -13,7 +13,9 @@ import type {
   NumberFlag,
   PathFlag,
   ScalarFlag,
+  ScalarValidator,
   ScalarValue,
+  SimpleScalarFlag,
   StringFlag
 } from './types.ts';
 import type { SpecificValueOf, ValueOf, ValuesOf } from './values.js';
@@ -284,19 +286,18 @@ function parseChoiceFlag(
   flag: ChoiceFlag,
   context: ParsingContext
 ): ScalarParsingResult<ScalarValue> {
-  return typeof flag.choices[0] === 'number'
-    ? parseScalarInputs(
-      flag,
-      context,
-      extractScalarInputs(context),
-      v => parseInt(v, 10),
-      value => validateScalarValue(flag, value)
-    )
-    : parseStringInputs(
-      context,
-      flag as unknown as StringFlag,
-      v => v
-    ) as ScalarParsingResult<ScalarValue>;
+  const { choices } = flag;
+
+  return parseScalarInputs(
+    flag,
+    context,
+    extractScalarInputs(context),
+    v => typeof choices[0] === 'number' ? parseInt(v, 10) : v,
+    value =>
+      !choices.includes(value)
+        ? `Supported values: ${flag.choices.join(', ')}`
+        : undefined
+  );
 }
 
 /**
@@ -387,27 +388,37 @@ function parseScalarInputs<T extends ScalarFlag>(
   let provided: boolean;
   let values: SpecificValueOf<T>[] = [];
 
+  function requireValid(
+    value: SpecificValueOf<T>,
+    source: string
+  ): SpecificValueOf<T> {
+    const message = validate(value);
+
+    if (message) {
+      throw new ParsingError(
+        `Invalid value for flag: ${flagToSetter(name)} ${source}\n${message}`
+      );
+    }
+
+    return value;
+  }
+
   if (inputs.values) {
     for (const input of inputs.values) {
-      const value = parse(input);
-      const errorMessage = validate(value);
-
-      if (errorMessage) {
-        throw new ParsingError(
-          `Invalid value for flag: ${
-            flagToSetter(name)
-          } ${input}\n${errorMessage}`
-        );
-      } else {
-        values.push(value);
-      }
+      values.push(requireValid(parse(input), input));
     }
 
     provided = values.length > 0;
   } else {
     provided = false;
+
     values = flag.default !== undefined
-      ? [flag.default as SpecificValueOf<T>]
+      ? [
+        requireValid(
+          flag.default as SpecificValueOf<T>,
+          JSON.stringify(flag.default)
+        )
+      ]
       : [];
   }
 
@@ -441,23 +452,13 @@ function parseScalarInputs<T extends ScalarFlag>(
  *
  * @returns An error message
  */
-function validateScalarValue<T extends ScalarFlag>(
+function validateScalarValue<T extends SimpleScalarFlag>(
   flag: T,
   value: SpecificValueOf<T>
 ): string | undefined {
-  if (flag.type === 'choice') {
-    if (!flag.choices.includes(value as SpecificValueOf<T>)) {
-      return `Supported values: ${flag.choices.join(', ')}`;
-    }
-
-    return undefined;
-  }
-
   const { isValid } = flag;
 
-  if (isValid && !isValid(value as never)) {
-    return `Unsupported value: ${value}`;
-  }
-
-  return undefined;
+  return (isValid && !(isValid as ScalarValidator<ScalarValue>)(value))
+    ? `Unsupported value: ${value}`
+    : undefined;
 }
