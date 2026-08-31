@@ -28,14 +28,12 @@ describe('buildFlag', () => {
 
   it('supports complex boolean flags', () => {
     const flag = buildFlag('boolean', description, {
-      default: true,
-      hidden: true
+      default: true
     });
 
     assert.deepEqual(flag, {
       default: true,
       description,
-      hidden: true,
       type: 'boolean'
     });
 
@@ -49,7 +47,6 @@ describe('buildFlag', () => {
     const flag = buildFlag('number', description, {
       allowMany: true,
       default: 1,
-      hidden: true,
       required: true
     });
 
@@ -57,7 +54,6 @@ describe('buildFlag', () => {
       allowMany: true,
       default: 1,
       description,
-      hidden: true,
       required: true,
       type: 'number'
     });
@@ -72,7 +68,6 @@ describe('buildFlag', () => {
     const flag = buildFlag('path', description, {
       allowMany: true,
       default: '/tmp',
-      hidden: true,
       required: true
     });
 
@@ -80,7 +75,6 @@ describe('buildFlag', () => {
       allowMany: true,
       default: '/tmp',
       description,
-      hidden: true,
       required: true,
       type: 'path'
     });
@@ -95,7 +89,6 @@ describe('buildFlag', () => {
     const flag = buildFlag('string', description, {
       allowMany: true,
       default: 'value',
-      hidden: true,
       required: true
     });
 
@@ -103,7 +96,6 @@ describe('buildFlag', () => {
       allowMany: true,
       default: 'value',
       description,
-      hidden: true,
       required: true,
       type: 'string'
     });
@@ -116,14 +108,12 @@ describe('buildFlag', () => {
 
   it('supports choice flags', () => {
     const flag = buildFlag('choice', description, {
-      choices: ['alfa', 'bravo'],
-      hidden: true
+      choices: ['alfa', 'bravo']
     });
 
     assert.deepEqual(flag, {
       choices: ['alfa', 'bravo'],
       description,
-      hidden: true,
       type: 'choice'
     });
 
