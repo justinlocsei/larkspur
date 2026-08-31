@@ -1,11 +1,11 @@
 import { assert, describe, it } from 'vitest';
 
-import type { EntryPointProvider, LogLevel, RunOptions } from './cli.js';
+import type { EntryPointProvider, RunOptions } from './cli.js';
 import { run } from './cli.js';
 import type { EntryPoint } from './commands/types.js';
 import { OperationalError } from './errors.js';
 import C from './factory.js';
-import { ensure } from './tests.js';
+import { ensure, testLogging } from './tests.js';
 
 const filename = import.meta.filename;
 
@@ -15,25 +15,18 @@ async function testRun(
   config: RunOptions = {}
 ) {
   let error: Error | undefined;
-  const output: Record<LogLevel, string> = { error: '', info: '' };
+  const { getOutput, logging } = testLogging();
 
   await run(entry, {
     args: [process.execPath, ...args],
-    logging: {
-      error: m => {
-        output.error += m;
-      },
-      info: m => {
-        output.info += m;
-      }
-    },
+    logging,
     onError: cause => {
       error = cause;
     },
     ...config
   });
 
-  return { error, output };
+  return { error, output: getOutput() };
 }
 
 describe('run', () => {
@@ -166,7 +159,7 @@ describe('run', () => {
     );
 
     assert.isUndefined(error);
-    assert.equal(output.info, '@output');
+    assert.equal(output.info.trim(), '@output');
   });
 
   it('does not log blank strings returned by a command handler', async () => {

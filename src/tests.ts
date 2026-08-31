@@ -1,3 +1,4 @@
+import type { LogLevel } from './cli.js';
 import { createContext } from './context.js';
 import type { Context, Metadata } from './types.js';
 
@@ -75,6 +76,30 @@ export function createTestContext(
     name: 'testing',
     ...meta
   });
+}
+
+/**
+ * Captured output from a test
+ */
+type CapturedOutput = Record<LogLevel, string>;
+
+/**
+ * Capture CLI logging output in tests
+ */
+export function testLogging() {
+  const output: CapturedOutput = { error: '', info: '' };
+
+  return {
+    getOutput: (): CapturedOutput => output,
+    logging: {
+      error: (m = '') => {
+        output.error += m && `${m}\n`;
+      },
+      info: (m = '') => {
+        output.info += m && `${m}\n`;
+      }
+    }
+  };
 }
 
 /**
