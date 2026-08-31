@@ -1,57 +1,40 @@
 import { assert, describe, it } from 'vitest';
 
-import { OperationalError } from '../errors.js';
-import type { RunResponse } from '../runner.js';
-import { runCLI } from '../runner.js';
+import type { ParsingResult } from '../commands/parsing.js';
+import { parseCommand } from '../commands/parsing.js';
 import { createTestContext } from '../tests.js';
 import { defineCompletionCommands } from './commands.js';
 
-async function runCompletionCommand(
-  args: string[]
-): Promise<{ output: string | undefined; result: RunResponse }> {
-  const result = await runCLI({
-    args: ['completion', ...args],
-    context: createTestContext(),
-    entry: { completion: defineCompletionCommands() }
+function runCompletionCommand(args: string[]): ParsingResult {
+  return parseCommand(['completions', ...args], {
+    completions: defineCompletionCommands()
   });
-
-  return {
-    output: result.type === 'success' ? result.output : undefined,
-    result
-  };
 }
 
 describe('defineCompletionCommands', () => {
   it('returns a command group', () => {
-    const commands = defineCompletionCommands();
+    const completions = defineCompletionCommands();
 
-    assert(commands.type === 'group');
-    assert.isNotEmpty(commands.subcommands);
+    assert(completions.type === 'group');
+    assert.isNotEmpty(completions.subcommands);
   });
 
   describe('generate', () => {
     it('generates a completion script', async () => {
-      const { output, result } = await runCompletionCommand([
-        'generate',
-        '--shell',
-        'bash'
-      ]);
+      const parsed = runCompletionCommand(['generate', '--shell', 'bash']);
 
-      assert(result.type === 'success', 'command failed');
-      assert.include(output, 'COMPREPLY');
+      assert(parsed.type === 'command', 'command not parsed');
+      const run = await parsed.run(createTestContext());
+
+      assert(run.type === 'success', 'command failed');
+      assert.include(run.output, 'COMPREPLY');
     });
 
-    it('rejects unsupported shells', async () => {
-      const { result } = await runCompletionCommand([
-        'generate',
-        '--shell',
-        'fish'
-      ]);
+    it('rejects unsupported shells', () => {
+      const parsed = runCompletionCommand(['generate', '--shell', 'fish']);
 
-      assert(result.type === 'error', 'invalid shell was allowed');
-
-      assert.instanceOf(result.error, OperationalError);
-      assert.include(result.error.message, '--shell');
+      assert(parsed.type === 'error', 'invalid shell was allowed');
+      assert.include(parsed.message, '--shell');
     });
   });
 });
