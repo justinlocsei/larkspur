@@ -6,6 +6,14 @@ export type DeepPartial<T extends object> = {
 };
 
 /**
+ * Remove a set of fields from all members of a union
+ */
+export type DistributiveOmit<
+  T extends object,
+  K extends keyof T
+> = T extends unknown ? Omit<T, K> : never;
+
+/**
  * Distribute a readonly modifier to all values
  */
 export type DistributiveReadonly<T> = T extends T ? readonly T[] : never;
