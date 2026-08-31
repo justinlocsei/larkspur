@@ -233,9 +233,7 @@ export class BashCompletionProvider extends CompletionProvider {
       []
     );
 
-    const coreFlags = useSharedFlags(levels.length === 0 ? 'root' : 'nested');
-
-    const setters = Object.entries(coreFlags).flatMap(([n, f]) =>
+    const setters = Object.entries(useSharedFlags()).flatMap(([n, f]) =>
       getFlagForms(n, f).map(flagToSetter)
     );
 
@@ -274,7 +272,7 @@ export class BashCompletionProvider extends CompletionProvider {
   ): Completions {
     const flags: Flags = {
       ...command.flags,
-      ...useSharedFlags('nested')
+      ...useSharedFlags()
     };
 
     const setters = Object.entries(flags).flatMap(([n, f]) =>

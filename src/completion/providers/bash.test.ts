@@ -261,7 +261,7 @@ describe('BashCompletionProvider', () => {
 
   it('lists root flags', () =>
     checkCompletions({ command }, [
-      [['--'], ['--complete', '--help']]
+      [['--'], ['--help']]
     ]));
 
   it('lists choices for scalar flags', () =>
