@@ -5,7 +5,6 @@ import type {
 } from './commands/parsing.js';
 import { parseCommand } from './commands/parsing.js';
 import type { EntryPoint } from './commands/types.js';
-import { buildCompletions } from './completion.js';
 import { coerceError, OperationalError } from './errors.js';
 import { buildHelp } from './help.js';
 import type { Context } from './types.js';
@@ -25,13 +24,6 @@ export type RunRequest = {
 type IsRunResponse<T extends string, U> = U & {
   type: T;
 };
-
-/**
- * A completion script generated for a CLI
- */
-type CompletionRunResponse = IsRunResponse<'completion', {
-  script: string;
-}>;
 
 /**
  * A CLI run that failed with an error
@@ -59,7 +51,6 @@ type SuccessRunResponse = IsRunResponse<'success', {
  * The result of running a CLI
  */
 export type RunResponse =
-  | CompletionRunResponse
   | ErrorRunResponse
   | HelpRunResponse
   | SuccessRunResponse;
@@ -90,15 +81,6 @@ export async function runCLI({
   }
 
   switch (parsing.type) {
-    case 'completion':
-      return {
-        script: buildCompletions(parsing.shell, {
-          commands: entry,
-          context
-        }),
-        type: 'completion'
-      };
-
     case 'error':
       return failWith(
         new OperationalError(parsing.message),
