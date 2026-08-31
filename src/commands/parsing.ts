@@ -69,6 +69,7 @@ type FailureRunResult = IsRunResult<'failure', {
  */
 type SuccessRunResult = IsRunResult<'success', {
   command: ParsedCommand;
+  output?: string;
 }>;
 
 /**
@@ -223,14 +224,23 @@ function buildCommandRunner(
   const values = extractValues(flags);
 
   return async function runCommand(context) {
+    let output: string | undefined;
+
     try {
-      await command.handler(values as ValuesOf<Flags, 'narrow'>, {
-        args,
-        commands,
-        commandPath: path,
-        context,
-        providedFlags: new Set(providedFlags)
-      });
+      const result = await command.handler(
+        values as ValuesOf<Flags, 'narrow'>,
+        {
+          args,
+          commands,
+          commandPath: path,
+          context,
+          providedFlags: new Set(providedFlags)
+        }
+      );
+
+      if (typeof result === 'string') {
+        output = result;
+      }
     } catch (error) {
       if (error instanceof OperationalError) {
         return { error, type: 'failure' };
@@ -241,6 +251,7 @@ function buildCommandRunner(
 
     return {
       command: parsed,
+      output,
       type: 'success'
     };
   };

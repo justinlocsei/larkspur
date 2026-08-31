@@ -421,6 +421,19 @@ describe('parseCommand', () => {
     assert.deepEqual(details.providedFlags, ['string']);
   });
 
+  it('treats a return value from a command handler as primary output', async () => {
+    const result = parseCommand(
+      ['command'],
+      { command: C(description, async () => 'output') }
+    );
+
+    assert(result.type === 'command', 'Command not parsed');
+    const run = await result.run(createTestContext({ name: 'test-cli' }));
+
+    assert(run.type === 'success', 'Command not run');
+    assert.equal(run.output, 'output');
+  });
+
   it('reports whether all supported flags were provided', async () => {
     const command = C(description, {
       boolean: { default: false, description, type: 'boolean' },
