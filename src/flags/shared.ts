@@ -20,10 +20,12 @@ export const ROOT_FLAGS = useFlags({
   }
 });
 
+export const SHARED_FLAGS = { ...GLOBAL_FLAGS, ...ROOT_FLAGS };
+
 /**
- * The names of all shared flags
+ * All shared flags
  */
-export type SharedFlags = typeof GLOBAL_FLAGS & typeof ROOT_FLAGS;
+export type SharedFlags = typeof SHARED_FLAGS;
 
 /**
  * Use shared flags appropriate to the given scope
