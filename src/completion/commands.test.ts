@@ -2,8 +2,12 @@ import { assert, describe, it } from 'vitest';
 
 import type { ParsingResult } from '../commands/parsing.js';
 import { parseCommand } from '../commands/parsing.js';
-import { createTestContext } from '../tests.js';
-import { defineCompletionCommands } from './commands.js';
+import type { EntryPoint } from '../commands/types.js';
+import { createTestContext, ensure } from '../tests.js';
+import {
+  defineCompletionCommands,
+  withCompletionCommands
+} from './commands.js';
 
 function runCompletionCommand(args: string[]): ParsingResult {
   return parseCommand(['completions', ...args], {
@@ -35,6 +39,42 @@ describe('defineCompletionCommands', () => {
 
       assert(parsed.type === 'error', 'invalid shell was allowed');
       assert.include(parsed.message, '--shell');
+    });
+  });
+
+  describe('withCompletionCommands', () => {
+    it('adds completion commands to the entry point', () => {
+      const original: EntryPoint = {};
+
+      const updated = withCompletionCommands(
+        original,
+        createTestContext({}, { completion: { group: 'completions' } })
+      );
+
+      assert.isDefined(updated.completions);
+      assert.equal(updated.completions.type, 'group');
+
+      assert.isEmpty(original);
+    });
+
+    it('preserves the entry point if completions are not enabled', () => {
+      const entry = withCompletionCommands(
+        {},
+        createTestContext({}, { completion: { enabled: false } })
+      );
+
+      assert.isEmpty(entry);
+    });
+
+    it('throws an error if the completion group already exists', () => {
+      ensure.throws(
+        () =>
+          withCompletionCommands(
+            { testing: defineCompletionCommands() },
+            createTestContext({}, { completion: { group: 'testing' } })
+          ),
+        'testing'
+      );
     });
   });
 });

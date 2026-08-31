@@ -1,5 +1,7 @@
-import type { CommandGroup } from '../commands/types.js';
+import type { CommandGroup, EntryPoint } from '../commands/types.js';
+import { OperationalError } from '../errors.js';
 import C from '../factory.js';
+import type { Context } from '../types.js';
 import { COMPLETION_SHELLS } from '../types.js';
 import { buildShellCompletions } from './shells.js';
 
@@ -20,4 +22,27 @@ export function defineCompletionCommands(): CommandGroup {
         buildShellCompletions(shell, { commands, context })
     )
   });
+}
+
+/**
+ * Add completion commands to a CLI entry point
+ */
+export function withCompletionCommands(
+  entry: EntryPoint,
+  { config: { completion } }: Context
+): EntryPoint {
+  const { group } = completion;
+
+  if (!completion.enabled) {
+    return entry;
+  } else if (group in entry) {
+    throw new OperationalError(
+      `Completions would conflict with an existing command: ${group}`
+    );
+  }
+
+  return {
+    ...entry,
+    [group]: defineCompletionCommands()
+  };
 }
