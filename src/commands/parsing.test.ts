@@ -393,6 +393,11 @@ describe('parseCommand', () => {
               ]);
 
               assert.equal(parsing.context.meta.name, 'test-cli');
+
+              assert.equal(
+                parsing.commands.parent?.description,
+                description
+              );
             }
           )
         })

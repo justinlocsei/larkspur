@@ -170,7 +170,7 @@ export function parseCommand(args: string[], commands: CommandTree, {
   });
 
   return result.type === 'command'
-    ? { ...result, run: buildCommandRunner(result.command) }
+    ? { ...result, run: buildCommandRunner(result.command, commands) }
     : result;
 }
 
@@ -208,7 +208,10 @@ function tryParseFlags(
 /**
  * Build a runner for a parsed command
  */
-function buildCommandRunner(parsed: ParsedCommand): CommandRunner {
+function buildCommandRunner(
+  parsed: ParsedCommand,
+  commands: CommandTree
+): CommandRunner {
   const {
     args,
     command,
@@ -223,6 +226,7 @@ function buildCommandRunner(parsed: ParsedCommand): CommandRunner {
     try {
       await command.handler(values as ValuesOf<Flags, 'narrow'>, {
         args,
+        commands,
         commandPath: path,
         context,
         providedFlags: new Set(providedFlags)

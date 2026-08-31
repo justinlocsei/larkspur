@@ -65,6 +65,7 @@ export type EntryPoint = CommandTree;
  */
 export type CommandParsingDetails<T extends Flags = Flags> = {
   args: ArgParsingDetails;
+  commands: CommandTree;
   commandPath: string[];
   context: Context;
   providedFlags: ProvidedFlagNames<T>;
