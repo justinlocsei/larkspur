@@ -4,14 +4,15 @@ import { OperationalError } from './errors.js';
 import C from './factory.js';
 import type { RunRequest } from './runner.js';
 import { runCLI } from './runner.js';
+import { createTestContext } from './tests.js';
 
 const description = 'description';
 const handler = async () => {};
 
-function testCLI(options: Omit<RunRequest, 'meta'>) {
+function testCLI(options: Omit<RunRequest, 'context'>) {
   return runCLI({
     ...options,
-    meta: { name: 'testing' }
+    context: createTestContext()
   });
 }
 

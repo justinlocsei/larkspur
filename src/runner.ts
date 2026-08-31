@@ -8,15 +8,15 @@ import type { EntryPoint } from './commands/types.js';
 import { buildCompletions } from './completion.js';
 import { coerceError, OperationalError } from './errors.js';
 import { buildHelp } from './help.js';
-import type { CLIMetadata } from './types.js';
+import type { Context } from './types.js';
 
 /**
  * A request to run a CLI
  */
 export type RunRequest = {
   args: string[];
+  context: Context;
   entry: EntryPoint;
-  meta: CLIMetadata;
 };
 
 /**
@@ -76,13 +76,13 @@ function failWith(error: Error, help?: string): ErrorRunResponse {
  */
 export async function runCLI({
   args,
-  entry,
-  meta: cli
+  context,
+  entry
 }: RunRequest): Promise<RunResponse> {
   let parsing: ParsingResult;
 
   try {
-    parsing = parseCommand(args, entry);
+    parsing = parseCommand(args, entry, { context });
   } catch (error) {
     return failWith(
       OperationalError.wrap(error, 'Could not parse CLI arguments')
@@ -94,7 +94,7 @@ export async function runCLI({
       return {
         script: buildCompletions(parsing.shell, {
           commands: entry,
-          name: cli.name
+          context
         }),
         type: 'completion'
       };
@@ -103,13 +103,13 @@ export async function runCLI({
       return failWith(
         new OperationalError(parsing.message),
         parsing.help
-          ? buildHelp({ cli, scope: parsing.help })
+          ? buildHelp({ context, scope: parsing.help })
           : undefined
       );
 
     case 'help':
       return {
-        message: buildHelp({ cli, scope: parsing.scope }),
+        message: buildHelp({ context, scope: parsing.scope }),
         type: 'help'
       };
   }
