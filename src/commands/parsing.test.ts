@@ -653,32 +653,6 @@ describe('parseCommand', () => {
     });
   });
 
-  it('includes shared flags in all help requests', () => {
-    const commands = {
-      root: C(description, handler),
-      parent: C.group(description, {
-        child: C(description, handler)
-      })
-    };
-
-    const cases: Array<string[]> = [
-      ['--help'],
-      ['root', '--help'],
-      ['parent', '--help'],
-      ['parent', 'child', '--help']
-    ];
-
-    cases.forEach((args) => {
-      const result = parseCommand(args, commands);
-
-      assert.sameMembers(
-        result.type === 'help' ? Object.keys(result.scope.flags) : [],
-        args.length === 1 ? ['complete', 'help'] : ['help'],
-        `Core flags not present for args: ${args.join(' ')}`
-      );
-    });
-  });
-
   it('supports completion requests', () => {
     const commands = { command: C(description, handler) };
 

@@ -1,6 +1,5 @@
 import { NormalizedArgs } from '../args.js';
 import { OperationalError } from '../errors.js';
-import { visibleFlags } from '../flags/data.js';
 import type { FlagParsing, ParsedFlags } from '../flags/parsing.js';
 import {
   extractValues,
@@ -11,7 +10,6 @@ import {
 import { useSharedFlags } from '../flags/shared.js';
 import type { Flags } from '../flags/types.js';
 import type { ValuesOf } from '../flags/values.js';
-import type { DistributiveOmit } from '../types/utils.js';
 import type { CompletionShell } from '../types.js';
 import type {
   ArgParsingDetails,
@@ -100,17 +98,17 @@ type CompletionParsingResult = IsParsingResult<'completion', {
 /**
  * An error that occurred during parsing
  */
-type ErrorParsingResult<T = HelpRequestScope> = IsParsingResult<'error', {
+type ErrorParsingResult = IsParsingResult<'error', {
   code: ParsingErrorCode;
-  help?: T;
+  help?: HelpScope;
   message: string;
 }>;
 
 /**
  * A request for help
  */
-type HelpParsingResult<T = HelpRequestScope> = IsParsingResult<'help', {
-  scope: T;
+type HelpParsingResult = IsParsingResult<'help', {
+  scope: HelpScope;
 }>;
 
 /**
@@ -119,8 +117,8 @@ type HelpParsingResult<T = HelpRequestScope> = IsParsingResult<'help', {
 export type ParsingResult =
   | CommandParsingResult & { run: CommandRunner }
   | CompletionParsingResult
-  | ErrorParsingResult<HelpScope>
-  | HelpParsingResult<HelpScope>;
+  | ErrorParsingResult
+  | HelpParsingResult;
 
 /**
  * An internal parsing result
@@ -135,7 +133,6 @@ type InternalParsingResult =
  * The fields shared by all help scopes
  */
 type IsHelpScope<T extends string, U> = U & {
-  flags: Flags;
   type: T;
 };
 
@@ -146,11 +143,6 @@ export type HelpScope =
   | IsHelpScope<'command', { command: CommandHandler; path: string[] }>
   | IsHelpScope<'group', { group: CommandGroup; path: string[] }>
   | IsHelpScope<'root', { commands: CommandTree }>;
-
-/**
- * The scope of a help request
- */
-type HelpRequestScope = DistributiveOmit<HelpScope, 'flags'>;
 
 /**
  * The results of parsing flags
@@ -182,49 +174,13 @@ export function parseCommand(args: string[], commands: CommandTree, {
 }: {
   allowUnknownFlags?: boolean;
 } = {}): ParsingResult {
-  return finalizeParsing(
-    extractCommand(new NormalizedArgs(args), commands, { allowUnknownFlags })
-  );
-}
+  const result = extractCommand(new NormalizedArgs(args), commands, {
+    allowUnknownFlags
+  });
 
-/**
- * Package the help scope for external consumers
- */
-function finalizeHelp(scope: HelpRequestScope): HelpScope {
-  return {
-    ...scope,
-    flags: visibleFlags(
-      useSharedFlags(scope.type === 'root' ? 'root' : 'nested')
-    )
-  };
-}
-
-/**
- * Package the internal parsing result for external consumers
- */
-function finalizeParsing(result: InternalParsingResult): ParsingResult {
-  switch (result.type) {
-    case 'command':
-      return {
-        ...result,
-        run: buildCommandRunner(result.command)
-      };
-
-    case 'error':
-      return {
-        ...result,
-        help: result.help && finalizeHelp(result.help)
-      };
-
-    case 'help':
-      return {
-        ...result,
-        scope: finalizeHelp(result.scope)
-      };
-
-    default:
-      return result;
-  }
+  return result.type === 'command'
+    ? { ...result, run: buildCommandRunner(result.command) }
+    : result;
 }
 
 /**
@@ -234,7 +190,7 @@ function tryParseFlags(
   args: NormalizedArgs,
   flags: Flags,
   options: { allowUnused?: boolean },
-  help?: HelpRequestScope
+  help?: HelpScope
 ): FlagParsingResult {
   try {
     return {
@@ -331,7 +287,7 @@ function extractCommand(
     ? [undefined, parentPath]
     : [commands[name], [...parentPath, name]];
 
-  const commandHelp: HelpRequestScope = group
+  const commandHelp: HelpScope = group
     ? { group, path: parentPath, type: 'group' }
     : { commands, type: 'root' };
 
