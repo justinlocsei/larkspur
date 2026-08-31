@@ -1,5 +1,6 @@
 import type { LogLevel } from './cli.js';
 import { createContext } from './context.js';
+import type { UserConfig } from './types/config.js';
 import type { Context, Metadata } from './types.js';
 
 import fs from 'node:fs/promises';
@@ -70,12 +71,13 @@ export async function createTempDir(): Promise<string> {
  * Create a test context
  */
 export function createTestContext(
-  meta: Partial<Metadata> = {}
+  meta: Partial<Metadata> = {},
+  config: UserConfig = {}
 ): Context {
-  return createContext({
-    name: 'testing',
-    ...meta
-  });
+  return createContext(
+    { name: 'testing', ...meta },
+    config
+  );
 }
 
 /**
