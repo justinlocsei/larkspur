@@ -391,6 +391,8 @@ describe('parseCommand', () => {
                 'parent',
                 'command'
               ]);
+
+              assert.equal(parsing.context.meta.name, 'test-cli');
             }
           )
         })
@@ -399,7 +401,7 @@ describe('parseCommand', () => {
     );
 
     assert(result.type === 'command', 'Command not parsed');
-    const run = await result.run(context);
+    const run = await result.run(createTestContext({ name: 'test-cli' }));
 
     assert(run.type === 'success', 'Command not run');
     const details = run.command;
