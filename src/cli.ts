@@ -92,6 +92,15 @@ export async function run(
 
     case 'help':
       logging.info(response.message);
+      break;
+
+    case 'success': {
+      const output = response.output?.trim();
+
+      if (output) {
+        logging.info(output);
+      }
+    }
   }
 }
 

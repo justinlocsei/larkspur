@@ -158,4 +158,24 @@ describe('run', () => {
     assert.include(output.error, '@handler');
     assert.include(output.error, filename);
   });
+
+  it('logs a string returned by a command handler', async () => {
+    const { error, output } = await testRun(
+      { echo: C('description', async () => '@output') },
+      ['test-cli', 'echo']
+    );
+
+    assert.isUndefined(error);
+    assert.equal(output.info, '@output');
+  });
+
+  it('does not log blank strings returned by a command handler', async () => {
+    const { error, output } = await testRun(
+      { silent: C('description', async () => '   ') },
+      ['test-cli', 'silent']
+    );
+
+    assert.isUndefined(error);
+    assert.isEmpty(output.info);
+  });
 });
