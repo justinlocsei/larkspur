@@ -1,6 +1,7 @@
 import type { ProvidedFlagNames } from '../flags/parsing.js';
 import type { FlagContext, Flags } from '../flags/types.js';
 import type { ValuesOf } from '../flags/values.js';
+import type { Context } from '../types.js';
 
 /**
  * Define a command
@@ -65,6 +66,7 @@ export type EntryPoint = CommandTree;
 export type CommandParsingDetails<T extends Flags = Flags> = {
   args: ArgParsingDetails;
   commandPath: string[];
+  context: Context;
   providedFlags: ProvidedFlagNames<T>;
 };
 

@@ -224,6 +224,7 @@ function buildCommandRunner(parsed: ParsedCommand): CommandRunner {
       await command.handler(values as ValuesOf<Flags, 'narrow'>, {
         args,
         commandPath: path,
+        context,
         providedFlags: new Set(providedFlags)
       });
     } catch (error) {
