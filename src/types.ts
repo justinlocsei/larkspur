@@ -1,7 +1,7 @@
 /**
  * Metadata for a CLI
  */
-export type CLIMetadata = {
+export type Metadata = {
   description?: string;
   name: string;
 };
