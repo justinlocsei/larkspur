@@ -3,16 +3,8 @@ import type { CommandTree } from './commands/types.js';
 import { choicesForFlag, flagToSetter, visibleFlags } from './flags/data.js';
 import { useSharedFlags } from './flags/shared.js';
 import type { Flag, Flags } from './flags/types.ts';
-import type { CLIMetadata } from './types.js';
+import type { Context } from './types.js';
 import { compact, isEmpty, sortEntries, transformValues } from './utils.js';
-
-/**
- * Configuration for formatting help messages
- */
-type HelpFormatting = {
-  gutter: number;
-  indent: number;
-};
 
 /**
  * A flag formatted for display
@@ -30,17 +22,11 @@ type GroupedFlags = {
   required: Flags;
 };
 
-const DEFAULT_FORMATTING: HelpFormatting = {
-  gutter: 2,
-  indent: 2
-};
-
 /**
  * A request to display a help message
  */
 type HelpDisplayRequest = {
-  cli: CLIMetadata;
-  config?: HelpFormatting;
+  context: Context;
   scope: HelpScope;
 };
 
@@ -48,8 +34,7 @@ type HelpDisplayRequest = {
  * Build the text of a CLI's help message
  */
 export function buildHelp({
-  cli,
-  config = DEFAULT_FORMATTING,
+  context,
   scope
 }: HelpDisplayRequest): string {
   const flags: Flags = visibleFlags({
@@ -58,9 +43,8 @@ export function buildHelp({
   });
 
   const message = new HelpMessage({
-    cli,
-    config,
-    context: scopeToContext(scope, cli.description),
+    context,
+    display: scopeToDisplay(scope, context.meta.description),
     flags,
     scope
   });
@@ -69,21 +53,21 @@ export function buildHelp({
 }
 
 /**
- * A context for building help messages
+ * A display context for building help messages
  */
-type HelpContext = {
+type HelpDisplayContext = {
   commands: CommandTree;
   path: string[];
   title?: string;
 };
 
 /**
- * Convert a help scope to a context
+ * Convert a help scope to a display context
  */
-function scopeToContext(
+function scopeToDisplay(
   scope: HelpScope,
   description?: string
-): HelpContext {
+): HelpDisplayContext {
   switch (scope.type) {
     case 'command':
       return {
@@ -111,9 +95,11 @@ function scopeToContext(
 /**
  * Configuration for a help message
  */
-type HelpMessageConfig = Required<HelpDisplayRequest> & {
-  context: HelpContext;
+type HelpMessageConfig = {
+  context: Context;
+  display: HelpDisplayContext;
   flags: Flags;
+  scope: HelpScope;
 };
 
 class HelpMessage {
@@ -127,7 +113,7 @@ class HelpMessage {
   constructor(config: HelpMessageConfig) {
     this.config = config;
 
-    const { gutter, indent } = config.config;
+    const { gutter, indent } = config.context.config.help.formatting;
 
     this.gutter = ' '.repeat(gutter);
     this.indent = ' '.repeat(indent);
@@ -137,7 +123,7 @@ class HelpMessage {
    * Format the help message
    */
   format(): string {
-    const { context: { commands, title }, flags } = this.config;
+    const { display: { commands, title }, flags } = this.config;
 
     const lines = [this.buildUsage()];
 
@@ -160,7 +146,12 @@ class HelpMessage {
    * Build the usage message
    */
   private buildUsage(): string {
-    const { cli, context: { path }, scope, flags } = this.config;
+    const {
+      context: { meta: cli },
+      display: { path },
+      flags,
+      scope
+    } = this.config;
 
     const needsCommand = scope.type !== 'command';
 
@@ -178,7 +169,7 @@ class HelpMessage {
    * List commands
    */
   private listCommands(): string {
-    const { context: { commands } } = this.config;
+    const { display: { commands } } = this.config;
 
     const entries = transformValues(
       commands,
@@ -298,7 +289,7 @@ class HelpMessage {
    * Build usage information for a single flag
    */
   private showFlag({ flag, setter }: PrintableFlag, offset: number): string[] {
-    const { gutter, indent } = this.config.config;
+    const { gutter, indent } = this.config.context.config.help.formatting;
 
     const usage = [
       this.indent,
