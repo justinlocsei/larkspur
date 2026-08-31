@@ -4,7 +4,12 @@ import { OperationalError } from '../errors.js';
 import C from '../factory.js';
 import { extractValues } from '../flags/parsing.js';
 import type { Flag, SupportedValue } from '../flags/types.js';
-import { checkConversionAsync, ensure, T } from '../tests.js';
+import {
+  checkConversionAsync,
+  createTestContext,
+  ensure,
+  T
+} from '../tests.js';
 import type { DistributiveOmit } from '../types/utils.js';
 import { transformValues } from '../utils.js';
 import { extractCommands, parseCommand } from './parsing.js';
@@ -12,6 +17,7 @@ import type { CommandTree } from './types.js';
 
 const description = 'description';
 const handler = async () => {};
+const context = createTestContext();
 
 describe('extractCommands', () => {
   it('returns a single-element list when given a command handler', () => {
@@ -225,7 +231,7 @@ describe('parseCommand', () => {
         });
 
         assert(result.type === 'command', `Command not parsed: ${message}`);
-        await result.run();
+        await result.run(context);
 
         assert.deepStrictEqual(
           values,
@@ -393,7 +399,7 @@ describe('parseCommand', () => {
     );
 
     assert(result.type === 'command', 'Command not parsed');
-    const run = await result.run();
+    const run = await result.run(context);
 
     assert(run.type === 'success', 'Command not run');
     const details = run.command;
@@ -421,7 +427,7 @@ describe('parseCommand', () => {
         const parsed = parseCommand(['command', ...flags], { command });
 
         assert(parsed.type === 'command', `Command not parsed: ${message}`);
-        const result = await parsed.run();
+        const result = await parsed.run(context);
 
         assert(result.type === 'success', `Command failed: ${message}`);
 
@@ -509,7 +515,7 @@ describe('parseCommand', () => {
     });
 
     assert(parsed.type === 'command', 'Command not parsed');
-    const result = await parsed.run();
+    const result = await parsed.run(context);
 
     assert(result.type === 'failure', 'Command ran without errors');
 
@@ -525,7 +531,7 @@ describe('parseCommand', () => {
     });
 
     assert(parsed.type === 'command', 'Command not parsed');
-    await ensure.rejects(parsed.run, '@error');
+    await ensure.rejects(() => parsed.run(context), '@error');
   });
 
   it('can request help', () => {

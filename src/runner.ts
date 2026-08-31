@@ -99,7 +99,7 @@ export async function runCLI({
   let execution: RunResult;
 
   try {
-    execution = await parsing.run();
+    execution = await parsing.run(context);
   } catch (error) {
     return failWith(coerceError(error));
   }

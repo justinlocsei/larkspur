@@ -10,6 +10,7 @@ import {
 import { useSharedFlags } from '../flags/shared.js';
 import type { Flags } from '../flags/types.js';
 import type { ValuesOf } from '../flags/values.js';
+import type { Context } from '../types.js';
 import type {
   ArgParsingDetails,
   Command,
@@ -78,7 +79,7 @@ export type RunResult = FailureRunResult | SuccessRunResult;
 /**
  * A function that runs a command
  */
-type CommandRunner = () => Promise<RunResult>;
+type CommandRunner = (context: Context) => Promise<RunResult>;
 
 /**
  * The successful extraction of a command from CLI args
@@ -218,7 +219,7 @@ function buildCommandRunner(parsed: ParsedCommand): CommandRunner {
 
   const values = extractValues(flags);
 
-  return async function runCommand() {
+  return async function runCommand(context) {
     try {
       await command.handler(values as ValuesOf<Flags, 'narrow'>, {
         args,
