@@ -217,25 +217,6 @@ describe('buildHelp', () => {
     );
   });
 
-  it('hides flags marked as hidden', () => {
-    const help = buildHelp({
-      context: createTestContext(),
-      scope: {
-        command: C(
-          '@command',
-          {
-            secret: C.flag('boolean', '@secret', { hidden: true })
-          },
-          handler
-        ),
-        path: ['command'],
-        type: 'command'
-      }
-    });
-
-    assert.notInclude(help, '--secret');
-  });
-
   it('shows placeholders for scalar flags', () => {
     checkHelp(
       {

@@ -1,6 +1,6 @@
 import type { HelpScope } from './commands/parsing.js';
 import type { CommandTree } from './commands/types.js';
-import { choicesForFlag, flagToSetter, visibleFlags } from './flags/data.js';
+import { choicesForFlag, flagToSetter } from './flags/data.js';
 import { useSharedFlags } from './flags/shared.js';
 import type { Flag, Flags } from './flags/types.ts';
 import type { Context } from './types.js';
@@ -37,10 +37,10 @@ export function buildHelp({
   context,
   scope
 }: HelpDisplayRequest): string {
-  const flags: Flags = visibleFlags({
+  const flags: Flags = {
     ...useSharedFlags(),
     ...(scope.type === 'command' ? scope.command.flags : {})
-  });
+  };
 
   const message = new HelpMessage({
     context,
