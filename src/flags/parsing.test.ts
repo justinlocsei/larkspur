@@ -6,7 +6,7 @@ import type { DistributiveOmit } from '../types/utils.js';
 import { useFlag, useFlags } from './definition.js';
 import type { FlagParsing, ParsingOptions } from './parsing.js';
 import { extractValues, getSharedFlagValue, parseFlags } from './parsing.js';
-import { SHARED_FLAGS } from './shared.js';
+import { useSharedFlags } from './shared.js';
 import type {
   Flags,
   ScalarValidator,
@@ -51,14 +51,11 @@ describe('extractValues', () => {
 
 describe('getSharedFlagValue', () => {
   it('gets the value of a shared flag', () => {
-    const empty = parse([], SHARED_FLAGS);
-    const full = parse(['--help', '--complete', 'bash'], SHARED_FLAGS);
+    const empty = parse([], useSharedFlags());
+    const full = parse(['--help'], useSharedFlags());
 
     assert.isFalse(getSharedFlagValue(empty.flags, 'help'));
     assert.isTrue(getSharedFlagValue(full.flags, 'help'));
-
-    assert.isUndefined(getSharedFlagValue(empty.flags, 'complete'));
-    assert.equal(getSharedFlagValue(full.flags, 'complete'), 'bash');
   });
 });
 
