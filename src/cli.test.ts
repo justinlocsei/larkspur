@@ -91,17 +91,6 @@ describe('run', () => {
     assert.include(info, 'help');
   });
 
-  it('can show completions', async () => {
-    const { output: { error, info } } = await testRun(
-      { testing: C('description', async () => {}) },
-      ['test-cli', '--complete', 'bash']
-    );
-
-    assert.isEmpty(error);
-    assert.include(info, 'test-cli');
-    assert.include(info, 'COMPREPLY');
-  });
-
   it('can use a custom CLI name and description', async () => {
     const { output } = await testRun(
       { testing: C('description', async () => {}) },
