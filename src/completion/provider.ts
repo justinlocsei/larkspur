@@ -1,15 +1,17 @@
 import type { CommandTree } from '../commands/types.ts';
+import type { Context } from '../types.js';
 import type { ScriptLines } from './script.js';
 import { formatScript } from './script.js';
 
-export { CORE_FLAGS } from '../commands/parsing.js';
 export type { CommandHandler } from '../commands/types.js';
 export {
   choicesForFlag,
   flagToSetter,
   getFlagForms,
-  isScalarFlag
+  isScalarFlag,
+  visibleFlags
 } from '../flags/data.js';
+export { GLOBAL_FLAGS, ROOT_FLAGS, useSharedFlags } from '../flags/shared.js';
 export type { Flags } from '../flags/types.js';
 
 export type { CommandTree, ScriptLines };
@@ -27,7 +29,7 @@ export type CompletionScript<T = ScriptLines> = {
  */
 export type CompletionSource = {
   commands: CommandTree;
-  name: string;
+  context: Context;
 };
 
 export abstract class CompletionProvider {

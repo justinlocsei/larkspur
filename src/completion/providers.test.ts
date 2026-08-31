@@ -1,12 +1,13 @@
 import { assert, describe, it } from 'vitest';
 
+import { createTestContext } from '../tests.js';
 import type { CompletionSource } from './provider.js';
 import { BashCompletionProvider } from './providers/bash.js';
 import { loadProvider } from './providers.js';
 
 const cli: CompletionSource = {
   commands: {},
-  name: 'testing'
+  context: createTestContext()
 };
 
 describe('loadProvider', () => {
