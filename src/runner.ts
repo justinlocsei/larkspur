@@ -5,6 +5,7 @@ import type {
 } from './commands/parsing.js';
 import { parseCommand } from './commands/parsing.js';
 import type { EntryPoint } from './commands/types.js';
+import { withCompletionCommands } from './completion/commands.js';
 import { coerceError, OperationalError } from './errors.js';
 import { buildHelp } from './help.js';
 import type { Context } from './types.js';
@@ -72,9 +73,20 @@ export async function runCLI({
   entry
 }: RunRequest): Promise<RunResponse> {
   let parsing: ParsingResult;
+  let commands: EntryPoint;
 
   try {
-    parsing = parseCommand(args, entry);
+    commands = withCompletionCommands(entry, context);
+  } catch (error) {
+    return failWith(
+      error instanceof OperationalError
+        ? error
+        : OperationalError.wrap(error, 'Could not apply completion commands')
+    );
+  }
+
+  try {
+    parsing = parseCommand(args, commands);
   } catch (error) {
     return failWith(
       OperationalError.wrap(error, 'Could not parse CLI arguments')

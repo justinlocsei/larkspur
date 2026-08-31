@@ -9,10 +9,13 @@ import { createTestContext } from './tests.js';
 const description = 'description';
 const handler = async () => {};
 
-function testCLI(options: Omit<RunRequest, 'context'>) {
+function testCLI(
+  options: Omit<RunRequest, 'context'>,
+  context = createTestContext()
+) {
   return runCLI({
     ...options,
-    context: createTestContext()
+    context
   });
 }
 
@@ -152,5 +155,42 @@ describe('runCLI', () => {
 
     assert(response.type === 'success', 'command failed');
     assert.equal(response.output, '@output');
+  });
+
+  it('injects completion commands', async () => {
+    const response = await testCLI({
+      args: ['completions', 'generate', '--shell', 'bash'],
+      entry: {}
+    });
+
+    assert(response.type === 'success', 'completion command failed');
+    assert.include(response.output, 'COMPREPLY');
+  });
+
+  it('does not inject completion commands when disabled', async () => {
+    const response = await testCLI(
+      {
+        args: ['completions'],
+        entry: {}
+      },
+      createTestContext(
+        {},
+        { completion: { enabled: false } }
+      )
+    );
+
+    assert(response.type === 'error', 'completion command was available');
+    assert.include(response.error.message, 'Unknown command');
+  });
+
+  it('rejects completion command name conflicts', async () => {
+    const response = await testCLI({
+      args: [],
+      entry: { completions: C(description, handler) }
+    });
+
+    assert(response.type === 'error', 'conflict');
+    assert.instanceOf(response.error, OperationalError);
+    assert.include(response.error.message, 'completions');
   });
 });
