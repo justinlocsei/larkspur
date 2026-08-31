@@ -1,6 +1,7 @@
 import type { HelpScope } from './commands/parsing.js';
 import type { CommandTree } from './commands/types.js';
 import { choicesForFlag, flagToSetter, visibleFlags } from './flags/data.js';
+import { useSharedFlags } from './flags/shared.js';
 import type { Flag, Flags } from './flags/types.ts';
 import type { CLIMetadata } from './types.js';
 import { compact, isEmpty, sortEntries, transformValues } from './utils.js';
@@ -52,7 +53,7 @@ export function buildHelp({
   scope
 }: HelpDisplayRequest): string {
   const flags: Flags = visibleFlags({
-    ...scope.flags,
+    ...useSharedFlags(scope.type === 'root' ? 'root' : 'nested'),
     ...(scope.type === 'command' ? scope.command.flags : {})
   });
 

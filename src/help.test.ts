@@ -8,6 +8,15 @@ async function handler() {}
 
 const cli: CLIMetadata = { name: 'testing' };
 
+const rootFlags = [
+  '',
+  'Flags:',
+  '',
+  '  --complete <choice>  Generate completions for the given shell',
+  '                       (Choices: bash)',
+  '  --help               Show help'
+];
+
 describe('buildHelp', () => {
   it('can show help for a CLI’s root commands', () => {
     const help = buildHelp({
@@ -17,7 +26,6 @@ describe('buildHelp', () => {
           alfa: C('@alfa', handler),
           bravo: C('@bravo', handler)
         },
-        flags: {},
         type: 'root'
       }
     });
@@ -30,7 +38,8 @@ describe('buildHelp', () => {
         'Commands:',
         '',
         '  alfa   @alfa',
-        '  bravo  @bravo'
+        '  bravo  @bravo',
+        ...rootFlags
       ].join('\n')
     );
   });
@@ -45,7 +54,6 @@ describe('buildHelp', () => {
             charlie: C('@charlie', handler)
           })
         },
-        flags: {},
         type: 'root'
       }
     });
@@ -58,7 +66,8 @@ describe('buildHelp', () => {
         'Commands:',
         '',
         '  alfa             @alfa',
-        '  bravo <command>  @bravo'
+        '  bravo <command>  @bravo',
+        ...rootFlags
       ].join('\n')
     );
   });
@@ -70,7 +79,6 @@ describe('buildHelp', () => {
         commands: {
           command: C('@command', handler)
         },
-        flags: {},
         type: 'root'
       }
     });
@@ -84,7 +92,8 @@ describe('buildHelp', () => {
         '',
         'Commands:',
         '',
-        '  command  @command'
+        '  command  @command',
+        ...rootFlags
       ].join('\n')
     );
   });
@@ -97,7 +106,6 @@ describe('buildHelp', () => {
           alfa: C('@alfa', handler),
           bravo: C('@bravo', handler)
         }),
-        flags: {},
         path: ['parent'],
         type: 'group'
       }
@@ -113,7 +121,11 @@ describe('buildHelp', () => {
         'Commands:',
         '',
         '  alfa   @alfa',
-        '  bravo  @bravo'
+        '  bravo  @bravo',
+        '',
+        'Flags:',
+        '',
+        '  --help  Show help'
       ].join('\n')
     );
   });
@@ -123,13 +135,23 @@ describe('buildHelp', () => {
       cli,
       scope: {
         command: C('@command', handler),
-        flags: {},
         path: ['command'],
         type: 'command'
       }
     });
 
-    assert.equal(help, ['Usage: testing command', '', '@command'].join('\n'));
+    assert.equal(
+      help,
+      [
+        'Usage: testing command [flags]',
+        '',
+        '@command',
+        '',
+        'Flags:',
+        '',
+        '  --help  Show help'
+      ].join('\n')
+    );
   });
 
   it('can show help for a grouped command', () => {
@@ -137,7 +159,6 @@ describe('buildHelp', () => {
       cli,
       scope: {
         command: C('@command', handler),
-        flags: {},
         path: ['parent', 'command'],
         type: 'command'
       }
@@ -145,7 +166,15 @@ describe('buildHelp', () => {
 
     assert.equal(
       help,
-      ['Usage: testing parent command', '', '@command'].join('\n')
+      [
+        'Usage: testing parent command [flags]',
+        '',
+        '@command',
+        '',
+        'Flags:',
+        '',
+        '  --help  Show help'
+      ].join('\n')
     );
   });
 
@@ -153,30 +182,31 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        commands: {
-          command: C('@command', handler)
-        },
-        flags: {
-          alfa: C.flag('boolean', '@alfa'),
-          bravo: C.flag('boolean', '@bravo')
-        },
-        type: 'root'
+        command: C(
+          '@command',
+          {
+            alfa: C.flag('boolean', '@alfa'),
+            bravo: C.flag('boolean', '@bravo')
+          },
+          handler
+        ),
+        path: ['command'],
+        type: 'command'
       }
     });
 
     assert.equal(
       help,
       [
-        'Usage: testing <command> [flags]',
+        'Usage: testing command [flags]',
         '',
-        'Commands:',
-        '',
-        '  command  @command',
+        '@command',
         '',
         'Flags:',
         '',
         '  --alfa   @alfa',
-        '  --bravo  @bravo'
+        '  --bravo  @bravo',
+        '  --help   Show help'
       ].join('\n')
     );
   });
@@ -185,12 +215,14 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        command: C('@command', {
-          bravo: C.flag('boolean', '@bravo')
-        }, handler),
-        flags: {
-          alfa: C.flag('boolean', '@alfa')
-        },
+        command: C(
+          '@command',
+          {
+            alfa: C.flag('boolean', '@alfa'),
+            bravo: C.flag('boolean', '@bravo')
+          },
+          handler
+        ),
         path: [],
         type: 'command'
       }
@@ -206,7 +238,8 @@ describe('buildHelp', () => {
         'Flags:',
         '',
         '  --alfa   @alfa',
-        '  --bravo  @bravo'
+        '  --bravo  @bravo',
+        '  --help   Show help'
       ].join('\n')
     );
   });
@@ -215,13 +248,15 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        commands: {
-          command: C('@command', handler)
-        },
-        flags: {
-          secret: C.flag('boolean', '@secret', { hidden: true })
-        },
-        type: 'root'
+        command: C(
+          '@command',
+          {
+            secret: C.flag('boolean', '@secret', { hidden: true })
+          },
+          handler
+        ),
+        path: ['command'],
+        type: 'command'
       }
     });
 
@@ -232,12 +267,15 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        command: C('@command', handler),
-        flags: {
-          alfa: C.flag('string', '@alfa'),
-          bravo: C.flag('number', '@bravo'),
-          charlie: C.flag('path', '@charlie')
-        },
+        command: C(
+          '@command',
+          {
+            alfa: C.flag('string', '@alfa'),
+            bravo: C.flag('number', '@bravo'),
+            charlie: C.flag('path', '@charlie')
+          },
+          handler
+        ),
         path: [],
         type: 'command'
       }
@@ -254,7 +292,8 @@ describe('buildHelp', () => {
         '',
         '  --alfa <string>   @alfa',
         '  --bravo <number>  @bravo',
-        '  --charlie <path>  @charlie'
+        '  --charlie <path>  @charlie',
+        '  --help            Show help'
       ].join('\n')
     );
   });
@@ -263,12 +302,15 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        command: C('@command', handler),
-        flags: {
-          alfa: C.flag('string', '@alfa', { allowMany: true }),
-          bravo: C.flag('number', '@bravo', { allowMany: true }),
-          charlie: C.flag('path', '@charlie', { allowMany: true })
-        },
+        command: C(
+          '@command',
+          {
+            alfa: C.flag('string', '@alfa', { allowMany: true }),
+            bravo: C.flag('number', '@bravo', { allowMany: true }),
+            charlie: C.flag('path', '@charlie', { allowMany: true })
+          },
+          handler
+        ),
         path: [],
         type: 'command'
       }
@@ -285,7 +327,8 @@ describe('buildHelp', () => {
         '',
         '  --alfa <string> ...   @alfa',
         '  --bravo <number> ...  @bravo',
-        '  --charlie <path> ...  @charlie'
+        '  --charlie <path> ...  @charlie',
+        '  --help                Show help'
       ].join('\n')
     );
   });
@@ -294,30 +337,34 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        commands: {
-          command: C('@command', handler)
-        },
-        flags: {
-          alfa: C.flag('string', '@alfa', { required: true }),
-          bravo: C.flag('number', '@bravo', { required: true })
-        },
-        type: 'root'
+        command: C(
+          '@command',
+          {
+            alfa: C.flag('string', '@alfa', { required: true }),
+            bravo: C.flag('number', '@bravo', { required: true })
+          },
+          handler
+        ),
+        path: ['command'],
+        type: 'command'
       }
     });
 
     assert.equal(
       help,
       [
-        'Usage: testing <command> [flags]',
+        'Usage: testing command [flags]',
         '',
-        'Commands:',
-        '',
-        '  command  @command',
+        '@command',
         '',
         'Required Flags:',
         '',
         '  --alfa <string>   @alfa',
-        '  --bravo <number>  @bravo'
+        '  --bravo <number>  @bravo',
+        '',
+        'Optional Flags:',
+        '',
+        '  --help  Show help'
       ].join('\n')
     );
   });
@@ -326,25 +373,25 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        commands: {
-          command: C('@command', handler)
-        },
-        flags: {
-          alfa: C.flag('string', '@alfa', { required: true }),
-          bravo: C.flag('number', '@bravo')
-        },
-        type: 'root'
+        command: C(
+          '@command',
+          {
+            alfa: C.flag('string', '@alfa', { required: true }),
+            bravo: C.flag('number', '@bravo')
+          },
+          handler
+        ),
+        path: ['command'],
+        type: 'command'
       }
     });
 
     assert.equal(
       help,
       [
-        'Usage: testing <command> [flags]',
+        'Usage: testing command [flags]',
         '',
-        'Commands:',
-        '',
-        '  command  @command',
+        '@command',
         '',
         'Required Flags:',
         '',
@@ -352,7 +399,8 @@ describe('buildHelp', () => {
         '',
         'Optional Flags:',
         '',
-        '  --bravo <number>  @bravo'
+        '  --bravo <number>  @bravo',
+        '  --help            Show help'
       ].join('\n')
     );
   });
@@ -361,14 +409,17 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        command: C('@command', handler),
-        flags: {
-          alfa: C.flag('boolean', '@alfa', { default: false }),
-          bravo: C.flag('boolean', '@bravo', { default: true }),
-          charlie: C.flag('number', '@charlie', { default: 1 }),
-          delta: C.flag('string', '@delta', { default: 'value' }),
-          echo: C.flag('path', '@echo', { default: '/tmp' })
-        },
+        command: C(
+          '@command',
+          {
+            alfa: C.flag('boolean', '@alfa', { default: false }),
+            bravo: C.flag('boolean', '@bravo', { default: true }),
+            charlie: C.flag('number', '@charlie', { default: 1 }),
+            delta: C.flag('string', '@delta', { default: 'value' }),
+            echo: C.flag('path', '@echo', { default: '/tmp' })
+          },
+          handler
+        ),
         path: [],
         type: 'command'
       }
@@ -391,7 +442,8 @@ describe('buildHelp', () => {
         '  --delta <string>    @delta',
         '                      (Default: value)',
         '  --echo <path>       @echo',
-        '                      (Default: /tmp)'
+        '                      (Default: /tmp)',
+        '  --help              Show help'
       ].join('\n')
     );
   });
@@ -400,14 +452,17 @@ describe('buildHelp', () => {
     const help = buildHelp({
       cli,
       scope: {
-        command: C('@command', handler),
-        flags: {
-          alfa: C.flag('number', '@alfa', { default: 1 }),
-          bravo: C.flag('choice', '@bravo', {
-            choices: ['one', 'two'],
-            default: 'one'
-          })
-        },
+        command: C(
+          '@command',
+          {
+            alfa: C.flag('number', '@alfa', { default: 1 }),
+            bravo: C.flag('choice', '@bravo', {
+              choices: ['one', 'two'],
+              default: 'one'
+            })
+          },
+          handler
+        ),
         path: [],
         type: 'command'
       }
@@ -426,7 +481,8 @@ describe('buildHelp', () => {
         '                    (Default: 1)',
         '  --bravo <choice>  @bravo',
         '                    (Choices: one, two)',
-        '                    (Default: one)'
+        '                    (Default: one)',
+        '  --help            Show help'
       ].join('\n')
     );
   });
