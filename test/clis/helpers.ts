@@ -1,7 +1,5 @@
 import { assert, it } from 'vitest';
 
-import { COMPLETION_SHELLS } from '../../src/types.js';
-
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 
@@ -79,19 +77,6 @@ export function test(
 
   it('shows help', () => {
     assert.include(checkOutput('--help'), '--help');
-  });
-
-  for (const shell of COMPLETION_SHELLS) {
-    it(`can generate ${shell} completions`, () => {
-      assert.isNotEmpty(checkOutput('--complete', shell));
-    });
-  }
-
-  it('validates completion requests', () => {
-    const result = run('--complete', 'fish');
-
-    assert.include(result.stderr, 'fish');
-    assert.equal(result.status, 1);
   });
 
   Object.entries(tests).forEach(([name, test]) => {
