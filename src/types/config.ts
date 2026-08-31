@@ -20,6 +20,7 @@ export type HelpConfig = {
  */
 export type CompletionConfig = {
   enabled: boolean;
+  group: string;
 };
 
 /**

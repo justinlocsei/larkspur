@@ -9,7 +9,8 @@ describe('createContext', () => {
       {
         config: {
           completion: {
-            enabled: true
+            enabled: true,
+            group: 'completions'
           },
           help: {
             formatting: {
@@ -34,7 +35,8 @@ describe('createContext', () => {
       {
         config: {
           completion: {
-            enabled: true
+            enabled: true,
+            group: 'completions'
           },
           help: {
             formatting: {

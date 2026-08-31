@@ -39,11 +39,13 @@ function resolveHelpConfig(user: UserConfig): HelpConfig {
 function resolveCompletionConfig(user: UserConfig): CompletionConfig {
   const {
     completion: {
-      enabled = true
+      enabled = true,
+      group = 'completions'
     } = {}
   } = user;
 
   return {
-    enabled
+    enabled,
+    group
   };
 }

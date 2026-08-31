@@ -6,7 +6,8 @@ describe('resolveConfig', () => {
   it('returns defaults for an empty configuration', () => {
     assert.deepEqual(resolveConfig(), {
       completion: {
-        enabled: true
+        enabled: true,
+        group: 'completions'
       },
       help: {
         formatting: {
@@ -20,12 +21,13 @@ describe('resolveConfig', () => {
   it('merges partial configuration data with defaults', () => {
     assert.deepEqual(
       resolveConfig({
-        completion: { enabled: false },
+        completion: { enabled: false, group: 'completion' },
         help: { formatting: { gutter: 4 } }
       }),
       {
         completion: {
-          enabled: false
+          enabled: false,
+          group: 'completion'
         },
         help: {
           formatting: {
