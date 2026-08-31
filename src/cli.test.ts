@@ -1,6 +1,6 @@
 import { assert, describe, it } from 'vitest';
 
-import type { Config, EntryPointProvider, LogLevel } from './cli.js';
+import type { EntryPointProvider, LogLevel, RunOptions } from './cli.js';
 import { run } from './cli.js';
 import type { EntryPoint } from './commands/types.js';
 import { OperationalError } from './errors.js';
@@ -12,7 +12,7 @@ const filename = import.meta.filename;
 async function testRun(
   entry: EntryPointProvider,
   args: string[],
-  config: Config = {}
+  config: RunOptions = {}
 ) {
   let error: Error | undefined;
   const output: Record<LogLevel, string> = { error: '', info: '' };

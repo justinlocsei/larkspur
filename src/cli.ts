@@ -1,7 +1,9 @@
 import type { EntryPoint } from './commands/types.ts';
+import { createContext } from './context.js';
 import { OperationalError } from './errors.js';
 import { runCLI } from './runner.js';
-import type { CLIMetadata } from './types.ts';
+import type { UserConfig } from './types/config.js';
+import type { Metadata } from './types.ts';
 
 import path from 'node:path';
 
@@ -28,10 +30,11 @@ export type EntryPointProvider =
   | (() => EntryPoint | Promise<EntryPoint>);
 
 /**
- * Configuration for a CLI
+ * Options for running a CLI
  */
-export type Config = Partial<CLIMetadata> & {
+export type RunOptions = Partial<Metadata> & {
   args?: string[];
+  config?: UserConfig;
   logging?: LoggingHandlers;
   onError?: (error: Error) => void;
 };
@@ -41,26 +44,31 @@ export type Config = Partial<CLIMetadata> & {
  */
 export async function run(
   entry: EntryPointProvider,
-  config: Config = {}
+  options: RunOptions = {}
 ): Promise<void> {
   const resolvedEntry = await resolveEntryPoint(entry);
 
   const {
     args = process.argv,
+    config,
+    description,
     logging = {
       error: m => console.error(m),
       info: m => console.info(m)
     },
-    onError = () => (process.exitCode = 1)
-  } = config;
+    onError = () => (process.exitCode = 1),
+    name = inferName(args)
+  } = options;
+
+  const context = createContext(
+    { description, name },
+    config
+  );
 
   const response = await runCLI({
     args: args.slice(2),
-    entry: resolvedEntry,
-    meta: {
-      description: config.description,
-      name: config.name || inferName(args)
-    }
+    context,
+    entry: resolvedEntry
   });
 
   switch (response.type) {
