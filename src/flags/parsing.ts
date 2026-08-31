@@ -3,6 +3,7 @@ import { expandPath } from '../paths.js';
 import type { OneOrMany } from '../types/utils.js';
 import { sortEntries } from '../utils.js';
 import { flagToSetter, isFlagSetter, isScalarFlag } from './data.js';
+import type { SharedFlags } from './shared.js';
 import type {
   BooleanFlag,
   ChoiceFlag,
@@ -119,6 +120,16 @@ export function extractValues(
   return Object.fromEntries(
     Object.entries(flags).map(([name, parsed]) => [name, parsed.value])
   );
+}
+
+/**
+ * Get the value of a shared flag
+ */
+export function getSharedFlagValue<T extends keyof SharedFlags>(
+  flags: ParsedFlags,
+  id: T
+) {
+  return flags[id]?.value as SpecificValueOf<SharedFlags[T]> | undefined;
 }
 
 /**
