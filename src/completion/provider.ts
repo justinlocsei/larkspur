@@ -1,5 +1,5 @@
 import type { CommandTree } from '../commands/types.ts';
-import type { Context } from '../types.js';
+import type { Config, Context, Metadata } from '../types.js';
 import type { ScriptLines } from './script.js';
 import { formatScript } from './script.js';
 
@@ -33,13 +33,19 @@ export type CompletionSource = {
 };
 
 export abstract class CompletionProvider {
-  protected cli: CompletionSource;
+  protected cli: Metadata;
+  protected commands: CommandTree;
+  protected config: Config;
 
   /**
    * Create a generator for completions of a CLI's commands
    */
   constructor(cli: CompletionSource) {
-    this.cli = cli;
+    const { commands, context } = cli;
+
+    this.cli = context.meta;
+    this.commands = commands;
+    this.config = context.config;
   }
 
   /**

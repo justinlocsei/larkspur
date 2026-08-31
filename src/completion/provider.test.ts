@@ -1,15 +1,17 @@
 import { assert, describe, it } from 'vitest';
 
+import C from '../factory.js';
+import { createTestContext } from '../tests.js';
 import type { CompletionScript } from './provider.js';
 import { CompletionProvider } from './provider.js';
 
 class TestCompletionProvider extends CompletionProvider {
   provideScript(): CompletionScript {
     return {
-      entryPoint: '_complete',
+      entryPoint: this.cli.name,
       script: [
         '_complete() {',
-        ['echo'],
+        [`echo "${Object.keys(this.commands).sort().join(' ')}"`],
         '}'
       ]
     };
@@ -19,18 +21,26 @@ class TestCompletionProvider extends CompletionProvider {
 describe('CompletionProvider', () => {
   describe('buildScript', () => {
     function testScript() {
+      const command = C('description', async () => {});
+
       return new TestCompletionProvider({
-        name: 'test-cli',
-        commands: {}
+        commands: {
+          alfa: command,
+          bravo: command
+        },
+        context: createTestContext({ name: 'test-cli' })
       }).buildScript();
     }
 
     it('exposes the script entry point', () => {
-      assert.equal(testScript().entryPoint, '_complete');
+      assert.equal(testScript().entryPoint, 'test-cli');
     });
 
     it('includes formatted script lines from provideScript', () => {
-      assert.equal(testScript().script, '_complete() {\n  echo\n}');
+      assert.equal(
+        testScript().script,
+        '_complete() {\n  echo "alfa bravo"\n}'
+      );
     });
   });
 });
