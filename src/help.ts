@@ -38,7 +38,7 @@ export function buildHelp({
   scope
 }: HelpDisplayRequest): string {
   const flags: Flags = visibleFlags({
-    ...useSharedFlags(scope.type === 'root' ? 'root' : 'nested'),
+    ...useSharedFlags(),
     ...(scope.type === 'command' ? scope.command.flags : {})
   });
 

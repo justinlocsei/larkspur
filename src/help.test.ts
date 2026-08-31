@@ -12,9 +12,7 @@ const rootFlags = [
   '',
   'Flags:',
   '',
-  '  --complete <choice>  Generate completions for the given shell',
-  '                       (Choices: bash)',
-  '  --help               Show help'
+  '  --help  Show help'
 ];
 
 function checkHelp(
