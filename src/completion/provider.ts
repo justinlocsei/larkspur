@@ -11,7 +11,7 @@ export {
   isScalarFlag,
   visibleFlags
 } from '../flags/data.js';
-export { GLOBAL_FLAGS, ROOT_FLAGS, useSharedFlags } from '../flags/shared.js';
+export { useSharedFlags } from '../flags/shared.js';
 export type { Flags } from '../flags/types.js';
 
 export type { CommandTree, ScriptLines };
