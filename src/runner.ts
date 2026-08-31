@@ -45,6 +45,7 @@ type HelpRunResponse = IsRunResponse<'help', {
  */
 type SuccessRunResponse = IsRunResponse<'success', {
   command: ParsedCommand;
+  output?: string;
 }>;
 
 /**
@@ -106,5 +107,5 @@ export async function runCLI({
 
   return execution.type === 'failure'
     ? failWith(execution.error)
-    : { command: execution.command, type: 'success' };
+    : execution;
 }

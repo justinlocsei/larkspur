@@ -141,4 +141,16 @@ describe('runCLI', () => {
     assert.include(error.message, '@handler');
     assert.isUndefined(response.help);
   });
+
+  it('captures a string returned by a command handler', async () => {
+    const response = await testCLI({
+      args: ['command'],
+      entry: {
+        command: C(description, async () => '@output')
+      }
+    });
+
+    assert(response.type === 'success', 'command failed');
+    assert.equal(response.output, '@output');
+  });
 });
