@@ -1,10 +1,9 @@
 /**
- * Remove a set of fields from all members of a union
+ * Recursively make an object partial
  */
-export type DistributiveOmit<
-  T extends object,
-  K extends keyof T
-> = T extends unknown ? Omit<T, K> : never;
+export type DeepPartial<T extends object> = {
+  [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K];
+};
 
 /**
  * Distribute a readonly modifier to all values
