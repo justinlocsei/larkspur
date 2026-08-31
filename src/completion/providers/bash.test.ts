@@ -2,8 +2,12 @@ import { assert, describe, it } from 'vitest';
 
 import type { CommandTree } from '../../commands/types.js';
 import C from '../../factory.js';
-import { checkConversionAsync, useTempDir, useTempFile } from '../../tests.js';
-import { COMPLETION_SHELLS } from '../../types.js';
+import {
+  checkConversionAsync,
+  createTestContext,
+  useTempDir,
+  useTempFile
+} from '../../tests.js';
 import { compact } from '../../utils.js';
 import { formatScript } from '../script.js';
 import { BashCompletionProvider } from './bash.js';
@@ -25,7 +29,7 @@ describe('BashCompletionProvider', () => {
   ): Promise<string[]> {
     const completion = new BashCompletionProvider({
       commands,
-      name: 'testing'
+      context: createTestContext({ name: 'testing' })
     }).provideScript();
 
     const args = ['testing', ...inputs];
@@ -111,7 +115,7 @@ describe('BashCompletionProvider', () => {
         ],
         [['parent', 'al'], ['alfa']],
         [['parent', 'br'], ['bravo']],
-        [['parent', '--'], ['--complete', '--help']],
+        [['parent', '--'], ['--help']],
         [['parent', 'ch'], []]
       ]
     ));
@@ -159,7 +163,7 @@ describe('BashCompletionProvider', () => {
       [
         [
           ['command', ' '],
-          ['--alfa-one', '--alfa-two', '--bravo-one', '--complete', '--help']
+          ['--alfa-one', '--alfa-two', '--bravo-one', '--help']
         ],
         [
           ['command', '--al'],
@@ -212,22 +216,22 @@ describe('BashCompletionProvider', () => {
       [
         [
           ['root', ' '],
-          ['--complete', '--for-root', '--help']
+          ['--for-root', '--help']
         ],
         [
           ['parent', 'alfa', ' '],
-          ['--complete', '--for-alfa', '--help']
+          ['--for-alfa', '--help']
         ],
         [
           ['parent', 'bravo', ' '],
-          ['--complete', '--for-bravo', '--help']
+          ['--for-bravo', '--help']
         ]
       ]
     ));
 
   it('includes core flags in all commands', () =>
     checkCompletions({ command }, [
-      [['command', ' '], ['--complete', '--help']],
+      [['command', ' '], ['--help']],
       [['command', '--he'], ['--help']],
       [['command', '--x'], []]
     ]));
@@ -247,7 +251,7 @@ describe('BashCompletionProvider', () => {
       [
         [
           ['command', ' '],
-          ['--bravo', '--complete', '--help', '--no-alfa']
+          ['--bravo', '--help', '--no-alfa']
         ],
         [['command', '--no'], ['--no-alfa']],
         [['command', '--br'], ['--bravo']],
@@ -255,10 +259,9 @@ describe('BashCompletionProvider', () => {
       ]
     ));
 
-  it('lists supported shells for completions', () =>
+  it('lists root flags', () =>
     checkCompletions({ command }, [
-      [['command', '--complete', ' '], [...COMPLETION_SHELLS]],
-      [['command', '--complete', 'b'], ['bash']]
+      [['--'], ['--complete', '--help']]
     ]));
 
   it('lists choices for scalar flags', () =>

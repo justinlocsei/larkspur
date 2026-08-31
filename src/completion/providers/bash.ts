@@ -9,12 +9,12 @@ import type {
   ScriptLines
 } from '../provider.js';
 import {
-  CORE_FLAGS,
   CompletionProvider,
   choicesForFlag,
   flagToSetter,
   getFlagForms,
-  isScalarFlag
+  isScalarFlag,
+  useSharedFlags
 } from '../provider.js';
 
 /**
@@ -49,9 +49,7 @@ export class BashCompletionProvider extends CompletionProvider {
    * Provide bash completions
    */
   provideScript(): CompletionScript {
-    const { cli } = this;
-
-    const completions = this.completeCommands(cli.commands, []);
+    const completions = this.completeCommands(this.commands, []);
     const fn = this.createEntryPoint(completions.entry);
 
     return {
@@ -59,7 +57,7 @@ export class BashCompletionProvider extends CompletionProvider {
       script: [
         ...this.renderCompletions(fn, completions),
         '',
-        `complete -o default -F ${fn.entry.name} ${cli.name}`
+        `complete -o default -F ${fn.entry.name} ${this.cli.name}`
       ]
     };
   }
@@ -235,7 +233,9 @@ export class BashCompletionProvider extends CompletionProvider {
       []
     );
 
-    const setters = Object.entries(CORE_FLAGS).flatMap(([n, f]) =>
+    const coreFlags = useSharedFlags(levels.length === 0 ? 'root' : 'nested');
+
+    const setters = Object.entries(coreFlags).flatMap(([n, f]) =>
       getFlagForms(n, f).map(flagToSetter)
     );
 
@@ -274,7 +274,7 @@ export class BashCompletionProvider extends CompletionProvider {
   ): Completions {
     const flags: Flags = {
       ...command.flags,
-      ...CORE_FLAGS
+      ...useSharedFlags('nested')
     };
 
     const setters = Object.entries(flags).flatMap(([n, f]) =>
