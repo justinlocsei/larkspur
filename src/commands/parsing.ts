@@ -10,7 +10,6 @@ import {
 import { useSharedFlags } from '../flags/shared.js';
 import type { Flags } from '../flags/types.js';
 import type { ValuesOf } from '../flags/values.js';
-import type { CompletionShell } from '../types.js';
 import type {
   ArgParsingDetails,
   Command,
@@ -89,13 +88,6 @@ type CommandParsingResult = IsParsingResult<'command', {
 }>;
 
 /**
- * A request for shell completions
- */
-type CompletionParsingResult = IsParsingResult<'completion', {
-  shell: CompletionShell;
-}>;
-
-/**
  * An error that occurred during parsing
  */
 type ErrorParsingResult = IsParsingResult<'error', {
@@ -116,7 +108,6 @@ type HelpParsingResult = IsParsingResult<'help', {
  */
 export type ParsingResult =
   | CommandParsingResult & { run: CommandRunner }
-  | CompletionParsingResult
   | ErrorParsingResult
   | HelpParsingResult;
 
@@ -125,7 +116,6 @@ export type ParsingResult =
  */
 type InternalParsingResult =
   | CommandParsingResult
-  | CompletionParsingResult
   | ErrorParsingResult
   | HelpParsingResult;
 
@@ -268,7 +258,7 @@ function extractCommand(
 ): InternalParsingResult {
   const parsedCoreFlags = tryParseFlags(
     normalized,
-    useSharedFlags(parentPath.length ? 'nested' : 'root'),
+    useSharedFlags(),
     { allowUnused: true }
   );
 
@@ -276,9 +266,8 @@ function extractCommand(
     return parsedCoreFlags.error;
   }
 
-  const { args: coreArgs, flags } = parsedCoreFlags.parsed;
+  const { flags } = parsedCoreFlags.parsed;
   const showHelp = getSharedFlagValue(flags, 'help') === true;
-  const shell = getSharedFlagValue(flags, 'complete');
 
   const { args } = normalized;
   const name = args[0];
@@ -293,8 +282,6 @@ function extractCommand(
 
   if (showHelp && (!name || !command)) {
     return { scope: commandHelp, type: 'help' };
-  } else if (!showHelp && shell && !coreArgs.extra.length) {
-    return { shell, type: 'completion' };
   }
 
   if (!name) {
