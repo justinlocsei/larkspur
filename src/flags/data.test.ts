@@ -7,10 +7,8 @@ import {
   flagToSetter,
   getFlagForms,
   isFlagSetter,
-  isScalarFlag,
-  visibleFlags
+  isScalarFlag
 } from './data.js';
-import { useFlags } from './definition.js';
 import type { Flag, FlagChoices } from './types.js';
 
 const description = 'description';
@@ -100,20 +98,5 @@ describe('isScalarFlag', () => {
         [path, true]
       ]
     );
-  });
-});
-
-describe('visibleFlags', () => {
-  it('omits hidden flags', () => {
-    const flags = useFlags({
-      alfa: string,
-      bravo: C.flag('string', description, { hidden: true }),
-      charlie: string
-    });
-
-    assert.deepEqual(visibleFlags(flags), {
-      alfa: string,
-      charlie: string
-    });
   });
 });
