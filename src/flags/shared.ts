@@ -31,7 +31,5 @@ export type SharedFlags = typeof SHARED_FLAGS;
  * Use shared flags appropriate to the given scope
  */
 export function useSharedFlags(scope: 'nested' | 'root'): Flags {
-  return scope === 'root'
-    ? { ...GLOBAL_FLAGS, ...ROOT_FLAGS }
-    : GLOBAL_FLAGS;
+  return scope === 'root' ? SHARED_FLAGS : GLOBAL_FLAGS;
 }
