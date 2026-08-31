@@ -52,7 +52,7 @@ export async function run(
     args = process.argv,
     config,
     description,
-    logging = {
+    logging: log = {
       error: m => console.error(m),
       info: m => console.info(m)
     },
@@ -76,11 +76,11 @@ export async function run(
       const { error, help = '' } = response;
 
       if (help) {
-        logging.info(help);
-        logging.info();
+        log.info(help);
+        log.info();
       }
 
-      logging.error(
+      log.error(
         error instanceof OperationalError
           ? error.message
           : error.stack || error.message
@@ -91,14 +91,14 @@ export async function run(
     }
 
     case 'help':
-      logging.info(response.message);
+      log.info(response.message);
       break;
 
     case 'success': {
       const output = response.output?.trim();
 
       if (output) {
-        logging.info(output);
+        log.info(output);
       }
     }
   }
