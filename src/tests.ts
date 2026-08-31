@@ -1,3 +1,6 @@
+import { createContext } from './context.js';
+import type { Context, Metadata } from './types.js';
+
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
@@ -60,6 +63,18 @@ export async function createTempDir(): Promise<string> {
   await fs.chmod(tmpDir, 0o700);
 
   return tmpDir;
+}
+
+/**
+ * Create a test context
+ */
+export function createTestContext(
+  meta: Partial<Metadata> = {}
+): Context {
+  return createContext({
+    name: 'testing',
+    ...meta
+  });
 }
 
 /**
