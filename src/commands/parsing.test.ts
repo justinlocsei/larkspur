@@ -653,7 +653,7 @@ describe('parseCommand', () => {
     });
   });
 
-  it('includes core flags in all help requests', () => {
+  it('includes shared flags in all help requests', () => {
     const commands = {
       root: C(description, handler),
       parent: C.group(description, {
@@ -673,7 +673,7 @@ describe('parseCommand', () => {
 
       assert.sameMembers(
         result.type === 'help' ? Object.keys(result.scope.flags) : [],
-        ['complete', 'help'],
+        args.length === 1 ? ['complete', 'help'] : ['help'],
         `Core flags not present for args: ${args.join(' ')}`
       );
     });
@@ -684,12 +684,14 @@ describe('parseCommand', () => {
 
     assert.equal(
       parseCommand(['--complete', 'bash'], commands).type,
-      'completion'
+      'completion',
+      'root completion ignored'
     );
 
     assert.equal(
       parseCommand(['command', '--complete', 'bash'], commands).type,
-      'completion'
+      'error',
+      'child completion not rejected'
     );
   });
 

@@ -1,13 +1,18 @@
 import { NormalizedArgs } from '../args.js';
 import { OperationalError } from '../errors.js';
+import { visibleFlags } from '../flags/data.js';
 import type { FlagParsing, ParsedFlags } from '../flags/parsing.js';
-import { extractValues, ParsingError, parseFlags } from '../flags/parsing.js';
+import {
+  extractValues,
+  getSharedFlagValue,
+  ParsingError,
+  parseFlags
+} from '../flags/parsing.js';
+import { useSharedFlags } from '../flags/shared.js';
 import type { Flags } from '../flags/types.js';
-import type { SpecificValueOf, ValuesOf } from '../flags/values.js';
-import { useFlags } from '../flags.js';
+import type { ValuesOf } from '../flags/values.js';
 import type { DistributiveOmit } from '../types/utils.js';
 import type { CompletionShell } from '../types.js';
-import { COMPLETION_SHELLS } from '../types.js';
 import type {
   ArgParsingDetails,
   Command,
@@ -154,29 +159,6 @@ type FlagParsingResult =
   | { type: 'failure'; error: ErrorParsingResult }
   | { type: 'success'; parsed: FlagParsing };
 
-export const CORE_FLAGS = useFlags({
-  complete: {
-    choices: COMPLETION_SHELLS,
-    description: 'Generate completions for the given shell',
-    type: 'choice'
-  },
-  help: {
-    default: false,
-    description: 'Show help',
-    type: 'boolean'
-  }
-});
-
-/**
- * Get the value of a core flag
- */
-function getCoreFlagValue<T extends keyof typeof CORE_FLAGS>(
-  flags: ParsedFlags,
-  id: T
-) {
-  return flags[id]?.value as SpecificValueOf<typeof CORE_FLAGS[T]> | undefined;
-}
-
 /**
  * Extract all commands contained in a node
  */
@@ -209,7 +191,12 @@ export function parseCommand(args: string[], commands: CommandTree, {
  * Package the help scope for external consumers
  */
 function finalizeHelp(scope: HelpRequestScope): HelpScope {
-  return { ...scope, flags: CORE_FLAGS };
+  return {
+    ...scope,
+    flags: visibleFlags(
+      useSharedFlags(scope.type === 'root' ? 'root' : 'nested')
+    )
+  };
 }
 
 /**
@@ -323,17 +310,19 @@ function extractCommand(
     parentPath?: string[];
   } = {}
 ): InternalParsingResult {
-  const parsedCoreFlags = tryParseFlags(normalized, CORE_FLAGS, {
-    allowUnused: true
-  });
+  const parsedCoreFlags = tryParseFlags(
+    normalized,
+    useSharedFlags(parentPath.length ? 'nested' : 'root'),
+    { allowUnused: true }
+  );
 
   if (parsedCoreFlags.type === 'failure') {
     return parsedCoreFlags.error;
   }
 
-  const { flags } = parsedCoreFlags.parsed;
-  const showHelp = getCoreFlagValue(flags, 'help') === true;
-  const shell = getCoreFlagValue(flags, 'complete');
+  const { args: coreArgs, flags } = parsedCoreFlags.parsed;
+  const showHelp = getSharedFlagValue(flags, 'help') === true;
+  const shell = getSharedFlagValue(flags, 'complete');
 
   const { args } = normalized;
   const name = args[0];
@@ -348,7 +337,7 @@ function extractCommand(
 
   if (showHelp && (!name || !command)) {
     return { scope: commandHelp, type: 'help' };
-  } else if (!showHelp && shell) {
+  } else if (!showHelp && shell && !coreArgs.extra.length) {
     return { shell, type: 'completion' };
   }
 
