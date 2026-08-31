@@ -82,7 +82,7 @@ export async function runCLI({
   let parsing: ParsingResult;
 
   try {
-    parsing = parseCommand(args, entry, { context });
+    parsing = parseCommand(args, entry);
   } catch (error) {
     return failWith(
       OperationalError.wrap(error, 'Could not parse CLI arguments')
