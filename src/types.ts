@@ -1,5 +1,7 @@
 import type { Config } from './types/config.js';
 
+export type { Config };
+
 /**
  * Metadata for a CLI
  */
