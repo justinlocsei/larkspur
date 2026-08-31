@@ -1,12 +1,12 @@
 import { assert, describe, it } from 'vitest';
 
+import type { HelpScope } from './commands/parsing.js';
 import C from './factory.js';
 import { buildHelp } from './help.js';
 import { createTestContext } from './tests.js';
+import type { Metadata } from './types.js';
 
 async function handler() {}
-
-const context = createTestContext({ name: 'testing' });
 
 const rootFlags = [
   '',
@@ -17,21 +17,30 @@ const rootFlags = [
   '  --help               Show help'
 ];
 
+function checkHelp(
+  scope: HelpScope,
+  lines: string[],
+  meta?: Partial<Metadata>
+) {
+  assert.equal(
+    buildHelp({
+      context: createTestContext(meta),
+      scope
+    }),
+    lines.join('\n')
+  );
+}
+
 describe('buildHelp', () => {
   it('can show help for a CLI’s root commands', () => {
-    const help = buildHelp({
-      context,
-      scope: {
+    checkHelp(
+      {
         commands: {
           alfa: C('@alfa', handler),
           bravo: C('@bravo', handler)
         },
         type: 'root'
-      }
-    });
-
-    assert.equal(
-      help,
+      },
       [
         'Usage: testing <command> [flags]',
         '',
@@ -40,14 +49,13 @@ describe('buildHelp', () => {
         '  alfa   @alfa',
         '  bravo  @bravo',
         ...rootFlags
-      ].join('\n')
+      ]
     );
   });
 
   it('can show help for a CLI’s root commands', () => {
-    const help = buildHelp({
-      context,
-      scope: {
+    checkHelp(
+      {
         commands: {
           alfa: C('@alfa', handler),
           bravo: C.group('@bravo', {
@@ -55,11 +63,7 @@ describe('buildHelp', () => {
           })
         },
         type: 'root'
-      }
-    });
-
-    assert.equal(
-      help,
+      },
       [
         'Usage: testing <command> [flags]',
         '',
@@ -68,26 +72,18 @@ describe('buildHelp', () => {
         '  alfa             @alfa',
         '  bravo <command>  @bravo',
         ...rootFlags
-      ].join('\n')
+      ]
     );
   });
 
   it('can include a description for the root help', () => {
-    const help = buildHelp({
-      context: createTestContext({
-        description: '@description',
-        name: 'testing'
-      }),
-      scope: {
+    checkHelp(
+      {
         commands: {
           command: C('@command', handler)
         },
         type: 'root'
-      }
-    });
-
-    assert.equal(
-      help,
+      },
       [
         'Usage: testing <command> [flags]',
         '',
@@ -97,25 +93,21 @@ describe('buildHelp', () => {
         '',
         '  command  @command',
         ...rootFlags
-      ].join('\n')
+      ],
+      { description: '@description' }
     );
   });
 
   it('can show help for a command group', () => {
-    const help = buildHelp({
-      context,
-      scope: {
+    checkHelp(
+      {
         group: C.group('@parent', {
           alfa: C('@alfa', handler),
           bravo: C('@bravo', handler)
         }),
         path: ['parent'],
         type: 'group'
-      }
-    });
-
-    assert.equal(
-      help,
+      },
       [
         'Usage: testing parent <command> [flags]',
         '',
@@ -129,22 +121,17 @@ describe('buildHelp', () => {
         'Flags:',
         '',
         '  --help  Show help'
-      ].join('\n')
+      ]
     );
   });
 
   it('can show help for a top-level command', () => {
-    const help = buildHelp({
-      context,
-      scope: {
+    checkHelp(
+      {
         command: C('@command', handler),
         path: ['command'],
         type: 'command'
-      }
-    });
-
-    assert.equal(
-      help,
+      },
       [
         'Usage: testing command [flags]',
         '',
@@ -153,22 +140,17 @@ describe('buildHelp', () => {
         'Flags:',
         '',
         '  --help  Show help'
-      ].join('\n')
+      ]
     );
   });
 
   it('can show help for a grouped command', () => {
-    const help = buildHelp({
-      context,
-      scope: {
+    checkHelp(
+      {
         command: C('@command', handler),
         path: ['parent', 'command'],
         type: 'command'
-      }
-    });
-
-    assert.equal(
-      help,
+      },
       [
         'Usage: testing parent command [flags]',
         '',
@@ -177,14 +159,13 @@ describe('buildHelp', () => {
         'Flags:',
         '',
         '  --help  Show help'
-      ].join('\n')
+      ]
     );
   });
 
   it('can list flags', () => {
-    const help = buildHelp({
-      context,
-      scope: {
+    checkHelp(
+      {
         command: C(
           '@command',
           {
@@ -195,11 +176,7 @@ describe('buildHelp', () => {
         ),
         path: ['command'],
         type: 'command'
-      }
-    });
-
-    assert.equal(
-      help,
+      },
       [
         'Usage: testing command [flags]',
         '',
@@ -210,14 +187,13 @@ describe('buildHelp', () => {
         '  --alfa   @alfa',
         '  --bravo  @bravo',
         '  --help   Show help'
-      ].join('\n')
+      ]
     );
   });
 
   it('combines command and core flags', () => {
-    const help = buildHelp({
-      context,
-      scope: {
+    checkHelp(
+      {
         command: C(
           '@command',
           {
@@ -228,11 +204,7 @@ describe('buildHelp', () => {
         ),
         path: [],
         type: 'command'
-      }
-    });
-
-    assert.equal(
-      help,
+      },
       [
         'Usage: testing [flags]',
         '',
@@ -243,13 +215,13 @@ describe('buildHelp', () => {
         '  --alfa   @alfa',
         '  --bravo  @bravo',
         '  --help   Show help'
-      ].join('\n')
+      ]
     );
   });
 
   it('hides flags marked as hidden', () => {
     const help = buildHelp({
-      context,
+      context: createTestContext(),
       scope: {
         command: C(
           '@command',
@@ -267,9 +239,8 @@ describe('buildHelp', () => {
   });
 
   it('shows placeholders for scalar flags', () => {
-    const help = buildHelp({
-      context,
-      scope: {
+    checkHelp(
+      {
         command: C(
           '@command',
           {
@@ -281,11 +252,7 @@ describe('buildHelp', () => {
         ),
         path: [],
         type: 'command'
-      }
-    });
-
-    assert.equal(
-      help,
+      },
       [
         'Usage: testing [flags]',
         '',
@@ -297,14 +264,13 @@ describe('buildHelp', () => {
         '  --bravo <number>  @bravo',
         '  --charlie <path>  @charlie',
         '  --help            Show help'
-      ].join('\n')
+      ]
     );
   });
 
   it('shows placeholders for multi-value scalar flags', () => {
-    const help = buildHelp({
-      context,
-      scope: {
+    checkHelp(
+      {
         command: C(
           '@command',
           {
@@ -316,11 +282,7 @@ describe('buildHelp', () => {
         ),
         path: [],
         type: 'command'
-      }
-    });
-
-    assert.equal(
-      help,
+      },
       [
         'Usage: testing [flags]',
         '',
@@ -332,14 +294,13 @@ describe('buildHelp', () => {
         '  --bravo <number> ...  @bravo',
         '  --charlie <path> ...  @charlie',
         '  --help                Show help'
-      ].join('\n')
+      ]
     );
   });
 
   it('shows required flags', () => {
-    const help = buildHelp({
-      context,
-      scope: {
+    checkHelp(
+      {
         command: C(
           '@command',
           {
@@ -350,11 +311,7 @@ describe('buildHelp', () => {
         ),
         path: ['command'],
         type: 'command'
-      }
-    });
-
-    assert.equal(
-      help,
+      },
       [
         'Usage: testing command [flags]',
         '',
@@ -368,14 +325,13 @@ describe('buildHelp', () => {
         'Optional Flags:',
         '',
         '  --help  Show help'
-      ].join('\n')
+      ]
     );
   });
 
   it('shows required and optional flags', () => {
-    const help = buildHelp({
-      context,
-      scope: {
+    checkHelp(
+      {
         command: C(
           '@command',
           {
@@ -386,11 +342,7 @@ describe('buildHelp', () => {
         ),
         path: ['command'],
         type: 'command'
-      }
-    });
-
-    assert.equal(
-      help,
+      },
       [
         'Usage: testing command [flags]',
         '',
@@ -404,14 +356,13 @@ describe('buildHelp', () => {
         '',
         '  --bravo <number>  @bravo',
         '  --help            Show help'
-      ].join('\n')
+      ]
     );
   });
 
   it('shows default values for flags', () => {
-    const help = buildHelp({
-      context,
-      scope: {
+    checkHelp(
+      {
         command: C(
           '@command',
           {
@@ -425,11 +376,7 @@ describe('buildHelp', () => {
         ),
         path: [],
         type: 'command'
-      }
-    });
-
-    assert.equal(
-      help,
+      },
       [
         'Usage: testing [flags]',
         '',
@@ -447,14 +394,13 @@ describe('buildHelp', () => {
         '  --echo <path>       @echo',
         '                      (Default: /tmp)',
         '  --help              Show help'
-      ].join('\n')
+      ]
     );
   });
 
   it('shows choices for flags', () => {
-    const help = buildHelp({
-      context,
-      scope: {
+    checkHelp(
+      {
         command: C(
           '@command',
           {
@@ -468,11 +414,7 @@ describe('buildHelp', () => {
         ),
         path: [],
         type: 'command'
-      }
-    });
-
-    assert.equal(
-      help,
+      },
       [
         'Usage: testing [flags]',
         '',
@@ -486,7 +428,7 @@ describe('buildHelp', () => {
         '                    (Choices: one, two)',
         '                    (Default: one)',
         '  --help            Show help'
-      ].join('\n')
+      ]
     );
   });
 });
