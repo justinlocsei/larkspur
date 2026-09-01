@@ -119,6 +119,26 @@ describe('parseCommand', () => {
     );
   });
 
+  it('handles commands with overlapping prefixes', () => {
+    const commands = {
+      alfa: C('alfa', handler),
+      'alfa-one': C('bravo', handler)
+    };
+
+    const alfa = parseCommand(['alfa'], commands);
+    const bravo = parseCommand(['alfa-one'], commands);
+
+    assert.equal(
+      alfa.type === 'command' ? alfa.command.command.description : '',
+      'alfa'
+    );
+
+    assert.equal(
+      bravo.type === 'command' ? bravo.command.command.description : '',
+      'bravo'
+    );
+  });
+
   it('returns an error when no args are given', () => {
     const result = parseCommand([], {
       alfa: C(description, handler)
