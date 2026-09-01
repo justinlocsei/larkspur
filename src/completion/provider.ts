@@ -75,3 +75,10 @@ export abstract class CompletionProvider {
       .replace(/\s+/g, '_');
   }
 }
+
+/**
+ * A generic completion provider's class
+ */
+export type CompletionProviderClass = {
+  new(cli: CompletionSource): CompletionProvider;
+};
