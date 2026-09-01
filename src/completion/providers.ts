@@ -27,6 +27,11 @@ const PROVIDERS: Record<
   }
 };
 
+export const SHELL_VARIABLES = Object
+  .entries(PROVIDERS)
+  .flatMap(([_, p]) => p.environmentVariables)
+  .sort();
+
 /**
  * Detect a supported shell from the environment
  */

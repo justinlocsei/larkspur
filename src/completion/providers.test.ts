@@ -2,7 +2,12 @@ import { assert, describe, it } from 'vitest';
 
 import { checkConversion, createTestContext } from '../tests.js';
 import type { CompletionShell, EnvironmentVariables } from '../types.js';
-import { detectShell, getShellProfiles, useProvider } from './providers.js';
+import {
+  detectShell,
+  getShellProfiles,
+  SHELL_VARIABLES,
+  useProvider
+} from './providers.js';
 
 describe('detectShell', () => {
   it('uses environment variables to detect a supported shell', () => {
@@ -24,6 +29,15 @@ describe('getShellProfiles', () => {
     assert.deepEqual(getShellProfiles('bash'), [
       '~/.bashrc',
       '~/.bash_profile'
+    ]);
+  });
+});
+
+describe('SHELL_VARIABLES', () => {
+  it('includes all supported shell environment variables', () => {
+    assert.deepEqual(SHELL_VARIABLES, [
+      'BASH',
+      'BASH_VERSION'
     ]);
   });
 });
