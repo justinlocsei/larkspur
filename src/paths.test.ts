@@ -1,28 +1,35 @@
 import { assert, describe, it } from 'vitest';
 
 import { expandPath } from './paths.js';
+import { checkConversion } from './tests.js';
 
 import { homedir } from 'node:os';
 import path from 'node:path';
 
 describe('expandPath', () => {
-  function checkPath(input: string[], output: string[]) {
-    assert.equal(expandPath(...input), path.join(...output));
+  function checkPaths(tests: Array<[string[], string[]]>) {
+    checkConversion(
+      (i, o, m) => assert.equal(expandPath(...i), path.join(...o), m),
+      tests
+    );
   }
 
-  it('joins path components', () => {
-    checkPath(['alfa', 'bravo'], ['alfa', 'bravo']);
-  });
-
-  it('normalizes relative path components', () => {
-    checkPath(['alfa', 'bravo', '..', 'bravo', '.'], ['alfa', 'bravo']);
+  it('joins and normalizes path components', () => {
+    checkPaths([
+      [['alfa'], ['alfa']],
+      [['alfa', 'bravo'], ['alfa', 'bravo']],
+      [['alfa', 'bravo', '..', 'charlie', '.'], ['alfa', 'charlie']]
+    ]);
   });
 
   it('expands references to the home directory', () => {
-    checkPath(['~', 'alfa'], [homedir(), 'alfa']);
-  });
-
-  it('preserves tildes that are not references to the home directory', () => {
-    checkPath(['alfa', '~bravo'], ['alfa', '~bravo']);
+    checkPaths([
+      [['~'], [homedir()]],
+      [[`~${path.sep}`], [homedir()]],
+      [['~', 'alfa'], [homedir(), 'alfa']],
+      [['~', '~alfa'], [homedir(), '~alfa']],
+      [['~user'], ['~user']],
+      [['alfa', '~user'], ['alfa', '~user']]
+    ]);
   });
 });
