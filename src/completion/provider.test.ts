@@ -6,10 +6,6 @@ import type { CompletionScript } from './provider.js';
 import { CompletionProvider } from './provider.js';
 
 class TestCompletionProvider extends CompletionProvider {
-  provideProfiles(): string[] {
-    return ['~/.profile'];
-  }
-
   provideScript(): CompletionScript {
     return {
       entryPoint: this.cli.name,

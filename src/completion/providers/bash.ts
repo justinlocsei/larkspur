@@ -46,13 +46,6 @@ type CustomCompletions = Partial<Record<string, CompletionFunction>>;
 
 export class BashCompletionProvider extends CompletionProvider {
   /**
-   * Provide common bash profile scripts
-   */
-  provideProfiles(): string[] {
-    return ['~/.bashrc', '~/.bash_profile'];
-  }
-
-  /**
    * Provide bash completions
    */
   provideScript(): CompletionScript {
