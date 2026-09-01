@@ -43,7 +43,14 @@ describe('OperationalError', () => {
   });
 
   describe('.wrap', () => {
-    it('treats a given cause as details for an operational error', () => {
+    it('returns operational errors unchanged', () => {
+      const original = new OperationalError('original');
+      const wrapped = OperationalError.wrap(original, 'wrapped');
+
+      assert.equal(wrapped.message, 'original');
+    });
+
+    it('wraps non-operational errors with a message and details', () => {
       checkConversion<unknown, string>(
         (cause, output, message) => {
           const error = OperationalError.wrap(cause, 'test-message');
@@ -53,7 +60,6 @@ describe('OperationalError', () => {
           assert.include(error.message, output, message);
         },
         [
-          [new OperationalError('error'), 'error'],
           [new Error('error'), 'Error: error'],
           ['error', 'Error: error'],
           [null, 'Error: Unknown error'],

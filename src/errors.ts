@@ -22,8 +22,10 @@ export class OperationalError extends Error {
   /**
    * Treat a value as details for an operational error
    */
-  static wrap(cause: unknown, message: string) {
-    return new OperationalError(message, coerceError(cause));
+  static wrap(cause: unknown, message: string): OperationalError {
+    return cause instanceof OperationalError
+      ? cause
+      : new OperationalError(message, coerceError(cause));
   }
 
   /**
