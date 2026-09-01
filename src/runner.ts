@@ -80,9 +80,7 @@ export async function runCLI({
     commands = withCompletionCommands(entry, context);
   } catch (error) {
     return failWith(
-      error instanceof OperationalError
-        ? error
-        : OperationalError.wrap(error, 'Could not apply completion commands')
+      OperationalError.wrap(error, 'Could not apply completion commands')
     );
   }
 
@@ -90,9 +88,7 @@ export async function runCLI({
     validateCommands(commands);
   } catch (error) {
     return failWith(
-      error instanceof OperationalError
-        ? error
-        : OperationalError.wrap(error, 'Could not validate CLI commands')
+      OperationalError.wrap(error, 'Could not validate CLI commands')
     );
   }
 
