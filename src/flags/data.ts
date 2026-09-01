@@ -1,3 +1,4 @@
+import { NEGATE_BOOLEAN } from './names.js';
 import type { Flag, FlagChoices, ScalarFlag } from './types.js';
 
 // The text used before a flag name to mark it as a setter
@@ -29,7 +30,7 @@ export function flagToSetter(name: string): string {
  */
 export function getFlagForms(name: string, flag: Flag): string[] {
   return flag.type === 'boolean'
-    ? [flag.default ? `no-${name}` : name]
+    ? [flag.default ? `${NEGATE_BOOLEAN}${name}` : name]
     : [name];
 }
 

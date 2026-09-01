@@ -3,6 +3,7 @@ import { expandPath } from '../paths.js';
 import type { OneOrMany } from '../types/utils.js';
 import { sortEntries } from '../utils.js';
 import { flagToSetter, isFlagSetter, isScalarFlag } from './data.js';
+import { NEGATE_BOOLEAN } from './names.js';
 import type { SharedFlags } from './shared.js';
 import type {
   BooleanFlag,
@@ -223,7 +224,7 @@ function parseBooleanFlag(
 ): FlagParsingResult<boolean> {
   const { args, name } = context;
   const lastOn = args.lastIndexOf(flagToSetter(name));
-  const lastOff = args.lastIndexOf(flagToSetter(`no-${name}`));
+  const lastOff = args.lastIndexOf(flagToSetter(`${NEGATE_BOOLEAN}${name}`));
 
   if (lastOn !== -1 && lastOff !== -1) {
     forbidDuplicates(context);

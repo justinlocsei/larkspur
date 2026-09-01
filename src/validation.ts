@@ -1,14 +1,12 @@
 import type { CommandTree } from './commands/types.js';
 import { OperationalError } from './errors.js';
 import { flagToSetter } from './flags/data.js';
+import { NEGATE_BOOLEAN } from './flags/names.js';
 import type { Flags } from './flags/types.js';
 import { sortEntries } from './utils.js';
 
 // The pattern for command flag names
 const IDENTIFIER_PATTERN = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
-
-// The reserved prefix for negated boolean flags
-export const BOOLEAN_NEGATION_PREFIX = 'no-';
 
 /**
  * Report whether an identifier is valid
@@ -28,7 +26,7 @@ export function isValidCommandName(name: string): boolean {
  * Report whether a flag name is valid
  */
 export function isValidFlagName(name: string): boolean {
-  return isValidIdentifier(name) && !name.startsWith(BOOLEAN_NEGATION_PREFIX);
+  return isValidIdentifier(name) && !name.startsWith(NEGATE_BOOLEAN);
 }
 
 /**
@@ -92,7 +90,7 @@ function validateFlagName(name: string, scope: string): void {
 
   if (!isValidCommandName(name)) {
     reject();
-  } else if (name.startsWith(BOOLEAN_NEGATION_PREFIX)) {
-    reject(`Flag names cannot start with "${BOOLEAN_NEGATION_PREFIX}"`);
+  } else if (name.startsWith(NEGATE_BOOLEAN)) {
+    reject(`Flag names cannot start with "${NEGATE_BOOLEAN}"`);
   }
 }

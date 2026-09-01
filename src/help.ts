@@ -1,6 +1,7 @@
 import type { HelpScope } from './commands/parsing.js';
 import type { CommandTree } from './commands/types.js';
 import { choicesForFlag, flagToSetter } from './flags/data.js';
+import { NEGATE_BOOLEAN } from './flags/names.js';
 import { useSharedFlags } from './flags/shared.js';
 import type { Flag, Flags } from './flags/types.ts';
 import type { Context } from './types.js';
@@ -272,7 +273,7 @@ class HelpMessage {
    */
   private formatSetter(id: string, flag: Flag): string {
     const name = flag.type === 'boolean'
-      ? (flag.default ? `[no-]${id}` : id)
+      ? (flag.default ? `[${NEGATE_BOOLEAN}]${id}` : id)
       : id;
 
     const allowMany = flag.type !== 'boolean' && flag.allowMany;
