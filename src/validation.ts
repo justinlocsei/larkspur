@@ -5,8 +5,10 @@ import { NEGATE_BOOLEAN } from './flags/names.js';
 import type { Flags } from './flags/types.js';
 import { sortEntries } from './utils.js';
 
+export { NEGATE_BOOLEAN };
+
 // The pattern for command flag names
-const IDENTIFIER_PATTERN = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
+export const IDENTIFIER_PATTERN = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
 
 /**
  * Report whether an identifier is valid
