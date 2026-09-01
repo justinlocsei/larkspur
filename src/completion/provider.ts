@@ -60,6 +60,11 @@ export abstract class CompletionProvider {
   }
 
   /**
+   * Provide the names of the shell's profile scripts
+   */
+  abstract provideProfiles(): string[];
+
+  /**
    * Provide the lines of the completion script for the shell
    */
   abstract provideScript(): CompletionScript;
