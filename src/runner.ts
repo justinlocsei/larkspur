@@ -9,6 +9,7 @@ import { withCompletionCommands } from './completion/commands.js';
 import { coerceError, OperationalError } from './errors.js';
 import { buildHelp } from './help.js';
 import type { Context } from './types.js';
+import { validateCommands } from './validation.js';
 
 /**
  * A request to run a CLI
@@ -82,6 +83,16 @@ export async function runCLI({
       error instanceof OperationalError
         ? error
         : OperationalError.wrap(error, 'Could not apply completion commands')
+    );
+  }
+
+  try {
+    validateCommands(commands);
+  } catch (error) {
+    return failWith(
+      error instanceof OperationalError
+        ? error
+        : OperationalError.wrap(error, 'Could not validate CLI commands')
     );
   }
 

@@ -183,6 +183,27 @@ describe('runCLI', () => {
     assert.include(response.error.message, 'Unknown command');
   });
 
+  it('rejects invalid command trees before parsing', async () => {
+    const response = await testCLI({
+      args: ['command'],
+      entry: {
+        testing: C(
+          description,
+          { BadFlag: C.flag('string', description) },
+          handler
+        )
+      }
+    });
+
+    assert(response.type === 'error', 'invalid tree was allowed');
+    assert.instanceOf(response.error, OperationalError);
+
+    assert.equal(
+      response.error.message,
+      'Invalid flag --BadFlag on command: testing'
+    );
+  });
+
   it('rejects completion command name conflicts', async () => {
     const response = await testCLI({
       args: [],
