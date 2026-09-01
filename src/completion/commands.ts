@@ -3,7 +3,11 @@ import { OperationalError } from '../errors.js';
 import C from '../factory.js';
 import type { Context } from '../types.js';
 import { COMPLETION_SHELLS } from '../types.js';
-import { buildShellCompletions } from './shells.js';
+import {
+  buildInstallInstructions,
+  buildShellCompletions,
+  detectShell
+} from './shells.js';
 
 /**
  * Define a command group to manage completions
@@ -20,6 +24,26 @@ export function defineCompletionCommands(): CommandGroup {
       },
       async ({ shell }, { commands, context }) =>
         buildShellCompletions(shell, { commands, context })
+    ),
+
+    install: C(
+      'show installation instructions',
+      {
+        shell: C.flag('choice', 'a supported shell', {
+          choices: COMPLETION_SHELLS
+        })
+      },
+      async (flags, { commands, context }) => {
+        const shell = flags.shell || detectShell(process.env);
+
+        if (!shell) {
+          throw new OperationalError(
+            'Completions are not supported for the current shell.'
+          );
+        }
+
+        return buildInstallInstructions(shell, { commands, context });
+      }
     )
   });
 }

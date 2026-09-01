@@ -1,4 +1,4 @@
-import { assert, describe, it } from 'vitest';
+import { afterEach, assert, describe, it, vi } from 'vitest';
 
 import type { ParsingResult } from '../commands/parsing.js';
 import { parseCommand } from '../commands/parsing.js';
@@ -8,6 +8,7 @@ import {
   defineCompletionCommands,
   withCompletionCommands
 } from './commands.js';
+import { SHELL_VARIABLES } from './providers.js';
 
 function runCompletionCommand(args: string[]): ParsingResult {
   return parseCommand(['completions', ...args], {
@@ -39,6 +40,48 @@ describe('defineCompletionCommands', () => {
 
       assert(parsed.type === 'error', 'invalid shell was allowed');
       assert.include(parsed.message, '--shell');
+    });
+  });
+
+  describe('install', () => {
+    afterEach(() => {
+      vi.unstubAllEnvs();
+    });
+
+    it('shows installation instructions', async () => {
+      const parsed = runCompletionCommand(['install', '--shell', 'bash']);
+
+      assert(parsed.type === 'command', 'command not parsed');
+      const run = await parsed.run(createTestContext());
+
+      assert(run.type === 'success', 'command failed');
+      assert.include(run.output, '--shell bash');
+    });
+
+    it('detects the shell when --shell is omitted', async () => {
+      vi.stubEnv('BASH_VERSION', '5.2');
+
+      const parsed = runCompletionCommand(['install']);
+
+      assert(parsed.type === 'command', 'command not parsed');
+      const run = await parsed.run(createTestContext());
+
+      assert(run.type === 'success', 'command failed');
+      assert.include(run.output, 'bash');
+    });
+
+    it('fails when a supported shell cannot be detected', async () => {
+      for (const variable of SHELL_VARIABLES) {
+        vi.stubEnv(variable, undefined);
+      }
+
+      const parsed = runCompletionCommand(['install']);
+
+      assert(parsed.type === 'command', 'command not parsed');
+      const run = await parsed.run(createTestContext());
+
+      assert(run.type === 'failure', 'command succeeded');
+      assert.include(run.error.message, 'not supported');
     });
   });
 
