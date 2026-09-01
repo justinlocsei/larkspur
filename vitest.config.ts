@@ -8,6 +8,7 @@ export default defineConfig({
       {
         extends: true,
         test: {
+          exclude: ['src/**/*.prop.test.ts'],
           include: ['src/**/*.test.ts'],
           name: 'unit'
         }
@@ -18,6 +19,14 @@ export default defineConfig({
           globalSetup: ['./test/global-setup.ts'],
           include: ['test/clis/**/*.test.ts'],
           name: 'integration'
+        }
+      },
+      {
+        extends: true,
+        test: {
+          include: ['src/**/*.prop.test.ts'],
+          name: 'properties',
+          testTimeout: 30_000
         }
       }
     ]

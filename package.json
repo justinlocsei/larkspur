@@ -28,7 +28,8 @@
     "format": "biome check --write --linter-enabled=false . && dprint fmt",
     "prepublishOnly": "npm run build",
     "test": "vitest run --project unit --reporter verbose",
-    "test:all": "npm run test && npm run test:integration",
+    "test:all": "npm run test && npm run test:integration && npm run test:properties",
+    "test:properties": "vitest run --project properties --reporter verbose",
     "test:integration": "vitest run --project integration --reporter verbose"
   },
   "devDependencies": {
