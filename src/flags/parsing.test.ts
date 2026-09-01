@@ -1,6 +1,7 @@
 import { assert, describe, it } from 'vitest';
 
 import { NormalizedArgs } from '../args.js';
+import C from '../factory.js';
 import { checkConversion, ensure, inspect } from '../tests.js';
 import type { DistributiveOmit } from '../types/utils.js';
 import { useFlag, useFlags } from './definition.js';
@@ -194,6 +195,28 @@ describe('parseFlags', () => {
           ['2', '3']
         ]
       ]
+    );
+  });
+
+  it('handles flags with overlapping prefixes', () => {
+    const flag = C.flag('string', description);
+
+    const parsed = parse([
+      '--alfa',
+      '1',
+      '--alfa-one',
+      '2',
+      '--alfa-two',
+      '3'
+    ], {
+      alfa: flag,
+      'alfa-one': flag,
+      'alfa-two': flag
+    });
+
+    assert.deepEqual(
+      extractValues(parsed.flags),
+      { alfa: '1', 'alfa-one': '2', 'alfa-two': '3' }
     );
   });
 
