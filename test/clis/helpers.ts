@@ -60,7 +60,8 @@ type CustomTests = Partial<Record<string, (actions: TestActions) => void>>;
  */
 export function test(
   file: string,
-  tests: CustomTests = {}
+  tests: CustomTests = {},
+  { valid = true }: { valid?: boolean } = {}
 ): void {
   const run: RunCLI = (...args: string[]) => testCLI(file, args);
 
@@ -75,9 +76,11 @@ export function test(
 
   const actions: TestActions = { checkOutput, run };
 
-  it('shows help', () => {
-    assert.include(checkOutput('--help'), '--help');
-  });
+  if (valid) {
+    it('shows help', () => {
+      assert.include(checkOutput('--help'), '--help');
+    });
+  }
 
   Object.entries(tests).forEach(([name, test]) => {
     if (test) {
