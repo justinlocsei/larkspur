@@ -119,6 +119,21 @@ describe('parseCommand', () => {
     );
   });
 
+  it('handles repeated command names in nested groups', () => {
+    const commands = {
+      alfa: C.group(description, {
+        alfa: C.group(description, {
+          alfa: C(description, handler)
+        })
+      })
+    };
+
+    const parsed = parseCommand(['alfa', 'alfa', 'alfa'], commands);
+
+    assert(parsed.type === 'command', 'Command not parsed');
+    assert.deepEqual(parsed.command.path, ['alfa', 'alfa', 'alfa']);
+  });
+
   it('handles commands with overlapping prefixes', () => {
     const commands = {
       alfa: C('alfa', handler),
