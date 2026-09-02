@@ -8,7 +8,7 @@ import type {
   PathFlag,
   StringFlag
 } from '../../flags/types.js';
-import { flagName } from './definition.js';
+import { description, flagName } from './definition.js';
 
 const optional = <T>(a: fc.Arbitrary<T>) => fc.option(a, { nil: undefined });
 const optionalBoolean = optional(fc.boolean());
@@ -17,7 +17,7 @@ const scalarOptions = <T>(defaultValue: fc.Arbitrary<T>) =>
   fc.record({
     allowMany: optionalBoolean,
     default: optional(defaultValue),
-    description: fc.string(),
+    description,
     required: fc.oneof(fc.constant(true), fc.constant(undefined))
   });
 
