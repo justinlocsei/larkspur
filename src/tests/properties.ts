@@ -9,17 +9,10 @@ import type {
   PathFlag,
   StringFlag
 } from '../flags/types.js';
-import { IDENTIFIER_PATTERN, NEGATE_BOOLEAN } from '../validation.js';
 
 export const argv = fc.array(
   fc.string({ maxLength: 40 }),
   { maxLength: 20 }
-);
-
-export const identifier = fc.stringMatching(IDENTIFIER_PATTERN);
-
-export const flagName = identifier.filter(name =>
-  !name.startsWith(NEGATE_BOOLEAN)
 );
 
 type SingleCommand = {
