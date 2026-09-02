@@ -1,6 +1,6 @@
 // biome-ignore-all lint/suspicious/noTemplateCurlyInString: used for completion scripts
 
-import { compact } from '../../utils.js';
+import { compact, drain } from '../../utils.js';
 import type {
   CommandHandler,
   CommandTree,
@@ -68,12 +68,21 @@ export class BashCompletionProvider extends CompletionProvider {
   private renderCompletions(...completions: Completions[]): ScriptLines {
     const fns: CompletionFunction[] = [];
 
-    function findFns({ children = [], entry, helpers = [] }: Completions) {
-      fns.push(entry, ...helpers);
-      children.forEach(findFns);
-    }
+    const stack = [...completions].reverse();
 
-    completions.forEach(findFns);
+    for (const completion of drain(stack)) {
+      const { children = [], helpers = [] } = completion;
+
+      fns.push(completion.entry, ...helpers);
+
+      for (let i = children.length - 1; i >= 0; i--) {
+        const child = children[i];
+
+        if (child) {
+          stack.push(child);
+        }
+      }
+    }
 
     return fns.flatMap((fn, index) => {
       const rendered = [`${fn.name}() {`, fn.lines, '}'];
