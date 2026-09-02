@@ -13,7 +13,7 @@ import { description, flagName } from './definition.js';
 /**
  * Options for defining a flag arbitrary
  */
-type FlagOptions = {
+export type FlagOptions = {
   required?: boolean;
 };
 
