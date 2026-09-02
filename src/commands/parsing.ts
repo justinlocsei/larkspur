@@ -10,6 +10,7 @@ import {
 import { useSharedFlags } from '../flags/shared.js';
 import type { Flags } from '../flags/types.js';
 import type { ValuesOf } from '../flags/values.js';
+import type { Variant } from '../types/utils.js';
 import type { Context } from '../types.js';
 import type {
   ArgParsingDetails,
@@ -140,8 +141,8 @@ export type HelpScope =
  * The results of parsing flags
  */
 type FlagParsingResult =
-  | { type: 'failure'; error: ErrorParsingResult }
-  | { type: 'success'; parsed: FlagParsing };
+  | Variant<'failure', { error: ErrorParsingResult }>
+  | Variant<'success', { parsed: FlagParsing }>;
 
 /**
  * Extract all commands contained in a node
