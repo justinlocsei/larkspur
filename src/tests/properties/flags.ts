@@ -8,7 +8,7 @@ import type {
   PathFlag,
   StringFlag
 } from '../../flags/types.js';
-import { flagName } from './identifiers.js';
+import { flagName } from './definition.js';
 
 const optional = <T>(a: fc.Arbitrary<T>) => fc.option(a, { nil: undefined });
 const optionalBoolean = optional(fc.boolean());
