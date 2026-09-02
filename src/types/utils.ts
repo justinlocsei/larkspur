@@ -49,3 +49,8 @@ export type Optional<T extends object, K extends keyof T> =
 export type Require<T extends object, K extends keyof T> =
   & Omit<T, K>
   & Required<Pick<T, K>>;
+
+/**
+ * Define a member of a tagged union
+ */
+export type Variant<T extends string, V> = { type: T } & V;
