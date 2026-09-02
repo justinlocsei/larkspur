@@ -8,14 +8,17 @@ import {
 import { entryPoint } from './tests/properties.js';
 import { createTestContext } from './tests.js';
 
-test.prop([entryPoint])('command trees always produce help messages', entry => {
-  buildHelp({
-    context: createTestContext(),
-    scope: { commands: entry.tree, type: 'root' }
-  });
-});
+test.prop([entryPoint()])(
+  'command trees always produce help messages',
+  entry => {
+    buildHelp({
+      context: createTestContext(),
+      scope: { commands: entry.tree, type: 'root' }
+    });
+  }
+);
 
-test.prop([entryPoint])(
+test.prop([entryPoint()])(
   'command handlers in a tree always produce help messages',
   entry => {
     for (const path of entry.handlers) {
@@ -29,7 +32,7 @@ test.prop([entryPoint])(
   }
 );
 
-test.prop([entryPoint])(
+test.prop([entryPoint()])(
   'command groups in a tree always produce help messages',
   entry => {
     for (const path of entry.groups) {
