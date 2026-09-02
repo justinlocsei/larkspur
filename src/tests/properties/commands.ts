@@ -10,6 +10,7 @@ import C from '../../factory.js';
 import type { Flags } from '../../flags/types.js';
 import type { Variant } from '../../types/utils.js';
 import { description, identifier } from './definition.js';
+import type { FlagOptions as FlagArbitraryOptions } from './flags.js';
 import { flags } from './flags.js';
 
 /**
@@ -26,44 +27,6 @@ export const singleCommand = fc.tuple(identifier, description).map(
     tree: { [name]: C(description, async () => {}) }
   })
 );
-
-/**
- * A specification for a child node in a command tree
- */
-type ChildNodeSpec = {
-  name: string;
-  node: NodeSpec;
-};
-
-/**
- * A specification for a node in a command tree
- */
-type NodeSpec =
-  | Variant<'group', { children: ChildNodeSpec[]; description: string }>
-  | Variant<'handler', { description: string; flags: Flags }>;
-
-const depthIdentifier = fc.createDepthIdentifier();
-
-const { node: nodeSpec } = fc.letrec<{ node: NodeSpec }>(tie => ({
-  node: fc.oneof(
-    fc.tuple(description, flags).map(([text, flags]): NodeSpec => ({
-      description: text,
-      flags,
-      type: 'handler'
-    })),
-    fc.tuple(
-      description,
-      fc.uniqueArray(
-        fc.tuple(identifier, tie('node')),
-        { depthIdentifier, maxLength: 5, minLength: 1 }
-      )
-    ).map(([text, children]): NodeSpec => ({
-      children: children.map(([name, node]) => ({ name, node })),
-      description: text,
-      type: 'group'
-    }))
-  )
-}));
 
 /**
  * A generated entry point for a CLI
@@ -244,11 +207,66 @@ function buildTree(entries: ChildNodeSpec[]): EntryPoint {
   };
 }
 
-export const entryPoint: fc.Arbitrary<EntryPoint> = fc.uniqueArray(
-  fc.tuple(identifier, nodeSpec),
-  { maxLength: 10, minLength: 1 }
-).map(entries =>
-  buildTree(
-    entries.map(([name, node]): ChildNodeSpec => ({ name, node }))
-  )
-);
+/**
+ * Options for defining a command arbitrary
+ */
+export type CommandOptions = {
+  flags: FlagArbitraryOptions;
+};
+
+/**
+ * A specification for a child node in a command tree
+ */
+type ChildNodeSpec = {
+  name: string;
+  node: NodeSpec;
+};
+
+/**
+ * A specification for a node in a command tree
+ */
+type NodeSpec =
+  | Variant<'group', { children: ChildNodeSpec[]; description: string }>
+  | Variant<'handler', { description: string; flags: Flags }>;
+
+const depthIdentifier = fc.createDepthIdentifier();
+
+function nodeSpec(options: CommandOptions) {
+  const { node } = fc.letrec<{ node: NodeSpec }>(tie => ({
+    node: fc.oneof(
+      fc.tuple(description, flags(options.flags)).map((
+        [text, flags]
+      ): NodeSpec => ({
+        description: text,
+        flags,
+        type: 'handler'
+      })),
+      fc.tuple(
+        description,
+        fc.uniqueArray(
+          fc.tuple(identifier, tie('node')),
+          { depthIdentifier, maxLength: 5, minLength: 1 }
+        )
+      ).map(([text, children]): NodeSpec => ({
+        children: children.map(([name, node]) => ({ name, node })),
+        description: text,
+        type: 'group'
+      }))
+    )
+  }));
+
+  return node;
+}
+
+export function entryPoint(
+  options: CommandOptions = { flags: {} }
+): fc.Arbitrary<EntryPoint> {
+  return fc.uniqueArray(
+    fc.tuple(identifier, nodeSpec(options)),
+    { maxLength: 10, minLength: 1 }
+  ).map(entries =>
+    buildTree(
+      entries.map(([name, node]): ChildNodeSpec => ({ name, node }))
+    )
+  );
+}
