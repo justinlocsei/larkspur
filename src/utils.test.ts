@@ -1,7 +1,13 @@
 import { assert, describe, it } from 'vitest';
 
 import { T } from './tests.js';
-import { compact, drain, isEmpty, sortEntries, transformValues } from './utils.js';
+import {
+  compact,
+  drain,
+  isEmpty,
+  sortEntries,
+  transformValues
+} from './utils.js';
 
 describe('compact', () => {
   it('removes falsy values from an array', () => {
