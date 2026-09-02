@@ -1,6 +1,11 @@
 import { fc } from '@fast-check/vitest';
 
-import type { Command, CommandTree } from '../../commands/types.js';
+import type {
+  Command,
+  CommandGroup,
+  CommandHandler,
+  CommandTree
+} from '../../commands/types.js';
 import C from '../../factory.js';
 import type { Flags } from '../../flags/types.js';
 import type { Variant } from '../../types/utils.js';
@@ -63,11 +68,78 @@ const { node: nodeSpec } = fc.letrec<{ node: NodeSpec }>(tie => ({
 /**
  * A generated entry point for a CLI
  */
-type EntryPoint = {
+export type EntryPoint = {
   groups: string[][];
   handlers: string[][];
   tree: CommandTree;
 };
+
+/**
+ * Fetch a command at the given path from a tree
+ */
+function fetchCommand(entry: EntryPoint, path: string[]): Command {
+  if (!path.length) {
+    throw new Error('Command path must not be empty');
+  }
+
+  let { tree } = entry;
+  let command: Command | undefined;
+
+  for (const [index, segment] of path.entries()) {
+    command = tree[segment];
+    const level = path.slice(0, index + 1).join(' ');
+
+    if (!command) {
+      throw new Error(`Missing command at path: ${level}`);
+    }
+
+    if (index < path.length - 1) {
+      if (command.type !== 'group') {
+        throw new Error(`Expected group at path: ${level}`);
+      }
+
+      tree = command.subcommands;
+    }
+  }
+
+  if (!command) {
+    throw new Error(`Missing command at path: ${path.join(' ')}`);
+  }
+
+  return command;
+}
+
+/**
+ * Get a command handler from a generated entry point
+ */
+export function fetchCommandHandler(
+  entry: EntryPoint,
+  path: string[]
+): CommandHandler {
+  const command = fetchCommand(entry, path);
+
+  if (command.type !== 'handler') {
+    throw new Error(`Expected handler at path: ${path.join(' ')}`);
+  }
+
+  return command;
+}
+
+/**
+ * Get a command group from a generated entry point
+ */
+export function fetchCommandGroup(
+  entry: EntryPoint,
+  path: string[]
+): CommandGroup {
+  const command = fetchCommand(entry, path);
+
+  if (command.type !== 'group') {
+    throw new Error(`Expected group at path: ${path.join(' ')}`);
+  }
+
+  return command;
+}
 
 /**
  * A frame in the node-builder stack
