@@ -8,6 +8,15 @@ export function compact<T>(values: Masked<T>[]): T[] {
 }
 
 /**
+ * Yield items from the top of a stack until it is empty
+ */
+export function* drain<T>(stack: T[]): Generator<T, void> {
+  while (stack.length > 0) {
+    yield stack.pop() as T;
+  }
+}
+
+/**
  * Report whether an object lacks properties
  */
 export function isEmpty(object: Record<string, unknown>): boolean {

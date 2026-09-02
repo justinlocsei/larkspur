@@ -1,7 +1,7 @@
 import { assert, describe, it } from 'vitest';
 
 import { T } from './tests.js';
-import { compact, isEmpty, sortEntries, transformValues } from './utils.js';
+import { compact, drain, isEmpty, sortEntries, transformValues } from './utils.js';
 
 describe('compact', () => {
   it('removes falsy values from an array', () => {
@@ -23,6 +23,30 @@ describe('compact', () => {
     T.assert<T.Equivalent<typeof numbers, number[]>>(true);
     T.assert<T.Assignable<typeof strings, string[]>>(true);
     T.assert<T.Assignable<typeof booleans, boolean[]>>(true);
+  });
+});
+
+describe('drain', () => {
+  it('yields stack items from top to bottom', () => {
+    const stack = ['a', 'b', 'c'];
+
+    assert.deepEqual([...drain(stack)], ['c', 'b', 'a']);
+    assert.deepEqual(stack, []);
+  });
+
+  it('yields items pushed during iteration', () => {
+    const stack = ['root'];
+    const visited: string[] = [];
+
+    for (const item of drain(stack)) {
+      visited.push(item);
+
+      if (item === 'root') {
+        stack.push('child');
+      }
+    }
+
+    assert.deepEqual(visited, ['root', 'child']);
   });
 });
 
