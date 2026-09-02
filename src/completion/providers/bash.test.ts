@@ -147,6 +147,21 @@ describe('BashCompletionProvider', () => {
       ]
     ));
 
+  it('supports deeply nested commands', () => {
+    let commands: CommandTree = {};
+
+    for (let i = 3000; i > 0; i--) {
+      commands = { [`command-${i}`]: C.group(description, commands) };
+    }
+
+    const completion = new BashCompletionProvider({
+      commands,
+      context: createTestContext({ name: 'testing' })
+    }).provideScript();
+
+    assert.isArray(completion.script);
+  });
+
   it('lists a command’s flags', () =>
     checkCompletions(
       {

@@ -45,12 +45,22 @@ type Completions = {
  */
 type CustomCompletions = Partial<Record<string, CompletionFunction>>;
 
+/**
+ * A stack frame used when building completions
+ */
+type Frame = {
+  commands: CommandTree;
+  key: string;
+  levels: string[];
+  visited: boolean;
+};
+
 export class BashCompletionProvider extends CompletionProvider {
   /**
    * Provide bash completions
    */
   provideScript(): CompletionScript {
-    const completions = this.completeCommands(this.commands, []);
+    const completions = this.completeCommands(this.commands);
     const fn = this.createEntryPoint(completions.entry);
 
     return {
@@ -209,63 +219,89 @@ export class BashCompletionProvider extends CompletionProvider {
   /**
    * Define a completion function for a set of commands
    */
-  private completeCommands(
-    commands: CommandTree,
-    levels: string[]
-  ): Completions {
-    const {
-      commandNames,
-      subcommandCases,
-      subcommandCompletions
-    } = this.completeSubcommands(commands, levels);
+  private completeCommands(commands: CommandTree): Completions {
+    const built = new Map<string, Completions>();
+    const stack: Frame[] = [{ commands, key: '0', levels: [], visited: false }];
 
-    return {
-      children: subcommandCompletions,
-      entry: this.defineCommandGroupFunction(
-        levels,
-        commandNames,
-        subcommandCases
-      )
-    };
-  }
+    while (stack.length > 0) {
+      const frame = stack[stack.length - 1];
 
-  /**
-   * Complete each subcommand in a command group
-   */
-  private completeSubcommands(
-    commands: CommandTree,
-    levels: string[]
-  ): {
-    commandNames: string[];
-    subcommandCases: string[];
-    subcommandCompletions: Completions[];
-  } {
-    const commandNames = Object.keys(commands).sort();
-    const subcommandCases: string[] = [];
-    const subcommandCompletions: Completions[] = [];
+      if (!frame) {
+        break;
+      }
 
-    for (const name of commandNames) {
-      const command = commands[name];
+      const { commands, key, levels } = frame;
+      const commandNames = Object.keys(commands).sort();
 
-      if (!command) {
+      if (!frame.visited) {
+        frame.visited = true;
+
+        for (let i = commandNames.length - 1; i >= 0; i--) {
+          const name = commandNames[i];
+
+          if (name === undefined) {
+            continue;
+          }
+
+          const command = commands[name];
+
+          if (command?.type === 'group') {
+            stack.push({
+              commands: command.subcommands,
+              key: `${key}.${i}`,
+              levels: [...levels, this.asIdentifier(name)],
+              visited: false
+            });
+          }
+        }
+
         continue;
       }
 
-      const commandLevels = [...levels, this.asIdentifier(name)];
+      stack.pop();
 
-      const completions = command.type === 'group'
-        ? this.completeCommands(command.subcommands, commandLevels)
-        : this.completeCommand(command, commandLevels);
+      const subcommandCases: string[] = [];
+      const subcommandCompletions: Completions[] = [];
 
-      subcommandCases.push(this.subcommandCase(name, completions, command));
-      subcommandCompletions.push(completions);
+      for (const name of commandNames) {
+        const command = commands[name];
+
+        if (!command) {
+          continue;
+        }
+
+        const completions = command.type === 'group'
+          ? built.get(`${key}.${commandNames.indexOf(name)}`)
+          : this.completeCommand(command, [...levels, this.asIdentifier(name)]);
+
+        if (!completions) {
+          continue;
+        }
+
+        subcommandCases.push(this.subcommandCase(name, completions, command));
+        subcommandCompletions.push(completions);
+      }
+
+      built.set(
+        key,
+        {
+          children: subcommandCompletions,
+          entry: this.defineCommandGroupFunction(
+            levels,
+            commandNames,
+            subcommandCases
+          )
+        }
+      );
     }
 
-    return {
-      commandNames,
-      subcommandCases,
-      subcommandCompletions
-    };
+    const completion = built.get('0');
+
+    if (!completion) {
+      throw new Error('Failed to build command completions');
+    }
+
+    return completion;
   }
 
   /**
