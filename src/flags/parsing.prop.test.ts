@@ -3,7 +3,7 @@ import { assert } from 'vitest';
 
 import { NormalizedArgs } from '../args.js';
 import C from '../factory.js';
-import { flagName } from '../tests/arbitraries.js';
+import { flagName } from '../tests/properties.js';
 import type { FlagParsing } from './parsing.js';
 import { parseFlags } from './parsing.js';
 

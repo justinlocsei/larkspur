@@ -2,7 +2,7 @@ import { fc, test } from '@fast-check/vitest';
 import { assert } from 'vitest';
 
 import C from '../factory.js';
-import { argv, identifier, singleCommand } from '../tests/arbitraries.js';
+import { argv, identifier, singleCommand } from '../tests/properties.js';
 import { parseCommand } from './parsing.js';
 import type { CommandTree } from './types.js';
 

@@ -2,7 +2,7 @@ import { test } from '@fast-check/vitest';
 import { assert } from 'vitest';
 
 import { NormalizedArgs } from './args.js';
-import { argv } from './tests/arbitraries.js';
+import { argv } from './tests/properties.js';
 
 test.prop([argv])('normalization is idempotent', args => {
   const normalized = new NormalizedArgs(args).args;
