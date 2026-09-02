@@ -14,19 +14,10 @@ import type { Variant } from '../types/utils.js';
 import type { Context } from '../types.js';
 import type {
   ArgParsingDetails,
-  Command,
   CommandGroup,
   CommandHandler,
   CommandTree
 } from './types.js';
-
-/**
- * A command extracted from a tree
- */
-type FlattenedCommand = {
-  command: CommandHandler;
-  path: string[];
-};
 
 /**
  * An executable command extracted from CLI args
@@ -143,21 +134,6 @@ export type HelpScope =
 type FlagParsingResult =
   | Variant<'failure', { error: ErrorParsingResult }>
   | Variant<'success', { parsed: FlagParsing }>;
-
-/**
- * Extract all commands contained in a node
- */
-export function extractCommands(root: Command): FlattenedCommand[] {
-  function extract(command: Command, path: string[]): FlattenedCommand[] {
-    return command.type === 'group'
-      ? Object.entries(command.subcommands).flatMap(([id, subcommand]) =>
-        subcommand ? extract(subcommand, [...path, id]) : []
-      )
-      : [{ command, path }];
-  }
-
-  return extract(root, []);
-}
 
 /**
  * Attempt to find a command invocation in user-provided CLI args

@@ -12,49 +12,12 @@ import {
 } from '../tests.js';
 import type { DistributiveOmit } from '../types/utils.js';
 import { transformValues } from '../utils.js';
-import { extractCommands, parseCommand } from './parsing.js';
+import { parseCommand } from './parsing.js';
 import type { CommandTree } from './types.js';
 
 const description = 'description';
 const handler = async () => {};
 const context = createTestContext();
-
-describe('extractCommands', () => {
-  it('returns a single-element list when given a command handler', () => {
-    const commands = extractCommands(
-      C('testing', handler)
-    );
-
-    assert.equal(commands.length, 1);
-    const command = commands[0];
-
-    assert.isDefined(command);
-    assert.deepEqual(command.path, []);
-    assert.equal(command.command.description, 'testing');
-  });
-
-  it('returns all command handlers in a group', () => {
-    const commands = C.group('root', {
-      alfa: C('alfa', handler),
-      bravo: C('bravo', handler),
-      charlie: C.group('charlie', {
-        delta: C('delta', handler)
-      })
-    });
-
-    assert.sameDeepMembers(
-      extractCommands(commands).map(c => [
-        c.command.description,
-        c.path.join('.')
-      ]),
-      [
-        ['alfa', 'alfa'],
-        ['bravo', 'bravo'],
-        ['delta', 'charlie.delta']
-      ]
-    );
-  });
-});
 
 describe('parseCommand', () => {
   it('extracts a command from args', () => {
