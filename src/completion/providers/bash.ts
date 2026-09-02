@@ -2,6 +2,7 @@
 
 import { compact, drain } from '../../utils.js';
 import type {
+  Command,
   CommandHandler,
   CommandTree,
   CompletionScript,
@@ -212,41 +213,87 @@ export class BashCompletionProvider extends CompletionProvider {
     commands: CommandTree,
     levels: string[]
   ): Completions {
+    const {
+      commandNames,
+      subcommandCases,
+      subcommandCompletions
+    } = this.completeSubcommands(commands, levels);
+
+    return {
+      children: subcommandCompletions,
+      entry: this.defineCommandGroupFunction(
+        levels,
+        commandNames,
+        subcommandCases
+      )
+    };
+  }
+
+  /**
+   * Complete each subcommand in a command group
+   */
+  private completeSubcommands(
+    commands: CommandTree,
+    levels: string[]
+  ): {
+    commandNames: string[];
+    subcommandCases: string[];
+    subcommandCompletions: Completions[];
+  } {
     const commandNames = Object.keys(commands).sort();
     const subcommandCases: string[] = [];
+    const subcommandCompletions: Completions[] = [];
 
-    const subcommandCompletions = commandNames.reduce<Completions[]>(
-      (previous, name) => {
-        const command = commands[name];
+    for (const name of commandNames) {
+      const command = commands[name];
 
-        if (!command) {
-          return previous;
-        }
+      if (!command) {
+        continue;
+      }
 
-        const commandLevels = [...levels, this.asIdentifier(name)];
+      const commandLevels = [...levels, this.asIdentifier(name)];
 
-        const completions = command.type === 'group'
-          ? this.completeCommands(command.subcommands, commandLevels)
-          : this.completeCommand(command, commandLevels);
+      const completions = command.type === 'group'
+        ? this.completeCommands(command.subcommands, commandLevels)
+        : this.completeCommand(command, commandLevels);
 
-        subcommandCases.push(
-          `${name}) ${completions.entry.name} ${
-            command.type === 'group' ? '$next ' : ''
-          }"$2" "$3" "$4" ;;`
-        );
+      subcommandCases.push(this.subcommandCase(name, completions, command));
+      subcommandCompletions.push(completions);
+    }
 
-        previous.push(completions);
+    return {
+      commandNames,
+      subcommandCases,
+      subcommandCompletions
+    };
+  }
 
-        return previous;
-      },
-      []
-    );
+  /**
+   * Produce a case branch for completing a subcommand
+   */
+  private subcommandCase(
+    name: string,
+    completions: Completions,
+    command: Command
+  ): string {
+    return `${name}) ${completions.entry.name} ${
+      command.type === 'group' ? '$next ' : ''
+    }"$2" "$3" "$4" ;;`;
+  }
 
+  /**
+   * Define the completion function for a command group
+   */
+  private defineCommandGroupFunction(
+    levels: string[],
+    commandNames: string[],
+    subcommandCases: string[]
+  ): CompletionFunction {
     const setters = Object.entries(useSharedFlags()).flatMap(([n, f]) =>
       getFlagForms(n, f).map(flagToSetter)
     );
 
-    const entry = this.defineFunction('command', levels, [
+    return this.defineFunction('command', levels, [
       'local index=$1',
       'local next=$((index+1))',
       'local word="${COMP_WORDS[index]}"',
@@ -265,11 +312,6 @@ export class BashCompletionProvider extends CompletionProvider {
       ['case "$word" in', [...subcommandCases, '*) COMPREPLY=() ;;'], 'esac'],
       'fi'
     ]);
-
-    return {
-      entry,
-      children: subcommandCompletions
-    };
   }
 
   /**
