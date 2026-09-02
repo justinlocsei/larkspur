@@ -22,7 +22,7 @@ const optionalBoolean = optional(fc.boolean());
 
 const scalarOptions = <T>(
   defaultValue: fc.Arbitrary<T>,
-  { required = true }: FlagOptions = {}
+  { required = true }: FlagOptions
 ) =>
   fc.record({
     allowMany: optionalBoolean,
