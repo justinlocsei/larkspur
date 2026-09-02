@@ -64,6 +64,7 @@ const { node: nodeSpec } = fc.letrec<{ node: NodeSpec }>(tie => ({
  * A generated entry point for a CLI
  */
 type EntryPoint = {
+  groups: string[][];
   handlers: string[][];
   tree: CommandTree;
 };
@@ -83,6 +84,7 @@ type StackFrame = {
  */
 function buildTree(entries: ChildNodeSpec[]): EntryPoint {
   const built = new Map<string, Command>();
+  const groups: string[][] = [];
   const handlers: string[][] = [];
   const postOrder: { key: string; spec: NodeSpec }[] = [];
 
@@ -134,6 +136,8 @@ function buildTree(entries: ChildNodeSpec[]): EntryPoint {
 
       if (node.type === 'handler') {
         handlers.push(frame.path);
+      } else {
+        groups.push(frame.path);
       }
 
       postOrder.push({ key, spec: node });
@@ -159,6 +163,7 @@ function buildTree(entries: ChildNodeSpec[]): EntryPoint {
   }
 
   return {
+    groups,
     handlers,
     tree: entries.reduce<CommandTree>((p, node, index) => {
       p[node.name] = requireNode(String(index));
