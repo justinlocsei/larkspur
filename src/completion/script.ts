@@ -10,19 +10,29 @@ export function formatScript(
   lines: ScriptLines,
   indent: number = 2
 ): string {
-  function format(ls: ScriptLines, level: number) {
-    const nesting = ' '.repeat(indent * level);
+  const formatted: string[] = [];
 
-    return ls.reduce((previous: string[], line) => {
-      if (typeof line === 'string') {
-        previous.push(`${nesting}${line}`);
-      } else {
-        previous.push(...format(line, level + 1));
-      }
+  const stack: Array<{ index: number; level: number; lines: ScriptLines }> = [
+    { index: 0, level: 0, lines }
+  ];
 
-      return previous;
-    }, []);
+  while (stack.length > 0) {
+    const frame = stack[stack.length - 1];
+
+    if (!frame) {
+      break;
+    }
+
+    const line = frame.lines[frame.index++];
+
+    if (line === undefined) {
+      stack.pop();
+    } else if (typeof line === 'string') {
+      formatted.push(`${' '.repeat(indent * frame.level)}${line}`);
+    } else {
+      stack.push({ index: 0, level: frame.level + 1, lines: line });
+    }
   }
 
-  return format(lines, 0).join('\n');
+  return formatted.join('\n');
 }
