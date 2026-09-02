@@ -10,60 +10,80 @@ import type {
 } from '../../flags/types.js';
 import { description, flagName } from './definition.js';
 
+/**
+ * Options for defining a flag arbitrary
+ */
+type FlagOptions = {
+  required?: boolean;
+};
+
 const optional = <T>(a: fc.Arbitrary<T>) => fc.option(a, { nil: undefined });
 const optionalBoolean = optional(fc.boolean());
 
-const scalarOptions = <T>(defaultValue: fc.Arbitrary<T>) =>
+const scalarOptions = <T>(
+  defaultValue: fc.Arbitrary<T>,
+  { required = true }: FlagOptions = {}
+) =>
   fc.record({
     allowMany: optionalBoolean,
     default: optional(defaultValue),
     description,
-    required: fc.oneof(fc.constant(true), fc.constant(undefined))
+    required: required
+      ? fc.oneof(fc.constant(true), fc.constant(undefined))
+      : fc.constant(undefined)
   });
 
 const booleanFlag = fc.tuple(fc.string(), optionalBoolean).map((
   [description, value]
 ): BooleanFlag => C.flag('boolean', description, { default: value }));
 
-const choiceFlag = fc.tuple(
-  scalarOptions(fc.string()),
-  fc.array(fc.string(), { minLength: 1 }),
-  fc.boolean()
-)
-  .map(
-    ([{ allowMany, description, required }, choices, useDefault]): ChoiceFlag =>
-      C.flag('choice', description, {
-        allowMany,
-        choices,
-        default: useDefault ? choices[0] : undefined,
-        required
-      })
+const choiceFlag = (options: FlagOptions) =>
+  fc.tuple(
+    scalarOptions(fc.string(), options),
+    fc.array(fc.string(), { minLength: 1 }),
+    fc.boolean()
+  )
+    .map(
+      (
+        [{ allowMany, description, required }, choices, useDefault]
+      ): ChoiceFlag =>
+        C.flag('choice', description, {
+          allowMany,
+          choices,
+          default: useDefault ? choices[0] : undefined,
+          required
+        })
+    );
+
+const numberFlag = (options: FlagOptions) =>
+  scalarOptions(fc.integer(), options).map(
+    ({ description, ...options }): NumberFlag =>
+      C.flag('number', description, options)
   );
 
-const numberFlag = scalarOptions(fc.integer()).map(
-  ({ description, ...options }): NumberFlag =>
-    C.flag('number', description, options)
-);
+const pathFlag = (options: FlagOptions) =>
+  scalarOptions(fc.string(), options).map(
+    ({ description, ...options }): PathFlag =>
+      C.flag('path', description, options)
+  );
 
-const pathFlag = scalarOptions(fc.string()).map(
-  ({ description, ...options }): PathFlag =>
-    C.flag('path', description, options)
-);
+const stringFlag = (options: FlagOptions) =>
+  scalarOptions(fc.string(), options).map(
+    ({ description, ...options }): StringFlag =>
+      C.flag('string', description, options)
+  );
 
-const stringFlag = scalarOptions(fc.string()).map(
-  ({ description, ...options }): StringFlag =>
-    C.flag('string', description, options)
-);
+const flag = (options: FlagOptions) =>
+  fc.oneof(
+    booleanFlag,
+    choiceFlag(options),
+    numberFlag(options),
+    pathFlag(options),
+    stringFlag(options)
+  );
 
-export const flag = fc.oneof(
-  booleanFlag,
-  choiceFlag,
-  numberFlag,
-  pathFlag,
-  stringFlag
-);
-
-export const flags = fc.uniqueArray(
-  fc.tuple(flagName, flag),
-  { minLength: 0 }
-).map(entries => Object.fromEntries(entries));
+export const flags = (options: FlagOptions) =>
+  fc.uniqueArray(
+    fc.tuple(flagName, flag(options)),
+    { minLength: 0 }
+  ).map(entries => Object.fromEntries(entries));
