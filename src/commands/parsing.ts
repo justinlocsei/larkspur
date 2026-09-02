@@ -143,8 +143,13 @@ export function parseCommand(args: string[], commands: CommandTree, {
 }: {
   allowUnknownFlags?: boolean;
 } = {}): ParsingResult {
-  const result = extractCommand(new NormalizedArgs(args), commands, {
-    allowUnknownFlags
+  const result = extractCommand({
+    allowUnknownFlags,
+    current: {
+      args: new NormalizedArgs(args),
+      commands,
+      namespace: []
+    }
   });
 
   return result.type === 'command'
@@ -235,102 +240,113 @@ function buildCommandRunner(
 }
 
 /**
+ * The traversal state for a command tree
+ */
+type TraversalState = {
+  args: NormalizedArgs;
+  commands: CommandTree;
+  group?: CommandGroup;
+  namespace: string[];
+};
+
+/**
  * Extract a command from a list of arguments
  */
-function extractCommand(
-  normalized: NormalizedArgs,
-  commands: CommandTree,
-  {
-    allowUnknownFlags = false,
-    group,
-    parentPath = []
-  }: {
-    allowUnknownFlags?: boolean;
-    group?: CommandGroup;
-    parentPath?: string[];
-  } = {}
-): InternalParsingResult {
-  const parsedCoreFlags = tryParseFlags(
-    normalized,
-    useSharedFlags(),
-    { allowUnused: true }
-  );
+function extractCommand({
+  allowUnknownFlags = false,
+  current
+}: {
+  allowUnknownFlags?: boolean;
+  current: TraversalState;
+}): InternalParsingResult {
+  while (true) {
+    const coreFlags = tryParseFlags(
+      current.args,
+      useSharedFlags(),
+      { allowUnused: true }
+    );
 
-  if (parsedCoreFlags.type === 'failure') {
-    return parsedCoreFlags.error;
-  }
+    if (coreFlags.type === 'failure') {
+      return coreFlags.error;
+    }
 
-  const { flags } = parsedCoreFlags.parsed;
-  const showHelp = getSharedFlagValue(flags, 'help') === true;
+    const { flags } = coreFlags.parsed;
+    const showHelp = getSharedFlagValue(flags, 'help') === true;
 
-  const { args } = normalized;
-  const name = args[0];
+    const { args } = current.args;
+    const name = args[0];
 
-  const [command, path] = name === undefined
-    ? [undefined, parentPath]
-    : [commands[name], [...parentPath, name]];
+    const [command, path] = name === undefined
+      ? [undefined, current.namespace]
+      : [current.commands[name], [...current.namespace, name]];
 
-  const commandHelp: HelpScope = group
-    ? { group, path: parentPath, type: 'group' }
-    : { commands, type: 'root' };
+    const help: HelpScope = current.group
+      ? { group: current.group, path: current.namespace, type: 'group' }
+      : { commands: current.commands, type: 'root' };
 
-  if (showHelp && (!name || !command)) {
-    return { scope: commandHelp, type: 'help' };
-  }
+    if (showHelp && (!name || !command)) {
+      return { scope: help, type: 'help' };
+    }
 
-  if (!name) {
+    if (!name) {
+      return {
+        code: 'invalid-command',
+        help,
+        message: current.namespace.length
+          ? `You must provide a subcommand: ${
+            current.namespace.join(' ')
+          } <subcommand>`
+          : 'You must provide a command',
+        type: 'error'
+      };
+    } else if (!command) {
+      return {
+        code: 'invalid-command',
+        help,
+        message: `Unknown command: ${path.join(' ')}`,
+        type: 'error'
+      };
+    }
+
+    const remainingArgs = new NormalizedArgs(args.slice(1));
+
+    if (command.type === 'group') {
+      current = {
+        commands: command.subcommands,
+        group: command,
+        args: remainingArgs,
+        namespace: path
+      };
+
+      continue;
+    } else if (showHelp) {
+      return {
+        scope: { command, path, type: 'command' },
+        type: 'help'
+      };
+    }
+
+    const commandFlags = tryParseFlags(
+      remainingArgs,
+      command.flags || {},
+      { allowUnused: allowUnknownFlags },
+      { command, path, type: 'command' }
+    );
+
+    if (commandFlags.type === 'failure') {
+      return commandFlags.error;
+    }
+
+    const { parsed } = commandFlags;
+
     return {
-      code: 'invalid-command',
-      help: commandHelp,
-      message: parentPath.length
-        ? `You must provide a subcommand: ${parentPath.join(' ')} <subcommand>`
-        : 'You must provide a command',
-      type: 'error'
-    };
-  } else if (!command) {
-    return {
-      code: 'invalid-command',
-      help: commandHelp,
-      message: `Unknown command: ${path.join(' ')}`,
-      type: 'error'
+      command: {
+        ...parsed,
+        command,
+        path,
+        providedFlags: parsed.provided
+      },
+      type: 'command'
     };
   }
-
-  const remainingArgs = new NormalizedArgs(args.slice(1));
-
-  if (command.type === 'group') {
-    return extractCommand(remainingArgs, command.subcommands, {
-      allowUnknownFlags,
-      group: command,
-      parentPath: path
-    });
-  } else if (showHelp) {
-    return {
-      scope: { command, path, type: 'command' },
-      type: 'help'
-    };
-  }
-
-  const parsedCommandFlags = tryParseFlags(
-    remainingArgs,
-    command.flags || {},
-    { allowUnused: allowUnknownFlags },
-    { command, path, type: 'command' }
-  );
-
-  if (parsedCommandFlags.type === 'failure') {
-    return parsedCommandFlags.error;
-  }
-
-  const { parsed } = parsedCommandFlags;
-
-  return {
-    command: {
-      ...parsed,
-      command,
-      path,
-      providedFlags: parsed.provided
-    },
-    type: 'command'
-  };
 }

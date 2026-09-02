@@ -117,6 +117,21 @@ describe('parseCommand', () => {
     );
   });
 
+  it('handles deeply nested commands', () => {
+    let commands: CommandTree = {};
+    const args: string[] = [];
+
+    for (let i = 3000; i >= 0; i--) {
+      const name = `command-${i}`;
+      args.push(name);
+
+      commands = { [name]: C.group(description, commands) };
+    }
+
+    const result = parseCommand([...args.reverse(), '--help'], commands);
+    assert(result.type === 'help', 'Command not handled');
+  });
+
   it('returns an error when no args are given', () => {
     const result = parseCommand([], {
       alfa: C(description, handler)
