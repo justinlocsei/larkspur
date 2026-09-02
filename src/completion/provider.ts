@@ -3,7 +3,7 @@ import type { Config, Context, Metadata } from '../types.js';
 import type { ScriptLines } from './script.js';
 import { formatScript } from './script.js';
 
-export type { CommandHandler } from '../commands/types.js';
+export type { Command, CommandHandler } from '../commands/types.js';
 export {
   choicesForFlag,
   flagToSetter,
