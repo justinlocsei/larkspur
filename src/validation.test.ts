@@ -1,5 +1,6 @@
 import { assert, describe, it } from 'vitest';
 
+import type { CommandTree } from './commands/types.js';
 import { OperationalError } from './errors.js';
 import C from './factory.js';
 import { checkConversion, ensure } from './tests.js';
@@ -75,6 +76,16 @@ describe('validateCommands', () => {
         })
       })
     );
+  });
+
+  it('accepts a deeply nested command tree', () => {
+    let commands: CommandTree = {};
+
+    for (let i = 5000; i >= 0; i--) {
+      commands = { [`command-${i}`]: C.group(description, commands) };
+    }
+
+    assert.doesNotThrow(() => validateCommands(commands));
   });
 
   it('reports invalid root command names', () => {

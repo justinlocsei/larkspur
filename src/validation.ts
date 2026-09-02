@@ -1,9 +1,9 @@
-import type { CommandTree } from './commands/types.js';
+import type { Command, CommandTree } from './commands/types.js';
 import { OperationalError } from './errors.js';
 import { flagToSetter } from './flags/data.js';
 import { NEGATE_BOOLEAN } from './flags/names.js';
 import type { Flags } from './flags/types.js';
-import { sortEntries } from './utils.js';
+import { drain, sortEntries } from './utils.js';
 
 export { NEGATE_BOOLEAN };
 
@@ -35,26 +35,30 @@ export function isValidFlagName(name: string): boolean {
  * Validate commands
  */
 export function validateCommands(tree: CommandTree): void {
-  function validateCommands(tree: CommandTree, path: string[]): void {
-    for (const [name, command] of sortEntries(tree)) {
-      if (!command) {
-        continue;
-      }
+  const stack: Array<{ command: Command; name: string; path: string[] }> = [];
 
-      const commandPath = [...path, name];
-      const scope = commandPath.join(' > ');
-
-      validateCommandName(name, scope);
-
-      if (command.type === 'group') {
-        validateCommands(command.subcommands, commandPath);
-      } else if (command.flags) {
-        validateFlags(command.flags, scope);
+  function push(commands: CommandTree, path: string[]): void {
+    for (const [name, command] of sortEntries(commands).reverse()) {
+      if (command) {
+        stack.push({ command, name, path: [...path, name] });
       }
     }
   }
 
-  validateCommands(tree, []);
+  push(tree, []);
+
+  for (const frame of drain(stack)) {
+    const { command, name, path } = frame;
+    const scope = path.join(' > ');
+
+    validateCommandName(name, scope);
+
+    if (command.type === 'group') {
+      push(command.subcommands, path);
+    } else if (command.flags) {
+      validateFlags(command.flags, scope);
+    }
+  }
 }
 
 /**
