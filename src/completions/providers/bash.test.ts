@@ -10,7 +10,7 @@ import {
   useTempFile
 } from '../../tests.js';
 import { compact } from '../../utils.js';
-import { formatScript } from '../script.js';
+import { formatScript } from '../scripts.js';
 import { BashCompletionProvider } from './bash.js';
 
 import { spawnSync } from 'node:child_process';

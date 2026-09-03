@@ -1,7 +1,7 @@
 import type { CommandTree } from '../commands/types.ts';
 import type { Config, Context, Metadata } from '../types.js';
-import type { ScriptLines } from './script.js';
-import { formatScript } from './script.js';
+import type { ScriptLines } from './scripts.js';
+import { formatScript } from './scripts.js';
 
 export type { Command, CommandHandler } from '../commands/types.js';
 export {

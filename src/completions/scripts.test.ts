@@ -1,7 +1,7 @@
 import { assert, describe, it } from 'vitest';
 
-import type { ScriptLines } from './script.js';
-import { formatScript } from './script.js';
+import type { ScriptLines } from './scripts.js';
+import { formatScript } from './scripts.js';
 
 describe('formatScript', () => {
   it('flattens lines', () => {
