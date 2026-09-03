@@ -42,6 +42,23 @@ describe('parseCommand', () => {
     assert(result.type === 'command', 'Hidden command not parsed');
   });
 
+  it('rejects inherited object property names that are not defined commands', () => {
+    const result = parseCommand(['constructor'], {
+      testing: C(description, handler)
+    });
+
+    assert(result.type === 'error', 'Inherited property was treated as a command');
+    assert.include(result.message, 'Unknown command: constructor');
+  });
+
+  it('parses commands that use inherited object property names', async () => {
+    const result = parseCommand(['constructor'], {
+      constructor: C(description, handler)
+    });
+
+    assert(result.type === 'command', 'Defined constructor command not parsed');
+  });
+
   it('extracts the requested command from args', () => {
     const commands = {
       alfa: C('alfa', handler),

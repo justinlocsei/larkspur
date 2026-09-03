@@ -12,6 +12,7 @@ import type { Flags } from '../flags/types.js';
 import type { ValuesOf } from '../flags/values.js';
 import type { Variant } from '../types/utils.js';
 import type { Context } from '../types.js';
+import { getCommand } from './data.js';
 import type {
   ArgParsingDetails,
   CommandGroup,
@@ -278,7 +279,7 @@ function extractCommand({
 
     const [command, path] = name === undefined
       ? [undefined, current.namespace]
-      : [current.commands[name], [...current.namespace, name]];
+      : [getCommand(current.commands, name), [...current.namespace, name]];
 
     const help: HelpScope = current.group
       ? { group: current.group, path: current.namespace, type: 'group' }
