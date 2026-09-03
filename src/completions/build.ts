@@ -3,10 +3,6 @@ import type { CompletionShell } from '../types.js';
 import type { CompletionSource } from './provider.js';
 import { getShellProfiles, useProvider } from './providers.js';
 
-export { detectShell, useProvider as loadProvider } from './providers.js';
-
-export type { CompletionSource };
-
 /**
  * Build shell-specific completions for a CLI
  */
