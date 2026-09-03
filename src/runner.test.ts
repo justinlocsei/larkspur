@@ -204,7 +204,7 @@ describe('runCLI', () => {
     );
   });
 
-  it('rejects completion command name conflicts', async () => {
+  it('rejects names conflicts with completion commands', async () => {
     const response = await testCLI({
       args: [],
       entry: { completions: C(description, handler) }
