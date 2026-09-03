@@ -184,7 +184,7 @@ export class BashCompletionProvider extends CompletionProvider {
   ): CompletionFunction {
     return {
       lines,
-      name: this.nameFunction(type, ...levels)
+      name: this.nameFunction(type, ...levels.map(p => this.asIdentifier(p)))
     };
   }
 
@@ -272,7 +272,7 @@ export class BashCompletionProvider extends CompletionProvider {
             stack.push({
               commands: command.subcommands,
               key: `${key}.${i}`,
-              levels: [...levels, this.asIdentifier(name)],
+              levels: [...levels, name],
               visited: false
             });
           }
@@ -295,7 +295,7 @@ export class BashCompletionProvider extends CompletionProvider {
 
         const completions = command.type === 'group'
           ? built.get(`${key}.${commandNames.indexOf(name)}`)
-          : this.completeCommand(command, [...levels, this.asIdentifier(name)]);
+          : this.completeCommand(command, [...levels, name]);
 
         if (!completions) {
           continue;
