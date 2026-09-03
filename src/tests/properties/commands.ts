@@ -245,7 +245,12 @@ function nodeSpec(options: CommandOptions) {
         description,
         fc.uniqueArray(
           fc.tuple(identifier, tie('node')),
-          { depthIdentifier, maxLength: 5, minLength: 1 }
+          {
+            depthIdentifier,
+            maxLength: 5,
+            minLength: 1,
+            selector: ([name]) => name
+          }
         )
       ).map(([text, children]): NodeSpec => ({
         children: children.map(([name, node]) => ({ name, node })),
@@ -263,7 +268,11 @@ export function entryPoint(
 ): fc.Arbitrary<EntryPoint> {
   return fc.uniqueArray(
     fc.tuple(identifier, nodeSpec(options)),
-    { maxLength: 10, minLength: 1 }
+    {
+      maxLength: 10,
+      minLength: 1,
+      selector: ([name]) => name
+    }
   ).map(entries =>
     buildTree(
       entries.map(([name, node]): ChildNodeSpec => ({ name, node }))

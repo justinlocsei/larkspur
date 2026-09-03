@@ -85,5 +85,8 @@ const flag = (options: FlagOptions) =>
 export const flags = (options: FlagOptions) =>
   fc.uniqueArray(
     fc.tuple(flagName, flag(options)),
-    { minLength: 0 }
+    {
+      minLength: 0,
+      selector: ([name]) => name
+    }
   ).map(entries => Object.fromEntries(entries));
