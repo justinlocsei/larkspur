@@ -4,7 +4,7 @@ import { assert } from 'vitest';
 import { description, entryPoint } from '../tests/properties.js';
 import { createTestContext } from '../tests.js';
 import { COMPLETION_SHELLS } from '../types.js';
-import { buildShellCompletions } from './shells.js';
+import { buildShellCompletions } from './build.js';
 
 for (const shell of COMPLETION_SHELLS) {
   test.prop([fc.string(), description, entryPoint()])(

@@ -1,8 +1,8 @@
 import { assert, describe, it } from 'vitest';
 
 import { createTestContext } from '../tests.js';
+import { buildInstallInstructions, buildShellCompletions } from './build.js';
 import type { CompletionSource } from './provider.js';
-import { buildInstallInstructions, buildShellCompletions } from './shells.js';
 
 const cli: CompletionSource = {
   commands: {},

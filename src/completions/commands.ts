@@ -7,7 +7,7 @@ import {
   buildInstallInstructions,
   buildShellCompletions,
   detectShell
-} from './shells.js';
+} from './build.js';
 
 /**
  * Define a command group to manage completions
