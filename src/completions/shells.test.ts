@@ -3,16 +3,12 @@ import { assert, describe, it } from 'vitest';
 import { checkConversion } from '../tests.js';
 import type { EnvironmentVariables } from '../types.js';
 import type { SupportedShell } from './shells.js';
-import { detectShell, getShellMetadata, SHELL_VARIABLES } from './shells.js';
-
-describe('getShellMetadata', () => {
-  it('exposes metadata for a supported shell', () => {
-    const meta = getShellMetadata('bash');
-
-    assert.include(meta.profiles, '~/.bashrc');
-    assert.include(meta.environmentVariables, 'BASH_VERSION');
-  });
-});
+import {
+  detectShell,
+  getShellMetadata,
+  listShells,
+  SHELL_VARIABLES
+} from './shells.js';
 
 describe('detectShell', () => {
   it('uses environment variables to detect a supported shell', () => {
@@ -26,6 +22,21 @@ describe('detectShell', () => {
         [{}, undefined]
       ]
     );
+  });
+});
+
+describe('getShellMetadata', () => {
+  it('exposes metadata for a supported shell', () => {
+    const meta = getShellMetadata('bash');
+
+    assert.include(meta.profiles, '~/.bashrc');
+    assert.include(meta.environmentVariables, 'BASH_VERSION');
+  });
+});
+
+describe('listShells', () => {
+  it('lists all available shells with support for completions', () => {
+    assert.sameMembers(listShells().map(s => s.name), ['bash']);
   });
 });
 

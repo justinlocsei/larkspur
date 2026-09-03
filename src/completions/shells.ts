@@ -16,6 +16,13 @@ type ShellMetadata = {
   signature: string;
 };
 
+/**
+ * An available shell with support for completions
+ */
+type AvailableShell = ShellMetadata & {
+  name: SupportedShell;
+};
+
 const SHELL_METADATA: Record<SupportedShell, ShellMetadata> = {
   bash: {
     environmentVariables: ['BASH', 'BASH_VERSION'],
@@ -50,4 +57,14 @@ export function detectShell(
   }
 
   return undefined;
+}
+
+/**
+ * List all available shells with support for completions
+ */
+export function listShells(): AvailableShell[] {
+  return SUPPORTED_SHELLS.map((shell): AvailableShell => ({
+    ...getShellMetadata(shell),
+    name: shell
+  }));
 }
