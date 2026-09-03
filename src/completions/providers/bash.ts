@@ -2,6 +2,7 @@
 
 import { visibleCommands } from '../../commands/data.js';
 import { compact, drain } from '../../utils.js';
+import { encodeFlagPath } from '../custom.js';
 import type {
   Command,
   CommandHandler,
@@ -42,9 +43,9 @@ type Completions = {
 };
 
 /**
- * A mapping of flag names to custom completion functions
+ * A mapping of flag names to encoded flag paths
  */
-type CustomCompletions = Partial<Record<string, CompletionFunction>>;
+type CustomCompletions = Partial<Record<string, string>>;
 
 /**
  * A stack frame used when building completions
@@ -161,10 +162,19 @@ export class BashCompletionProvider extends CompletionProvider {
       'user_fn',
       [],
       [
-        'local fn_name=$1',
+        'local flag_path=$1',
         'local complete_on=$2',
-        '',
-        `${completeWords.name} "$(eval "$fn_name")" "$complete_on"`
+        'local value',
+        'COMPREPLY=()',
+        `while IFS= read -r -d '' value; do`,
+        [
+          'if [[ "$value" == "$complete_on"* ]]; then',
+          ['COMPREPLY+=("$value")'],
+          'fi'
+        ],
+        `done < <(${this.quote(this.cli.name)} ${
+          this.quote(this.config.completion.group)
+        } provide --flag "$flag_path" --current "$complete_on" --shell bash)`
       ]
     );
 
@@ -223,13 +233,13 @@ export class BashCompletionProvider extends CompletionProvider {
   }
 
   /**
-   * Produce a compgen command to use a set of words from a function's output
+   * Invoke the user completion provider for a flag path
    */
   private completeWithFunction(
-    fn: CompletionFunction,
+    flagPath: string,
     variable: string
   ): string {
-    return this.complete('user_fn', [fn.name], variable);
+    return this.complete('user_fn', [flagPath], variable);
   }
 
   /**
@@ -392,11 +402,7 @@ export class BashCompletionProvider extends CompletionProvider {
     const customCompletions = Object.entries(flags).reduce(
       (previous: CustomCompletions, [name, flag]) => {
         if (isScalarFlag(flag) && flag.completion) {
-          previous[name] = this.defineFunction(
-            'user_fn',
-            [...levels, this.asIdentifier(name)],
-            [flag.completion]
-          );
+          previous[name] = encodeFlagPath(levels, name);
         }
 
         return previous;
@@ -422,12 +428,7 @@ export class BashCompletionProvider extends CompletionProvider {
       'esac'
     ]);
 
-    return {
-      entry,
-      helpers: compact(Object.values(customCompletions)).sort((a, b) =>
-        a.name.localeCompare(b.name)
-      )
-    };
+    return { entry };
   }
 
   /**
@@ -450,10 +451,10 @@ export class BashCompletionProvider extends CompletionProvider {
           .map(f => flagToSetter(f) + suffix)
           .join('|');
 
-        const customFn = customCompletions[name];
+        const flagPath = customCompletions[name];
 
-        const completion = customFn
-          ? this.completeWithFunction(customFn, completeOn)
+        const completion = flagPath
+          ? this.completeWithFunction(flagPath, completeOn)
           : this.completeWords(
             [...(choicesForFlag(flag) || [])].sort().map(String),
             completeOn
