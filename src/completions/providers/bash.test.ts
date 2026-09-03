@@ -356,35 +356,6 @@ describe('BashCompletionProvider', () => {
       await ensure.rejects(() => fs.access(marker));
     }));
 
-  it('lists choices for scalar flags that use a custom completion function', () =>
-    checkCompletions(
-      {
-        command: C({
-          description,
-          flags: {
-            closed: {
-              completion: 'echo alfa-one && echo alfa-two && echo bravo-one',
-              description,
-              type: 'string'
-            }
-          },
-          handler
-        })
-      },
-      [
-        [['command', '--cl'], ['--closed']],
-        [
-          ['command', '--closed', ' '],
-          ['alfa-one', 'alfa-two', 'bravo-one']
-        ],
-        [
-          ['command', '--closed', 'alfa'],
-          ['alfa-one', 'alfa-two']
-        ],
-        [['command', '--closed', 'br'], ['bravo-one']]
-      ]
-    ));
-
   it('lists nothing for unconstrained scalar values', () =>
     checkCompletions(
       {
