@@ -322,7 +322,7 @@ describe('BashCompletionProvider', () => {
               closed: {
                 choices: [
                   'safe',
-                  `break", touch "${marker}", "`,
+                  `$(touch "${marker}")`,
                   `has'quote`
                 ],
                 description,
