@@ -13,12 +13,14 @@ export type SupportedShell = (typeof SUPPORTED_SHELLS)[number];
 type ShellMetadata = {
   environmentVariables: string[];
   profiles: string[];
+  signature: string;
 };
 
 const SHELL_METADATA: Record<SupportedShell, ShellMetadata> = {
   bash: {
     environmentVariables: ['BASH', 'BASH_VERSION'],
-    profiles: ['~/.bashrc', '~/.bash_profile']
+    profiles: ['~/.bashrc', '~/.bash_profile'],
+    signature: 'COMPREPLY'
   }
 };
 
