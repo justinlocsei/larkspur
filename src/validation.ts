@@ -7,8 +7,9 @@ import { drain, sortEntries } from './utils.js';
 
 export { NEGATE_BOOLEAN };
 
-// The pattern for command flag names
-export const IDENTIFIER_PATTERN = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
+// The pattern for command and flag names
+export const IDENTIFIER = '[a-z][a-z0-9]*(?:-[a-z0-9]+)*';
+export const IDENTIFIER_PATTERN = new RegExp(`^${IDENTIFIER}$`);
 
 /**
  * Report whether an identifier is valid
