@@ -2,9 +2,9 @@ import type { CommandGroup, EntryPoint } from '../commands/types.js';
 import { OperationalError } from '../errors.js';
 import C from '../factory.js';
 import type { Context } from '../types.js';
-import { COMPLETION_SHELLS } from '../types.js';
 import { buildInstallInstructions, buildShellCompletions } from './build.js';
 import { detectShell } from './providers.js';
+import { SUPPORTED_SHELLS } from './shells.js';
 
 /**
  * Define a command group to manage completions
@@ -15,7 +15,7 @@ export function defineCompletionCommands(): CommandGroup {
       'generate a completion script',
       {
         shell: C.flag('choice', 'a supported shell', {
-          choices: COMPLETION_SHELLS,
+          choices: SUPPORTED_SHELLS,
           required: true
         })
       },
@@ -27,7 +27,7 @@ export function defineCompletionCommands(): CommandGroup {
       'show installation instructions',
       {
         shell: C.flag('choice', 'a supported shell', {
-          choices: COMPLETION_SHELLS
+          choices: SUPPORTED_SHELLS
         })
       },
       async (flags, { commands, context }) => {

@@ -1,13 +1,13 @@
 import { formatList } from '../text.js';
-import type { CompletionShell } from '../types.js';
 import type { CompletionSource } from './provider.js';
 import { getShellProfiles, useProvider } from './providers.js';
+import type { SupportedShell } from './shells.js';
 
 /**
  * Build shell-specific completions for a CLI
  */
 export function buildShellCompletions(
-  shell: CompletionShell,
+  shell: SupportedShell,
   cli: CompletionSource
 ): string {
   return useProvider(shell, cli).buildScript().script;
@@ -17,7 +17,7 @@ export function buildShellCompletions(
  * Build installation instructions for shell completions
  */
 export function buildInstallInstructions(
-  shell: CompletionShell,
+  shell: SupportedShell,
   { context: { config, meta } }: CompletionSource
 ): string {
   return [

@@ -1,17 +1,18 @@
 import { assert, describe, it } from 'vitest';
 
 import { checkConversion, createTestContext } from '../tests.js';
-import type { CompletionShell, EnvironmentVariables } from '../types.js';
+import type { EnvironmentVariables } from '../types.js';
 import {
   detectShell,
   getShellProfiles,
   SHELL_VARIABLES,
   useProvider
 } from './providers.js';
+import type { SupportedShell } from './shells.js';
 
 describe('detectShell', () => {
   it('uses environment variables to detect a supported shell', () => {
-    checkConversion<EnvironmentVariables, CompletionShell | undefined>(
+    checkConversion<EnvironmentVariables, SupportedShell | undefined>(
       (input, output, message) =>
         assert.equal(detectShell(input), output, message),
       [

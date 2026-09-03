@@ -10,13 +10,6 @@ export type Metadata = {
   name: string;
 };
 
-export const COMPLETION_SHELLS = ['bash'] as const;
-
-/**
- * Shells that support completions
- */
-export type CompletionShell = (typeof COMPLETION_SHELLS)[number];
-
 /**
  * The execution context for a CLI
  */

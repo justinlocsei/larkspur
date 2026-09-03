@@ -1,11 +1,12 @@
-import type { CompletionShell, EnvironmentVariables } from '../types.js';
-import { COMPLETION_SHELLS } from '../types.js';
+import type { EnvironmentVariables } from '../types.js';
 import type {
   CompletionProvider,
   CompletionProviderClass,
   CompletionSource
 } from './provider.js';
 import { BashCompletionProvider } from './providers/bash.js';
+import type { SupportedShell } from './shells.js';
+import { SUPPORTED_SHELLS } from './shells.js';
 
 /**
  * An available completion provider
@@ -17,7 +18,7 @@ type AvailableProvider = {
 };
 
 const PROVIDERS: Record<
-  CompletionShell,
+  SupportedShell,
   AvailableProvider
 > = {
   bash: {
@@ -37,8 +38,8 @@ export const SHELL_VARIABLES = Object
  */
 export function detectShell(
   env: EnvironmentVariables
-): CompletionShell | undefined {
-  for (const shell of COMPLETION_SHELLS) {
+): SupportedShell | undefined {
+  for (const shell of SUPPORTED_SHELLS) {
     const { environmentVariables } = PROVIDERS[shell];
 
     if (environmentVariables.some((name) => env[name] !== undefined)) {
@@ -52,7 +53,7 @@ export function detectShell(
 /**
  * Get profile scripts for a supported shell
  */
-export function getShellProfiles(shell: CompletionShell): string[] {
+export function getShellProfiles(shell: SupportedShell): string[] {
   return PROVIDERS[shell].profiles;
 }
 
@@ -60,7 +61,7 @@ export function getShellProfiles(shell: CompletionShell): string[] {
  * Create a completion provider for a supported shell
  */
 export function useProvider(
-  shell: CompletionShell,
+  shell: SupportedShell,
   cli: CompletionSource
 ): CompletionProvider {
   return new PROVIDERS[shell].provider(cli);
