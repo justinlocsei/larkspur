@@ -21,6 +21,18 @@ type IsFlag<TType extends string, TValue> =
   & OptionalFlagFields<TValue>;
 
 /**
+ * The context for a user-provided completion function
+ */
+type UserCompletionContext = {
+  current: string;
+};
+
+/**
+ * A user-provided completion function
+ */
+export type UserCompletion = (context: UserCompletionContext) => string[];
+
+/**
  * Shared fields for all scalar flags
  */
 type ScalarFields = {
