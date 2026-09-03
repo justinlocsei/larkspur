@@ -28,27 +28,27 @@ export function buildFlag<O>(
   type: 'boolean',
   description: string,
   options: ValidOptions<BooleanFlag, O>
-): BooleanFlag & O;
+): BooleanFlag & NoInfer<O>;
 export function buildFlag<const C extends DistributiveReadonly<ScalarValue>, O>(
   type: 'choice',
   description: string,
   options: ValidOptions<ChoiceFlag<C>, O>
-): ChoiceFlag<C> & O;
+): ChoiceFlag<C> & NoInfer<O>;
 export function buildFlag<O>(
   type: 'number',
   description: string,
   options: ValidOptions<NumberFlag, O>
-): NumberFlag & O;
+): NumberFlag & NoInfer<O>;
 export function buildFlag<O>(
   type: 'path',
   description: string,
   options: ValidOptions<PathFlag, O>
-): PathFlag & O;
+): PathFlag & NoInfer<O>;
 export function buildFlag<O>(
   type: 'string',
   description: string,
   options: ValidOptions<StringFlag, O>
-): StringFlag & O;
+): StringFlag & NoInfer<O>;
 export function buildFlag(
   type: Flag['type'],
   description: string,

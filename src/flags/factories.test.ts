@@ -1,5 +1,6 @@
 import { assert, describe, it } from 'vitest';
 
+import { buildCommandHandler } from '../commands/factories.js';
 import { ensure, T } from '../tests.js';
 import { buildFlag } from './factories.js';
 import type {
@@ -104,6 +105,36 @@ describe('buildFlag', () => {
 
     // @ts-expect-error Extra options are not allowed
     buildFlag('string', description, { other: 'value' });
+  });
+
+  it('supports custom completions', () => {
+    const completion = ({ current }: { current: string }) => [current];
+    const flag = buildFlag('string', description, { completion });
+
+    assert.equal(flag.completion, completion);
+  });
+
+  it('supports custom completions when nested in a command', () => {
+    const command = buildCommandHandler(
+      description,
+      {
+        value: buildFlag('string', description, {
+          completion: ({ current }) => [current]
+        })
+      },
+      async () => {}
+    );
+
+    assert.isDefined(command.flags?.value);
+  });
+
+  it('supports custom completions on choice flags', () => {
+    const flag = buildFlag('choice', description, {
+      choices: ['alfa', 'bravo'],
+      completion: ({ current }) => [current]
+    });
+
+    assert.isFunction(flag.completion);
   });
 
   it('supports choice flags', () => {
