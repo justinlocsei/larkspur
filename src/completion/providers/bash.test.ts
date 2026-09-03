@@ -5,6 +5,7 @@ import C from '../../factory.js';
 import {
   checkConversionAsync,
   createTestContext,
+  ensure,
   useTempDir,
   useTempFile
 } from '../../tests.js';
@@ -308,6 +309,39 @@ describe('BashCompletionProvider', () => {
         [['command', '--closed', 'br'], ['bravo-one']]
       ]
     ));
+
+  it('safely embeds choice values', () =>
+    useTempDir(async (dirPath) => {
+      const marker = `${dirPath}/pwned`;
+
+      await checkCompletions(
+        {
+          command: C({
+            description,
+            flags: {
+              closed: {
+                choices: [
+                  'safe',
+                  `break", touch "${marker}", "`,
+                  `has'quote`
+                ],
+                description,
+                type: 'choice'
+              }
+            },
+            handler
+          })
+        },
+        [
+          [['command', '--closed', 'sa'], ['safe']],
+          [['command', '--closed', 'has'], [`has'quote`]]
+        ],
+        undefined,
+        { cwd: dirPath }
+      );
+
+      await ensure.rejects(() => fs.access(marker));
+    }));
 
   it('lists choices for scalar flags that use a custom completion function', () =>
     checkCompletions(
