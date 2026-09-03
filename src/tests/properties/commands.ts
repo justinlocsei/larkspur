@@ -1,12 +1,12 @@
 import { fc } from '@fast-check/vitest';
 
+import { getCommand } from '../../commands/data.js';
 import type {
   Command,
   CommandGroup,
   CommandHandler,
   CommandTree
 } from '../../commands/types.js';
-import { getCommand } from '../../commands/data.js';
 import C from '../../factory.js';
 import type { Flags } from '../../flags/types.js';
 import type { Variant } from '../../types/utils.js';

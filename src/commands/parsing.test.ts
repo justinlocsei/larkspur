@@ -47,7 +47,11 @@ describe('parseCommand', () => {
       testing: C(description, handler)
     });
 
-    assert(result.type === 'error', 'Inherited property was treated as a command');
+    assert(
+      result.type === 'error',
+      'Inherited property was treated as a command'
+    );
+
     assert.include(result.message, 'Unknown command: constructor');
   });
 
