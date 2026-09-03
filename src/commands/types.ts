@@ -20,6 +20,7 @@ export type CommandHandler<
 > = IsCommand<'handler', {
   flags?: F;
   handler: CommmandHandlerFn<F, C>;
+  hidden?: true;
 }>;
 
 /**

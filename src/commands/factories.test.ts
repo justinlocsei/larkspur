@@ -8,11 +8,12 @@ const handler = async () => {};
 
 describe('buildCommandHandler', () => {
   it('can define a command handler from a request object', () => {
-    const command = buildCommandHandler({ description, handler });
+    const command = buildCommandHandler({ description, handler, hidden: true });
 
     assert.equal(command.description, description);
     assert.equal(command.type, 'handler');
     assert.isFunction(command.handler);
+    assert.isTrue(command.hidden);
   });
 
   it('can define a command handler from a description and handler', () => {
