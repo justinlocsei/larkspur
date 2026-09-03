@@ -130,13 +130,28 @@ export class BashCompletionProvider extends CompletionProvider {
       'words',
       [],
       [
-        'local words=$1',
-        'local complete_on=$2',
+        'local complete_on=${@: -1}',
         '',
-        'if [[ -z "$words" ]]; then',
+        'if [[ $# -lt 2 ]]; then',
         ['COMPREPLY=()'],
+        'elif [[ $# -eq 2 ]]; then',
+        [
+          'local words=$1',
+          'COMPREPLY=($(compgen -W "$words" -- "$complete_on"))'
+        ],
         'else',
-        ['COMPREPLY=($(compgen -W "$words" -- "$complete_on"))'],
+        [
+          'local -a words=("${@:1:$#-1}")',
+          'local word',
+          'COMPREPLY=()',
+          'for word in "${words[@]}"; do',
+          [
+            'if [[ "$word" == "$complete_on"* ]]; then',
+            ['COMPREPLY+=("$word")'],
+            'fi'
+          ],
+          'done'
+        ],
         'fi'
       ]
     );
