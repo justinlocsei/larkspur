@@ -185,16 +185,23 @@ export class BashCompletionProvider extends CompletionProvider {
   }
 
   /**
+   * Quote a string for safe use in bash
+   */
+  private quote(value: string): string {
+    return `'${value.replace(/'/g, `'\\''`)}'`;
+  }
+
+  /**
    * Produce an invocation of a completion function
    */
   private complete(
     type: FunctionType,
-    input: string,
+    inputs: string[],
     variable: string
   ): string {
     return [
       this.nameFunction(type),
-      `"${input}"`,
+      ...inputs.map(i => this.quote(i)),
       `"${variable}"`
     ].join(' ');
   }
@@ -206,14 +213,14 @@ export class BashCompletionProvider extends CompletionProvider {
     fn: CompletionFunction,
     variable: string
   ): string {
-    return this.complete('user_fn', fn.name, variable);
+    return this.complete('user_fn', [fn.name], variable);
   }
 
   /**
    * Produce a compgen command to match a set of words against a variable
    */
   private completeWords(words: string[], variable: string): string {
-    return this.complete('words', words.join(' '), variable);
+    return this.complete('words', words, variable);
   }
 
   /**
