@@ -6,6 +6,7 @@ import type {
   CommandHandler,
   CommandTree
 } from '../../commands/types.js';
+import { getCommand } from '../../commands/data.js';
 import C from '../../factory.js';
 import type { Flags } from '../../flags/types.js';
 import type { Variant } from '../../types/utils.js';
@@ -49,7 +50,7 @@ function fetchCommand(entry: EntryPoint, path: string[]): Command {
   let command: Command | undefined;
 
   for (const [index, segment] of path.entries()) {
-    command = tree[segment];
+    command = getCommand(tree, segment);
     const level = path.slice(0, index + 1).join(' ');
 
     if (!command) {
