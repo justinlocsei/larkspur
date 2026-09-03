@@ -34,6 +34,14 @@ describe('parseCommand', () => {
     assert.isFunction(run);
   });
 
+  it('can parse hidden commands', async () => {
+    const result = parseCommand(['hidden'], {
+      hidden: C({ description, handler, hidden: true })
+    });
+
+    assert(result.type === 'command', 'Hidden command not parsed');
+  });
+
   it('extracts the requested command from args', () => {
     const commands = {
       alfa: C('alfa', handler),
