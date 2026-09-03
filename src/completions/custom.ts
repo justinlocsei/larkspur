@@ -109,8 +109,8 @@ function resolveFlag(
  */
 export function provideCompletions(
   source: CompletionSource,
-  { current, flag, shell }: {
-    current: string;
+  { current = '', flag, shell }: {
+    current?: string;
     flag: string;
     shell: SupportedShell;
   }
