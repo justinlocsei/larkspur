@@ -266,9 +266,9 @@ function parseNumberFlag(
     context,
     extractScalarInputs(context),
     v => parseNumberValue(v),
-    value =>
+    (value, original) =>
       !Number.isFinite(value)
-        ? `Invalid number: ${value.toString()}`
+        ? `Invalid number: ${original}`
         : validateScalarValue(flag, value)
   );
 }
@@ -429,7 +429,10 @@ function parseScalarInputs<T extends ScalarFlag>(
   context: ParsingContext,
   inputs: ScalarInputs,
   parse: (value: string) => SpecificValueOf<T>,
-  reportError: (value: SpecificValueOf<T>) => string | undefined
+  reportError: (
+    value: SpecificValueOf<T>,
+    original: string
+  ) => string | undefined
 ): ScalarParsingResult<SpecificValueOf<T>> {
   const { name } = context;
 
@@ -439,7 +442,7 @@ function parseScalarInputs<T extends ScalarFlag>(
   let values: Value[] = [];
 
   function validate(value: Value, source: string): Value {
-    const message = reportError(value);
+    const message = reportError(value, source);
 
     if (message) {
       throw new ParsingError(

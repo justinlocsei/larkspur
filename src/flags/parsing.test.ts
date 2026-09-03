@@ -483,7 +483,7 @@ describe('parseFlags', () => {
           alfa: C.flag('number', description),
           bravo: C.flag('boolean', description)
         }),
-      'Invalid number: NaN'
+      'Invalid number: --bravo'
     );
   });
 
