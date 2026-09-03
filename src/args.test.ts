@@ -45,4 +45,10 @@ describe('NormalizeArgs', () => {
       ]
     ]);
   });
+
+  it('preserves values that only resemble combined flags', () => {
+    checkArgs([
+      [['-- = '], ['-- = ']]
+    ]);
+  });
 });

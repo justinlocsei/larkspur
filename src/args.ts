@@ -1,7 +1,8 @@
 import { flagToSetter, SETTER_PREFIX } from './flags/data.js';
+import { IDENTIFIER } from './validation.js';
 
 const QUOTED = /^['"]([^'"]*)['"]$/;
-const COMBINED_FLAG = new RegExp(`^${SETTER_PREFIX}(.+)=(.*)`);
+const COMBINED_FLAG = new RegExp(`^${SETTER_PREFIX}(${IDENTIFIER})=(.*)`);
 
 export class NormalizedArgs {
   args: string[];
