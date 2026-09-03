@@ -23,7 +23,7 @@ type IsFlag<TType extends string, TValue> =
 /**
  * The context for a user-provided completion function
  */
-type UserCompletionContext = {
+export type UserCompletionContext = {
   current: string;
 };
 
@@ -37,7 +37,7 @@ export type UserCompletion = (context: UserCompletionContext) => string[];
  */
 type ScalarFields = {
   allowMany?: boolean;
-  completion?: string;
+  completion?: UserCompletion;
   required?: true;
 };
 
