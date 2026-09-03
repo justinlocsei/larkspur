@@ -100,6 +100,19 @@ describe('BashCompletionProvider', () => {
       ]
     ));
 
+  it('does not list hidden handlers', () =>
+    checkCompletions(
+      {
+        hidden: C({ description, handler, hidden: true }),
+        visible: command
+      },
+      [
+        [[' '], ['visible']],
+        [['h'], []],
+        [['v'], ['visible']]
+      ]
+    ));
+
   it('lists the commands and core flags in a namespace', () =>
     checkCompletions(
       {

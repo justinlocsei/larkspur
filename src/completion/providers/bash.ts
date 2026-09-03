@@ -1,5 +1,6 @@
 // biome-ignore-all lint/suspicious/noTemplateCurlyInString: used for completion scripts
 
+import { visibleCommands } from '../../commands/data.js';
 import { compact, drain } from '../../utils.js';
 import type {
   Command,
@@ -253,7 +254,7 @@ export class BashCompletionProvider extends CompletionProvider {
       }
 
       const { commands, key, levels } = frame;
-      const commandNames = Object.keys(commands).sort();
+      const commandNames = Object.keys(visibleCommands(commands)).sort();
 
       if (!frame.visited) {
         frame.visited = true;
