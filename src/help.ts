@@ -1,3 +1,4 @@
+import { visibleCommands } from './commands/data.js';
 import type { HelpScope } from './commands/parsing.js';
 import type { CommandTree } from './commands/types.js';
 import { choicesForFlag, flagToSetter } from './flags/data.js';
@@ -79,14 +80,14 @@ function scopeToDisplay(
 
     case 'group':
       return {
-        commands: scope.group.subcommands,
+        commands: visibleCommands(scope.group.subcommands),
         path: scope.path,
         title: scope.group.description
       };
 
     case 'root':
       return {
-        commands: scope.commands,
+        commands: visibleCommands(scope.commands),
         path: [],
         title: description
       };

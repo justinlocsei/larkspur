@@ -51,6 +51,26 @@ describe('buildHelp', () => {
     );
   });
 
+  it('does not show hidden root handlers', () => {
+    checkHelp(
+      {
+        commands: {
+          hidden: C({ description: '@hidden', handler, hidden: true }),
+          visible: C('@visible', handler)
+        },
+        type: 'root'
+      },
+      [
+        'Usage: testing <command> [flags]',
+        '',
+        'Commands:',
+        '',
+        '  visible  @visible',
+        ...rootFlags
+      ]
+    );
+  });
+
   it('can show help for a CLI’s root commands', () => {
     checkHelp(
       {
@@ -119,6 +139,29 @@ describe('buildHelp', () => {
         'Flags:',
         '',
         '  --help  Show help'
+      ]
+    );
+  });
+
+  it('does not show hidden handlers in a command group', () => {
+    checkHelp(
+      {
+        group: C.group('@parent', {
+          hidden: C({ description: '@hidden', handler, hidden: true }),
+          visible: C('@visible', handler)
+        }),
+        path: ['parent'],
+        type: 'group'
+      },
+      [
+        'Usage: testing parent <command> [flags]',
+        '',
+        '@parent',
+        '',
+        'Commands:',
+        '',
+        '  visible  @visible',
+        ...rootFlags
       ]
     );
   });
