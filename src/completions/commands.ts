@@ -3,6 +3,7 @@ import { OperationalError } from '../errors.js';
 import C from '../factory.js';
 import type { Context } from '../types.js';
 import { buildInstallInstructions, buildShellCompletions } from './build.js';
+import { provideCompletions } from './custom.js';
 import { detectShell, SUPPORTED_SHELLS } from './shells.js';
 
 /**
@@ -40,7 +41,25 @@ export function defineCompletionCommands(): CommandGroup {
 
         return buildInstallInstructions(shell, { commands, context });
       }
-    )
+    ),
+
+    provide: C({
+      description: 'provide values for a custom flag completion',
+      flags: {
+        current: C.flag('string', 'the current value'),
+        flag: C.flag('string', 'the encoded flag path', { required: true }),
+        shell: C.flag('choice', 'a supported shell', {
+          choices: SUPPORTED_SHELLS,
+          required: true
+        })
+      },
+      handler: async ({ current, flag, shell }, { commands, context }) =>
+        provideCompletions(
+          { commands, context },
+          { current, flag, shell }
+        ),
+      hidden: true
+    })
   });
 }
 

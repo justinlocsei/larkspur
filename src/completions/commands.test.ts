@@ -91,6 +91,54 @@ describe('defineCompletionCommands', () => {
       assert.include(run.error.message, 'not supported');
     });
   });
+
+  describe('provide', () => {
+    it('returns values from a user completion', async () => {
+      const parsed = parseCommand([
+        'completions',
+        'provide',
+        '--flag',
+        'command:value',
+        '--current',
+        'alfa',
+        '--shell',
+        'bash'
+      ], {
+        command: C(
+          'description',
+          {
+            value: C.flag('string', 'description', {
+              completion: ({ current }) => [`${current}-one`]
+            })
+          },
+          async () => {}
+        ),
+        completions: defineCompletionCommands()
+      });
+
+      assert(parsed.type === 'command', 'command not parsed');
+      const run = await parsed.run(createTestContext());
+
+      assert(run.type === 'success', 'command failed');
+      assert.equal(run.output, 'alfa-one');
+    });
+
+    it('returns an empty value when the flag cannot be resolved', async () => {
+      const parsed = runCompletionCommand([
+        'provide',
+        '--flag',
+        'missing:value',
+        '--shell',
+        'bash'
+      ]);
+
+      assert(parsed.type === 'command', 'command not parsed');
+      const run = await parsed.run(createTestContext());
+
+      assert(run.type === 'success', 'command failed');
+      assert.equal(run.output, '');
+    });
+  });
 });
 
 describe('withCompletionCommands', () => {
