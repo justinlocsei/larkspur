@@ -595,7 +595,7 @@ describe('parseFlags', () => {
     });
   });
 
-  it('throws an error if a a default value is invalid for a cohice flag', () => {
+  it('throws an error if a a default value is invalid for a choice flag', () => {
     const cases: Array<[
       ScalarValue[],
       ScalarValue
