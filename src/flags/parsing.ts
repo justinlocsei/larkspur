@@ -260,7 +260,7 @@ function parseNumberFlag(
     flag,
     context,
     extractScalarInputs(context),
-    v => parseInt(v, 10),
+    v => parseNumberValue(v),
     value =>
       !Number.isFinite(value)
         ? `Invalid number: ${value.toString()}`
@@ -301,12 +301,21 @@ function parseChoiceFlag(
     flag,
     context,
     extractScalarInputs(context),
-    v => typeof choices[0] === 'number' ? parseInt(v, 10) : v,
+    v => typeof choices[0] === 'number' ? parseNumberValue(v) : v,
     value =>
       !choices.includes(value)
         ? `Supported values: ${choices.join(', ')}`
         : undefined
   );
+}
+
+/**
+ * Parse a numeric flag value
+ */
+function parseNumberValue(value: string): number {
+  const number = Number(value);
+
+  return Number.isFinite(number) && value !== '' ? number : NaN;
 }
 
 /**

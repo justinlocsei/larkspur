@@ -103,6 +103,8 @@ describe('parseFlags', () => {
         [['boolean', ['--test']], true],
         [['boolean', ['--no-test']], false],
         [['number', ['--test', '1']], 1],
+        [['number', ['--test', '1.5']], 1.5],
+        [['number', ['--test', '1e3']], 1000],
         [['number', ['--test', '2']], 2],
         [['path', ['--test', 'alfa']], '/alfa'],
         [['path', ['--test', '/bravo']], '/bravo'],
