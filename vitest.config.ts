@@ -26,6 +26,7 @@ export default defineConfig({
         test: {
           include: ['src/**/*.prop.test.ts'],
           name: 'properties',
+          setupFiles: ['./test/setup/properties.ts'],
           testTimeout: 30_000
         }
       }
