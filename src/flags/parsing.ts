@@ -28,7 +28,6 @@ import path from 'node:path';
  * Inputs for a scalar flag
  */
 type ScalarInputs = {
-  consumedIndices: number[];
   values?: string[];
 };
 
@@ -38,7 +37,7 @@ type ScalarInputs = {
 type ParsedScalarValue<T> = OneOrMany<T> | undefined;
 
 /**
- * The result of extracting scalar values from a stream of inputs
+ * The result of parsing a scalar flag
  */
 type ScalarParsingResult<T> = FlagParsingResult<ParsedScalarValue<T>>;
 
@@ -46,7 +45,6 @@ type ScalarParsingResult<T> = FlagParsingResult<ParsedScalarValue<T>>;
  * The result of parsing a flag
  */
 type FlagParsingResult<T> = {
-  consumedIndices: number[];
   provided: boolean;
   value: T;
 };
@@ -56,6 +54,7 @@ type FlagParsingResult<T> = {
  */
 type ParsingContext = {
   args: string[];
+  consumed: Set<number>;
   name: string;
 };
 
@@ -141,23 +140,18 @@ export function parseFlags(
   flags: Flags,
   { allowUnused = false }: ParsingOptions = {}
 ): FlagParsing {
-  const consumed: number[] = [];
+  const consumed = new Set<number>();
   const providedFlags: string[] = [];
 
   const parsedFlags = sortEntries(flags).reduce<ParsedFlags>((
     previous,
     [name, flag]
   ) => {
-    const { consumedIndices, provided, value } = parseFlag(flag, {
-      args,
-      name
-    });
+    const { provided, value } = parseFlag(flag, { args, consumed, name });
 
     if (provided) {
       providedFlags.push(name);
     }
-
-    consumed.push(...consumedIndices);
 
     if (value === undefined && flagIsRequired(flag)) {
       throw new ParsingError(`Missing value for required flag: ${name}`);
@@ -170,7 +164,7 @@ export function parseFlags(
 
   if (!allowUnused) {
     for (const [index, arg] of args.entries()) {
-      if (!consumed.includes(index)) {
+      if (!consumed.has(index)) {
         throw new ParsingError(
           `${isFlagSetter(arg) ? 'Unknown flag' : 'Unused argument'}: ${arg}`
         );
@@ -181,8 +175,8 @@ export function parseFlags(
   return {
     args: {
       all: args,
-      extra: args.filter((_, i) => !consumed.includes(i)),
-      parsed: args.filter((_, i) => consumed.includes(i))
+      extra: args.filter((_, i) => !consumed.has(i)),
+      parsed: args.filter((_, i) => consumed.has(i))
     },
     flags: parsedFlags,
     provided: providedFlags
@@ -222,27 +216,38 @@ function parseBooleanFlag(
   flag: BooleanFlag,
   context: ParsingContext
 ): FlagParsingResult<boolean> {
-  const { args, name } = context;
-  const lastOn = args.lastIndexOf(flagToSetter(name));
-  const lastOff = args.lastIndexOf(flagToSetter(`${NEGATE_BOOLEAN}${name}`));
+  const { args, consumed, name } = context;
+
+  const lastOn = lastFlagIndex(
+    args,
+    flagToSetter(name),
+    consumed
+  );
+
+  const lastOff = lastFlagIndex(
+    args,
+    flagToSetter(`${NEGATE_BOOLEAN}${name}`),
+    consumed
+  );
 
   if (lastOn !== -1 && lastOff !== -1) {
     forbidDuplicates(context);
   } else if (lastOn !== -1) {
+    consumed.add(lastOn);
+
     return {
-      consumedIndices: [lastOn],
       provided: true,
       value: true
     };
   } else if (lastOff !== -1) {
+    consumed.add(lastOff);
+
     return {
-      consumedIndices: [lastOff],
       provided: true,
       value: false
     };
   } else {
     return {
-      consumedIndices: [],
       provided: false,
       value: flag.default ?? false
     };
@@ -343,52 +348,75 @@ function forbidDuplicates({ name }: ParsingContext): never {
 }
 
 /**
+ * Find the last unconsumed index of a flag setter
+ */
+function lastFlagIndex(
+  args: string[],
+  setter: string,
+  consumed: Set<number>
+): number {
+  for (let index = args.length - 1; index >= 0; index--) {
+    if (args[index] === setter && !consumed.has(index)) {
+      return index;
+    }
+  }
+
+  return -1;
+}
+
+/**
+ * Find the next unconsumed index of a flag setter
+ */
+function nextFlagIndex(
+  args: string[],
+  setter: string,
+  afterIndex: number,
+  consumed: Set<number>
+): number {
+  let index = afterIndex;
+
+  while (true) {
+    index = args.indexOf(setter, index + 1);
+
+    if (index === -1) {
+      return -1;
+    } else if (!consumed.has(index)) {
+      return index;
+    }
+  }
+}
+
+/**
  * Extract the text being used to set a scalar flag's values
  */
 function extractScalarInputs(context: ParsingContext): ScalarInputs {
-  const { args, name } = context;
+  const { args, consumed, name } = context;
 
   const setter = flagToSetter(name);
   const values: string[] = [];
-  const consumedIndices: number[] = [];
 
   let flagIndex = -1;
 
-  do {
-    flagIndex = args.indexOf(setter, flagIndex + 1);
+  for (;;) {
+    flagIndex = nextFlagIndex(args, setter, flagIndex, consumed);
 
     if (flagIndex === -1) {
-      continue;
+      break;
     }
 
-    consumedIndices.push(flagIndex);
+    const valueIndex = flagIndex + 1;
+    const nextArg = args[valueIndex];
 
-    let parsing = true;
-    let consumedValues = 0;
-
-    while (parsing) {
-      const nextArg = args[flagIndex + 1 + consumedValues];
-
-      if (nextArg === undefined || isFlagSetter(nextArg)) {
-        if (consumedValues) {
-          parsing = false;
-        } else {
-          throw new ParsingError(`Missing value for flag: ${name}`);
-        }
-      } else {
-        consumedValues++;
-        values.push(nextArg);
-        parsing = false;
-      }
+    if (nextArg === undefined || consumed.has(valueIndex)) {
+      throw new ParsingError(`Missing value for flag: ${name}`);
     }
 
-    consumedIndices.push(
-      ...Array.from({ length: consumedValues }, (_, i) => flagIndex + 1 + i)
-    );
-  } while (flagIndex !== -1);
+    values.push(nextArg);
+    consumed.add(flagIndex);
+    consumed.add(valueIndex);
+  }
 
   return {
-    consumedIndices,
     values: values.length ? values : undefined
   };
 }
@@ -455,7 +483,6 @@ function parseScalarInputs<T extends ScalarFlag>(
   }
 
   return {
-    consumedIndices: inputs.consumedIndices,
     provided,
     value
   };

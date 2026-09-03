@@ -222,6 +222,49 @@ describe('parseFlags', () => {
     );
   });
 
+  it('accepts flag-like strings as scalar values', () => {
+    const parsed = parse(['--a', '--a', '--a', ''], {
+      a: C.flag('string', description, { allowMany: true })
+    });
+
+    assert.deepEqual(extractValues(parsed.flags), { a: ['--a', ''] });
+  });
+
+  it('consumes setter-like values before other flags can claim them', () => {
+    const flag = C.flag('string', description);
+    const flags = { alfa: flag, bravo: flag };
+
+    const parsed = parse(['--alfa', '--bravo', '2'], flags, {
+      allowUnused: true
+    });
+
+    assert.deepEqual(extractValues(parsed.flags), { alfa: '--bravo' });
+    assert.deepEqual(parsed.args.extra, ['2']);
+  });
+
+  it('throws an error for values left after a setter-like value is consumed', () => {
+    ensure.throws(
+      () =>
+        parse(['--alfa', '--bravo', '2'], {
+          alfa: C.flag('string', description),
+          bravo: C.flag('string', description)
+        }),
+      'Unused argument: 2'
+    );
+  });
+
+  it('supports interleaved multi-value flags', () => {
+    const parsed = parse(['--alfa', '1', '--bravo', '2', '--alfa', '3'], {
+      alfa: C.flag('number', description, { allowMany: true }),
+      bravo: C.flag('number', description)
+    });
+
+    assert.deepEqual(extractValues(parsed.flags), {
+      alfa: [1, 3],
+      bravo: 2
+    });
+  });
+
   it('throws an error if multiple values are provided without restating the flag name', () => {
     const cases: Array<[ScalarType, string[]]> = [
       ['number', ['--test', '2', '3']],
@@ -412,38 +455,36 @@ describe('parseFlags', () => {
   });
 
   it('throws an error if a scalar flag lacks a value', () => {
-    const cases: Array<[ScalarType, string[]]> = [
-      ['number', ['--alfa']],
-      ['number', ['--alfa', '--bravo']],
-      ['path', ['--alfa']],
-      ['path', ['--alfa', '--bravo']],
-      ['string', ['--alfa']],
-      ['string', ['--alfa', '--bravo']]
-    ];
-
-    cases.forEach(([type, args]) => {
-      const message = `Incomplete value allowed for ${type} flag with args: ${
-        args.join(' ')
-      }`;
-
+    scalarTypes.forEach(type => {
       ensure.throws(
-        () =>
-          parse(args, {
-            alfa: {
-              description,
-              type
-            },
-            bravo: {
-              description,
-              type: 'boolean'
-            }
-          }),
-        e => {
-          assert.equal(e.message, 'Missing value for flag: alfa', message);
-        },
-        message
+        () => checkFlag('alfa', { type }, ['--alfa']),
+        'Missing value for flag: alfa',
+        `Incomplete value allowed for ${type} flag`
       );
     });
+  });
+
+  it('uses the next argument as a scalar value even when it looks like a setter', () => {
+    const parsed = parse(['--alfa', '--bravo'], {
+      alfa: C.flag('string', description),
+      bravo: C.flag('boolean', description)
+    });
+
+    assert.deepEqual(extractValues(parsed.flags), {
+      alfa: '--bravo',
+      bravo: false
+    });
+  });
+
+  it('throws an error if a flag-like scalar value is not valid for the flag type', () => {
+    ensure.throws(
+      () =>
+        parse(['--alfa', '--bravo'], {
+          alfa: C.flag('number', description),
+          bravo: C.flag('boolean', description)
+        }),
+      'Invalid number: NaN'
+    );
   });
 
   it('throws an error if an unknown flag is provided', () => {
