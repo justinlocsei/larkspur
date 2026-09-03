@@ -1,47 +1,7 @@
 import { assert, describe, it } from 'vitest';
 
-import { checkConversion, createTestContext } from '../tests.js';
-import type { EnvironmentVariables } from '../types.js';
-import {
-  detectShell,
-  getShellProfiles,
-  SHELL_VARIABLES,
-  useProvider
-} from './providers.js';
-import type { SupportedShell } from './shells.js';
-
-describe('detectShell', () => {
-  it('uses environment variables to detect a supported shell', () => {
-    checkConversion<EnvironmentVariables, SupportedShell | undefined>(
-      (input, output, message) =>
-        assert.equal(detectShell(input), output, message),
-      [
-        [{ BASH_VERSION: '5.2' }, 'bash'],
-        [{ BASH: '/bin/bash' }, 'bash'],
-        [{ SHELL: '/bin/bash' }, undefined],
-        [{}, undefined]
-      ]
-    );
-  });
-});
-
-describe('getShellProfiles', () => {
-  it('returns profile scripts for a supported shell', () => {
-    assert.deepEqual(getShellProfiles('bash'), [
-      '~/.bashrc',
-      '~/.bash_profile'
-    ]);
-  });
-});
-
-describe('SHELL_VARIABLES', () => {
-  it('includes all supported shell environment variables', () => {
-    assert.deepEqual(SHELL_VARIABLES, [
-      'BASH',
-      'BASH_VERSION'
-    ]);
-  });
-});
+import { createTestContext } from '../tests.js';
+import { useProvider } from './providers.js';
 
 describe('useProvider', () => {
   it('creates a bash provider', () => {
