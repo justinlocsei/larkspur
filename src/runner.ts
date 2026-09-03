@@ -5,7 +5,7 @@ import type {
 } from './commands/parsing.js';
 import { parseCommand } from './commands/parsing.js';
 import type { EntryPoint } from './commands/types.js';
-import { withCompletionCommands } from './completion/commands.js';
+import { withCompletionCommands } from './completions/commands.js';
 import { coerceError, OperationalError } from './errors.js';
 import { buildHelp } from './help.js';
 import type { Context } from './types.js';
