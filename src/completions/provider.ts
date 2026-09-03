@@ -68,7 +68,7 @@ export abstract class CompletionProvider {
    * Format user-provided completion values for a shell
    */
   formatCompletions(completions: string[]): string {
-    return completions.join('\0');
+    return completions.length > 0 ? `${completions.join('\0')}\0` : '';
   }
 
   /**

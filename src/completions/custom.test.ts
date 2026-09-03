@@ -65,7 +65,7 @@ describe('provideCompletions', () => {
       }
     );
 
-    assert.equal(result, 'alfa-one\0alfa-two');
+    assert.equal(result, 'alfa-one\0alfa-two\0');
   });
 
   it('returns an empty string for invalid providers', () => {
