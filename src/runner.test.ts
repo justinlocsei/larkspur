@@ -1,5 +1,6 @@
 import { assert, describe, it } from 'vitest';
 
+import { listShells } from './completions/shells.js';
 import { OperationalError } from './errors.js';
 import C from './factory.js';
 import type { RunRequest } from './runner.js';
@@ -157,15 +158,17 @@ describe('runCLI', () => {
     assert.equal(response.output, '@output');
   });
 
-  it('injects completion commands', async () => {
-    const response = await testCLI({
-      args: ['completions', 'generate', '--shell', 'bash'],
-      entry: {}
-    });
+  for (const shell of listShells()) {
+    it(`injects completion commands for ${shell.name}`, async () => {
+      const response = await testCLI({
+        args: ['completions', 'generate', '--shell', shell.name],
+        entry: {}
+      });
 
-    assert(response.type === 'success', 'completion command failed');
-    assert.include(response.output, 'COMPREPLY');
-  });
+      assert(response.type === 'success', 'completion command failed');
+      assert.include(response.output, shell.signature);
+    });
+  }
 
   it('does not inject completion commands when disabled', async () => {
     const response = await testCLI(

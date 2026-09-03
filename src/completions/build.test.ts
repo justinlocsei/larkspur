@@ -3,6 +3,7 @@ import { assert, describe, it } from 'vitest';
 import { createTestContext } from '../tests.js';
 import { buildInstallInstructions, buildShellCompletions } from './build.js';
 import type { CompletionSource } from './provider.js';
+import { listShells } from './shells.js';
 
 const cli: CompletionSource = {
   commands: {},
@@ -10,9 +11,11 @@ const cli: CompletionSource = {
 };
 
 describe('buildShellCompletions', () => {
-  it('supports bash', () => {
-    assert.include(buildShellCompletions('bash', cli), 'COMPREPLY');
-  });
+  for (const shell of listShells()) {
+    it(`supports ${shell.name}`, () => {
+      assert.include(buildShellCompletions(shell.name, cli), shell.signature);
+    });
+  }
 });
 
 describe('buildInstallInstructions', () => {
@@ -28,4 +31,13 @@ describe('buildInstallInstructions', () => {
       ].join('\n')
     );
   });
+
+  for (const shell of listShells()) {
+    it(`supports ${shell.name}`, () => {
+      assert.include(
+        buildInstallInstructions(shell.name, cli),
+        shell.name
+      );
+    });
+  }
 });

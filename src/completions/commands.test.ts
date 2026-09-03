@@ -8,7 +8,7 @@ import {
   defineCompletionCommands,
   withCompletionCommands
 } from './commands.js';
-import { SHELL_VARIABLES } from './shells.js';
+import { listShells, SHELL_VARIABLES } from './shells.js';
 
 function runCompletionCommand(args: string[]): ParsingResult {
   return parseCommand(['completions', ...args], {
@@ -25,18 +25,24 @@ describe('defineCompletionCommands', () => {
   });
 
   describe('generate', () => {
-    it('generates a completion script', async () => {
-      const parsed = runCompletionCommand(['generate', '--shell', 'bash']);
+    for (const shell of listShells()) {
+      it(`generates a completion script for ${shell.name}`, async () => {
+        const parsed = runCompletionCommand([
+          'generate',
+          '--shell',
+          shell.name
+        ]);
 
-      assert(parsed.type === 'command', 'command not parsed');
-      const run = await parsed.run(createTestContext());
+        assert(parsed.type === 'command', 'command not parsed');
+        const run = await parsed.run(createTestContext());
 
-      assert(run.type === 'success', 'command failed');
-      assert.include(run.output, 'COMPREPLY');
-    });
+        assert(run.type === 'success', 'command failed');
+        assert.include(run.output, shell.signature);
+      });
+    }
 
     it('rejects unsupported shells', () => {
-      const parsed = runCompletionCommand(['generate', '--shell', 'fish']);
+      const parsed = runCompletionCommand(['generate', '--shell', 'ksh']);
 
       assert(parsed.type === 'error', 'invalid shell was allowed');
       assert.include(parsed.message, '--shell');
