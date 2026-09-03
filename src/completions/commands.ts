@@ -3,8 +3,7 @@ import { OperationalError } from '../errors.js';
 import C from '../factory.js';
 import type { Context } from '../types.js';
 import { buildInstallInstructions, buildShellCompletions } from './build.js';
-import { detectShell } from './providers.js';
-import { SUPPORTED_SHELLS } from './shells.js';
+import { detectShell, SUPPORTED_SHELLS } from './shells.js';
 
 /**
  * Define a command group to manage completions

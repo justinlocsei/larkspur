@@ -8,7 +8,7 @@ import {
   defineCompletionCommands,
   withCompletionCommands
 } from './commands.js';
-import { SHELL_VARIABLES } from './providers.js';
+import { SHELL_VARIABLES } from './shells.js';
 
 function runCompletionCommand(args: string[]): ParsingResult {
   return parseCommand(['completions', ...args], {
