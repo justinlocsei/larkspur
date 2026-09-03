@@ -84,8 +84,8 @@ export function test(
 
   Object.entries(tests).forEach(([name, test]) => {
     if (test) {
-      it(name, () => {
-        test(actions);
+      it(name, async () => {
+        await test(actions);
       });
     }
   });
