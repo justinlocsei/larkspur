@@ -1,9 +1,26 @@
 import { assert, describe, it } from 'vitest';
 
 import C from '../factory.js';
-import { visibleCommands } from './data.js';
+import { getCommand, visibleCommands } from './data.js';
 
 const handler = async () => {};
+
+describe('getCommand', () => {
+  it('returns undefined for inherited object property names', () => {
+    const tree = {
+      testing: C('testing', handler)
+    };
+
+    assert.isUndefined(getCommand(tree, 'constructor'));
+  });
+
+  it('returns defined commands by name', () => {
+    const command = C('testing', handler);
+    const tree = { testing: command };
+
+    assert.equal(getCommand(tree, 'testing'), command);
+  });
+});
 
 describe('visibleCommands', () => {
   it('filters hidden command handlers', () => {

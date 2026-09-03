@@ -1,4 +1,17 @@
-import type { CommandTree } from './types.js';
+import type { Command, CommandTree } from './types.js';
+
+/**
+ * Get a named command from a tree
+ *
+ * This prevents native object properties from being treated as commands if a
+ * user explicitly provides them as arguments.
+ */
+export function getCommand(
+  tree: CommandTree,
+  name: string
+): Command | undefined {
+  return Object.hasOwn(tree, name) ? tree[name] : undefined;
+}
 
 /**
  * Filter hidden handlers from a tree
