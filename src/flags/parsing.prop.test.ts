@@ -86,8 +86,7 @@ test.prop([flagName, fc.array(fc.string(), { minLength: 2 })])(
     );
 
     checkScalarParsing(parsed, flag, v => {
-      assert(Array.isArray(v));
-      assert.equal(v.length, values.length);
+      assert.deepEqual(v, values);
     });
   }
 );
