@@ -296,7 +296,7 @@ describe('BashCompletionProvider', () => {
 
   it('safely embeds choice values', () =>
     useTempDir(async (dirPath) => {
-      const marker = `${dirPath}/pwned`;
+      const marker = `${dirPath}/marker`;
 
       await checkCompletions(
         {
