@@ -1,6 +1,6 @@
 import type { EnvironmentVariables } from '../types.js';
 
-export const SUPPORTED_SHELLS = ['bash'] as const;
+export const SUPPORTED_SHELLS = ['bash', 'zsh'] as const;
 
 /**
  * Shells that support completions
@@ -28,6 +28,11 @@ const SHELL_METADATA: Record<SupportedShell, ShellMetadata> = {
     environmentVariables: ['BASH', 'BASH_VERSION'],
     profiles: ['~/.bashrc', '~/.bash_profile'],
     signature: 'COMPREPLY'
+  },
+  zsh: {
+    environmentVariables: ['ZSH_VERSION'],
+    profiles: ['~/.zshrc'],
+    signature: '#compdef'
   }
 };
 

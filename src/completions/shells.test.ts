@@ -19,7 +19,8 @@ describe('detectShell', () => {
         [{ BASH_VERSION: '5.2' }, 'bash'],
         [{ BASH: '/bin/bash' }, 'bash'],
         [{ SHELL: '/bin/bash' }, undefined],
-        [{}, undefined]
+        [{}, undefined],
+        [{ ZSH_VERSION: '5.9' }, 'zsh']
       ]
     );
   });
@@ -36,7 +37,7 @@ describe('getShellMetadata', () => {
 
 describe('listShells', () => {
   it('lists all available shells with support for completions', () => {
-    assert.sameMembers(listShells().map(s => s.name), ['bash']);
+    assert.sameMembers(listShells().map(s => s.name), ['bash', 'zsh']);
   });
 });
 
@@ -44,7 +45,8 @@ describe('SHELL_VARIABLES', () => {
   it('includes all supported shell environment variables', () => {
     assert.deepEqual(SHELL_VARIABLES, [
       'BASH',
-      'BASH_VERSION'
+      'BASH_VERSION',
+      'ZSH_VERSION'
     ]);
   });
 });
