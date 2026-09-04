@@ -52,8 +52,8 @@ describe('provideCompletions', () => {
     context: createTestContext()
   });
 
-  it('calls the completion function and formats its values', () => {
-    const result = provideCompletions(
+  it('calls the completion function and formats its values', async () => {
+    const result = await provideCompletions(
       withCompletion(({ current }) => [
         `${current}-one`,
         `${current}-two`
@@ -64,8 +64,8 @@ describe('provideCompletions', () => {
     assert.equal(result, 'alfa-one\nalfa-two\n');
   });
 
-  it('returns an empty string for invalid providers', () => {
-    const result = provideCompletions(
+  it('returns an empty string for invalid providers', async () => {
+    const result = await provideCompletions(
       withCompletion(() => {
         throw new Error('failed');
       }),
@@ -75,7 +75,7 @@ describe('provideCompletions', () => {
     assert.equal(result, '');
   });
 
-  it('returns an empty string for invalid flag paths', () => {
+  it('returns an empty string for invalid flag paths', async () => {
     const flags = [
       'not-command',
       'command',
@@ -84,7 +84,7 @@ describe('provideCompletions', () => {
     ];
 
     for (const flag of flags) {
-      const result = provideCompletions(
+      const result = await provideCompletions(
         withCompletion(() => ['test']),
         { current: '', flag }
       );

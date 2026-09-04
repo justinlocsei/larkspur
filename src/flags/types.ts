@@ -30,7 +30,9 @@ export type UserCompletionContext = {
 /**
  * A user-provided completion function
  */
-export type UserCompletion = (context: UserCompletionContext) => string[];
+export type UserCompletion = (
+  context: UserCompletionContext
+) => string[] | Promise<string[]>;
 
 /**
  * Shared fields for all scalar flags

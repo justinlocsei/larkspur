@@ -106,13 +106,13 @@ function resolveFlag(
 /**
  * Invoke a user completion function and format its results
  */
-export function provideCompletions(
+export async function provideCompletions(
   source: CompletionSource,
   { current = '', flag }: {
     current?: string;
     flag: string;
   }
-): string {
+): Promise<string> {
   const decoded = decodeFlagPath(flag);
   const resolved = decoded && resolveFlag(source.commands, decoded);
 
@@ -123,7 +123,7 @@ export function provideCompletions(
   let completions: string[];
 
   try {
-    completions = resolved.flag.completion({ current });
+    completions = await resolved.flag.completion({ current });
   } catch {
     completions = [];
   }

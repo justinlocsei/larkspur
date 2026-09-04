@@ -54,7 +54,7 @@ export function defineCompletionCommands(): CommandGroup {
         })
       },
       handler: async ({ current, flag }, { commands, context }) =>
-        provideCompletions(
+        await provideCompletions(
           { commands, context },
           { current, flag }
         ),
