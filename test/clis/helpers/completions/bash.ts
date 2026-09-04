@@ -7,7 +7,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 const test: TestRunner = async ({ file, inputs, script }) => {
-  const cliPath = path.join(import.meta.dirname, '..', `${file}.mjs`);
+  const cliPath = path.join(import.meta.dirname, '..', '..', `${file}.mjs`);
   const cliName = path.basename(cliPath, '.mjs');
 
   return testBashCompletions({
