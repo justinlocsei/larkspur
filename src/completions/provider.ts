@@ -65,13 +65,6 @@ export abstract class CompletionProvider {
   abstract provideScript(): CompletionScript;
 
   /**
-   * Format user-provided completion values for a shell
-   */
-  formatCompletions(completions: string[]): string {
-    return completions.length > 0 ? `${completions.join('\0')}\0` : '';
-  }
-
-  /**
    * Allow text to be safely used as an identifier
    */
   protected asIdentifier(text: string): string {
