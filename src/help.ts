@@ -4,7 +4,7 @@ import type { CommandTree } from './commands/types.js';
 import { choicesForFlag, flagToSetter } from './flags/data.js';
 import { NEGATE_BOOLEAN } from './flags/names.js';
 import { useSharedFlags } from './flags/shared.js';
-import type { Flag, Flags } from './flags/types.ts';
+import type { Flag, Flags } from './flags/types.js';
 import type { Context } from './types.js';
 import { compact, isEmpty, sortEntries, transformValues } from './utils.js';
 

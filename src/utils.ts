@@ -1,4 +1,4 @@
-import type { Masked } from './types/utils.ts';
+import type { Masked } from './types/utils.js';
 
 /**
  * Exclude falsy values from a list

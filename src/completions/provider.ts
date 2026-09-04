@@ -1,4 +1,4 @@
-import type { CommandTree } from '../commands/types.ts';
+import type { CommandTree } from '../commands/types.js';
 import type { Config, Context, Metadata } from '../types.js';
 import type { ScriptLines } from './scripts.js';
 import { formatScript } from './scripts.js';

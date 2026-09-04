@@ -11,7 +11,7 @@ import type {
   ScalarFlag,
   StringFlag,
   SupportedValue
-} from './types.ts';
+} from './types.js';
 
 /**
  * Flag fields that describe an implicit or explicit default value

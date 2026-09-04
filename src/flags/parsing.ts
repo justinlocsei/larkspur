@@ -19,7 +19,7 @@ import type {
   ScalarValue,
   SimpleScalarFlag,
   StringFlag
-} from './types.ts';
+} from './types.js';
 import type { SpecificValueOf, ValueOf, ValuesOf } from './values.js';
 
 import path from 'node:path';
