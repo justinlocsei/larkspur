@@ -2,67 +2,38 @@ import { assert, describe, it } from 'vitest';
 
 import type { CommandTree } from '../../commands/types.js';
 import C from '../../factory.js';
+import type { TestContext } from '../../tests/shells/bash.js';
+import { testBashCompletions } from '../../tests/shells/bash.js';
 import {
   checkConversionAsync,
   createTestContext,
   ensure,
-  useTempDir,
-  useTempFile
+  useTempDir
 } from '../../tests.js';
-import { compact } from '../../utils.js';
-import { formatScript } from '../scripts.js';
 import { BashCompletionProvider } from './bash.js';
 
-import { spawnSync } from 'node:child_process';
 import fs from 'node:fs/promises';
 
 const description = '';
 const handler = async () => {};
 const command = C({ description, handler });
 
-type SpawnOptions = { cwd?: string };
-
 describe('BashCompletionProvider', () => {
   async function getCompletions(
     commands: CommandTree,
     inputs: string[],
-    spawnOptions?: SpawnOptions
+    context?: TestContext
   ): Promise<string[]> {
     const completion = new BashCompletionProvider({
       commands,
       context: createTestContext({ name: 'testing' })
-    }).provideScript();
+    }).buildScript();
 
-    const args = ['testing', ...inputs];
-
-    return useTempFile(async (filePath) => {
-      const harness = `
-        ${formatScript(completion.script)}
-
-        COMP_CWORD=${args.length - 1}
-        COMP_LINE="${args.join(' ')}"
-        COMP_WORDS=(${compact(args.map(a => a.trim())).join(' ')})
-        ${args[args.length - 1] === ' ' ? 'COMP_WORDS+=("")' : ''}
-
-        ${completion.entryPoint}
-
-        echo "\${COMPREPLY[@]}"
-      `;
-
-      await fs.writeFile(filePath, harness);
-
-      const { stdout, status } = spawnSync('bash', [filePath], {
-        ...spawnOptions,
-        stdio: 'pipe'
-      });
-
-      assert.equal(status, 0, `completions failed: ${inputs.join(' ')}`);
-
-      return stdout
-        .toString()
-        .split(' ')
-        .map(s => s.trim())
-        .filter(Boolean);
+    return testBashCompletions({
+      cliName: 'testing',
+      completion,
+      context,
+      inputs
     });
   }
 
@@ -70,7 +41,7 @@ describe('BashCompletionProvider', () => {
     commands: CommandTree,
     cases: Array<[string[], string[]]>,
     check?: (actual: string[], expected: string[], message: string) => void,
-    spawnOptions?: SpawnOptions
+    context?: TestContext
   ) {
     return checkConversionAsync<string[], string[]>(async (
       input,
@@ -78,7 +49,7 @@ describe('BashCompletionProvider', () => {
       message
     ) => {
       (check || assert.sameOrderedMembers)(
-        await getCompletions(commands, input, spawnOptions),
+        await getCompletions(commands, input, context),
         output,
         message
       );
