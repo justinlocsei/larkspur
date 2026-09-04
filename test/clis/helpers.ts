@@ -53,7 +53,9 @@ export type TestActions = {
 /**
  * Custom tests for a CLI
  */
-type CustomTests = Partial<Record<string, (actions: TestActions) => void>>;
+type CustomTests = Partial<
+  Record<string, (actions: TestActions) => void | Promise<void>>
+>;
 
 /**
  * Define tests for a CLI
