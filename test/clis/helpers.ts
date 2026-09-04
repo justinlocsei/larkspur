@@ -17,7 +17,7 @@ type TestResult = {
 /**
  * Test a CLI
  */
-export function testCLI(name: string, args: string[] = []): TestResult {
+export function testCLI(name: string, ...args: string[]): TestResult {
   const file = path.join(import.meta.dirname, `${name}.mjs`);
 
   const { status, stderr, stdout } = spawnSync(process.execPath, [
@@ -65,7 +65,7 @@ export function test(
   tests: CustomTests = {},
   { valid = true }: { valid?: boolean } = {}
 ): void {
-  const run: RunCLI = (...args: string[]) => testCLI(file, args);
+  const run: RunCLI = (...args: string[]) => testCLI(file, ...args);
 
   const checkOutput: CheckOutput = (...args: string[]) => {
     const result = run(...args);
