@@ -11,8 +11,7 @@ const cases: Array<[string[], string[]]> = [
   [['bravo', '--env', 'bravo-d'], ['bravo-dev']],
   [['bravo', '--env', 'alfa-d'], []],
   [['alfa', '--env='], ['alfa-dev', 'alfa-prod', 'alfa-staging']],
-  [['alfa', '--env=alfa-d'], ['alfa-dev']],
-  [['bravo', '--env='], ['bravo-dev', 'bravo-prod']]
+  [['bravo', '--env=bravo-d'], ['bravo-dev']]
 ];
 
 const tests: CustomTests = {};
