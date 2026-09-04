@@ -211,13 +211,6 @@ export class BashCompletionProvider extends CompletionProvider {
   }
 
   /**
-   * Quote a string for safe use in bash
-   */
-  private quote(value: string): string {
-    return `'${value.replace(/'/g, `'\\''`)}'`;
-  }
-
-  /**
    * Produce an invocation of a completion function
    */
   private complete(

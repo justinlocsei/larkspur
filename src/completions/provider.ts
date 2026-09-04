@@ -74,6 +74,13 @@ export abstract class CompletionProvider {
       .trim()
       .replace(/\s+/g, '_');
   }
+
+  /**
+   * Quote a string for safe use in a script
+   */
+  protected quote(value: string): string {
+    return `'${value.replace(/'/g, `'\\''`)}'`;
+  }
 }
 
 /**
