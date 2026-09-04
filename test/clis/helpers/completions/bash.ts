@@ -1,5 +1,3 @@
-// biome-ignore-all lint/suspicious/noTemplateCurlyInString: used for completion scripts
-
 import { testBashCompletions } from '../../../../src/tests/shells/bash.js';
 import type { TestRunner } from './shared.js';
 
