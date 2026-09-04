@@ -4,10 +4,12 @@ import type {
   CompletionSource
 } from './provider.js';
 import { BashCompletionProvider } from './providers/bash.js';
+import { ZshCompletionProvider } from './providers/zsh.js';
 import type { SupportedShell } from './shells.js';
 
 const PROVIDERS: Record<SupportedShell, CompletionProviderClass> = {
-  bash: BashCompletionProvider
+  bash: BashCompletionProvider,
+  zsh: ZshCompletionProvider
 };
 
 /**
