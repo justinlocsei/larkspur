@@ -166,7 +166,7 @@ export class BashCompletionProvider extends CompletionProvider {
         'local complete_on=$2',
         'local value',
         'COMPREPLY=()',
-        `while IFS= read -r -d '' value; do`,
+        `while IFS= read -r value; do`,
         [
           'if [[ "$value" == "$complete_on"* ]]; then',
           ['COMPREPLY+=("$value")'],
