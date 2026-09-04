@@ -120,7 +120,7 @@ describe('defineCompletionCommands', () => {
       const run = await parsed.run(createTestContext());
 
       assert(run.type === 'success', 'command failed');
-      assert.equal(run.output, 'alfa-one\0');
+      assert.equal(run.output, 'alfa-one\n');
     });
 
     it('returns an empty value when the flag cannot be resolved', async () => {

@@ -58,14 +58,10 @@ describe('provideCompletions', () => {
         `${current}-one`,
         `${current}-two`
       ]),
-      {
-        current: 'alfa',
-        flag: 'command:valid',
-        shell: 'bash'
-      }
+      { current: 'alfa', flag: 'command:valid' }
     );
 
-    assert.equal(result, 'alfa-one\0alfa-two\0');
+    assert.equal(result, 'alfa-one\nalfa-two\n');
   });
 
   it('returns an empty string for invalid providers', () => {
@@ -73,11 +69,7 @@ describe('provideCompletions', () => {
       withCompletion(() => {
         throw new Error('failed');
       }),
-      {
-        current: '',
-        flag: 'command:valid',
-        shell: 'bash'
-      }
+      { current: '', flag: 'command:valid' }
     );
 
     assert.equal(result, '');
@@ -94,11 +86,7 @@ describe('provideCompletions', () => {
     for (const flag of flags) {
       const result = provideCompletions(
         withCompletion(() => ['test']),
-        {
-          current: '',
-          flag,
-          shell: 'bash'
-        }
+        { current: '', flag }
       );
 
       assert.equal(result, '', `allowed flag: ${flag}`);
