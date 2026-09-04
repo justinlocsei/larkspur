@@ -1,6 +1,6 @@
 import { assert, describe, it } from 'vitest';
 
-import { formatCompletions } from './output.js';
+import { formatCompletions, parseCompletions } from './output.js';
 
 describe('formatCompletions', () => {
   it('formats values as a newline-delimited list', () => {
@@ -18,6 +18,28 @@ describe('formatCompletions', () => {
     assert.equal(
       formatCompletions(['bad\nvalue', 'valid', 'other\r', 'null\0']),
       'valid\n'
+    );
+  });
+});
+
+describe('parseCompletions', () => {
+  it('parses formatted completion output', () => {
+    assert.deepEqual(
+      parseCompletions('alfa-one\nalfa-two\n'),
+      ['alfa-one', 'alfa-two']
+    );
+  });
+
+  it('returns an empty list for empty output', () => {
+    assert.deepEqual(parseCompletions(''), []);
+  });
+
+  it('round-trips formatted completions', () => {
+    const items = ['alfa-one', 'alfa-two'];
+
+    assert.deepEqual(
+      parseCompletions(formatCompletions(items)),
+      items
     );
   });
 });
