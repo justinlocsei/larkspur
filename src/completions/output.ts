@@ -19,12 +19,3 @@ export function formatCompletions(completions: string[]): string {
 
   return values && `${values}${DELIMITER}`;
 }
-
-/**
- * Parse formatted completion output
- */
-export function parseCompletions(output: string): string[] {
-  return output
-    .split(DELIMITER)
-    .filter(Boolean);
-}

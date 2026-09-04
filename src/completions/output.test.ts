@@ -1,6 +1,6 @@
 import { assert, describe, it } from 'vitest';
 
-import { formatCompletions, parseCompletions } from './output.js';
+import { formatCompletions } from './output.js';
 
 describe('formatCompletions', () => {
   it('formats values as a newline-delimited list', () => {
@@ -22,15 +22,3 @@ describe('formatCompletions', () => {
   });
 });
 
-describe('parseCompletions', () => {
-  it('parses formatted completion output', () => {
-    assert.deepEqual(
-      parseCompletions('alfa-one\nalfa-two\n'),
-      ['alfa-one', 'alfa-two']
-    );
-  });
-
-  it('returns an empty list for empty output', () => {
-    assert.deepEqual(parseCompletions(''), []);
-  });
-});
