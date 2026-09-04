@@ -53,10 +53,10 @@ export function defineCompletionCommands(): CommandGroup {
           required: true
         })
       },
-      handler: async ({ current, flag, shell }, { commands, context }) =>
+      handler: async ({ current, flag }, { commands, context }) =>
         provideCompletions(
           { commands, context },
-          { current, flag, shell }
+          { current, flag }
         ),
       hidden: true
     })

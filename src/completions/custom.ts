@@ -3,9 +3,8 @@ import type { CommandHandler, CommandTree } from '../commands/types.js';
 import { isScalarFlag } from '../flags/data.js';
 import type { ScalarFlag } from '../flags/types.js';
 import type { Require } from '../types/utils.js';
+import { formatCompletions } from './output.js';
 import type { CompletionSource } from './provider.js';
-import { useProvider } from './providers.js';
-import type { SupportedShell } from './shells.js';
 
 /**
  * Encode a path to a command flag
@@ -109,10 +108,9 @@ function resolveFlag(
  */
 export function provideCompletions(
   source: CompletionSource,
-  { current = '', flag, shell }: {
+  { current = '', flag }: {
     current?: string;
     flag: string;
-    shell: SupportedShell;
   }
 ): string {
   const decoded = decodeFlagPath(flag);
@@ -122,7 +120,6 @@ export function provideCompletions(
     return '';
   }
 
-  const provider = useProvider(shell, source);
   let completions: string[];
 
   try {
@@ -131,5 +128,5 @@ export function provideCompletions(
     completions = [];
   }
 
-  return provider.formatCompletions(completions);
+  return formatCompletions(completions);
 }
