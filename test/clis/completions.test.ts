@@ -1,3 +1,4 @@
+import { parseCompletions } from '../../src/completions/output.js';
 import { listShellsWithCompletions } from './helpers/completions.js';
 import type { CustomTests } from './helpers.js';
 import { assert, test, testCLI } from './helpers.js';
@@ -32,7 +33,7 @@ for (const shell of listShellsWithCompletions()) {
     );
 
     assert.sameMembers(
-      result.stdout.split('\n').filter(Boolean),
+      parseCompletions(result.stdout),
       ['alfa-dev'],
       `shell: ${name}`
     );
