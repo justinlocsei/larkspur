@@ -86,18 +86,11 @@ export class ZshCompletionProvider extends CompletionProvider {
       const path = [...levels, name];
 
       const body = command.type === 'group'
-        ? this.renderGroup(command.subcommands, path)
+        ? this.renderCommandDispatch(command.subcommands, path)
         : this.renderHandler(command, path);
 
       return ['', ...this.defineFunction('command', path, body)];
     });
-  }
-
-  /**
-   * Render completion for a command group
-   */
-  private renderGroup(tree: CommandTree, levels: string[]): ScriptLines {
-    return this.renderCommandDispatch(tree, levels);
   }
 
   /**
