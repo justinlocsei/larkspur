@@ -2,12 +2,13 @@ import { assert, describe, it } from 'vitest';
 
 import C from '../factory.js';
 import { getCommand, visibleCommands } from './data.js';
+import type { CommandTree } from './types.js';
 
 const handler = async () => {};
 
 describe('getCommand', () => {
   it('returns undefined for inherited object property names', () => {
-    const tree = {
+    const tree: CommandTree = {
       testing: C('testing', handler)
     };
 
@@ -16,7 +17,7 @@ describe('getCommand', () => {
 
   it('returns defined commands by name', () => {
     const command = C('testing', handler);
-    const tree = { testing: command };
+    const tree: CommandTree = { testing: command };
 
     assert.equal(getCommand(tree, 'testing'), command);
   });
@@ -31,7 +32,7 @@ describe('visibleCommands', () => {
       }),
       hidden: C({ description: 'hidden', handler, hidden: true }),
       visible: C('visible', handler)
-    };
+    } satisfies CommandTree;
 
     const filtered = visibleCommands(tree);
     const { group } = filtered;
