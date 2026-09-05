@@ -94,7 +94,7 @@ export class ZshCompletionProvider extends CompletionProvider {
     tree: CommandTree,
     levels: string[] = []
   ): ScriptLines {
-    const wordIndex = levels.length + 2;
+    const wordIndex = levels.length + 2; // Skip the CLI name in zsh's one-based arrays
     const entries = this.visibleCommandEntries(tree);
 
     const commands = entries.map(([name, command]) =>
