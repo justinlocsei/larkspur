@@ -97,14 +97,17 @@ export class ZshCompletionProvider extends CompletionProvider {
     const wordIndex = levels.length + 2; // Skip the CLI name in zsh's one-based arrays
     const entries = this.visibleCommandEntries(tree);
 
-    const commands = entries.map(([name, command]) =>
-      `${name}:${command.description}`
-    );
+    const commandNames = entries
+      .map(([name, command]) => `${name}:${command.description}`)
+      .map(v => this.quote(v))
+      .join(' ');
 
     const cases = entries.map(([name]) =>
-      `${this.quote(name)}) ${
-        this.nameFunction('command', [...levels, name])
-      } ;;`
+      [
+        this.quote(name),
+        this.nameFunction('command', [...levels, name]),
+        ';;'
+      ].join(' ')
     );
 
     return [
@@ -114,9 +117,7 @@ export class ZshCompletionProvider extends CompletionProvider {
       [
         'command)',
         [
-          `local -a command_names=(${
-            commands.map(value => this.quote(value)).join(' ')
-          })`,
+          `local -a command_names=(${commandNames})`,
           "_describe 'command' command_names"
         ],
         ';;',
