@@ -16,6 +16,14 @@ export type { Flags } from '../flags/types.js';
 export type { CommandTree, ScriptLines };
 
 /**
+ * A generic completion function
+ */
+export type CompletionFunction = {
+  lines: ScriptLines;
+  name: string;
+};
+
+/**
  * A shell completion script
  */
 export type CompletionScript<T = ScriptLines> = {

@@ -7,6 +7,7 @@ import type {
   Command,
   CommandHandler,
   CommandTree,
+  CompletionFunction,
   CompletionScript,
   Flags,
   ScriptLines
@@ -19,14 +20,6 @@ import {
   isScalarFlag,
   useSharedFlags
 } from '../provider.js';
-
-/**
- * A generic completion function
- */
-type CompletionFunction = {
-  lines: ScriptLines;
-  name: string;
-};
 
 /**
  * A type for a completion function
