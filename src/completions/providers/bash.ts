@@ -1,6 +1,5 @@
 // biome-ignore-all lint/suspicious/noTemplateCurlyInString: used for completion scripts
 
-import { visibleCommands } from '../../commands/data.js';
 import { compact, drain } from '../../utils.js';
 import { encodeFlagPath } from '../custom.js';
 import type {
@@ -250,21 +249,23 @@ export class BashCompletionProvider extends CompletionProvider {
       }
 
       const { commands, key, levels } = frame;
-      const commandNames = Object.keys(visibleCommands(commands)).sort();
+
+      const entries = this.visibleCommandEntries(commands);
+      const commandNames = entries.map(([name]) => name);
 
       if (!frame.visited) {
         frame.visited = true;
 
-        for (let i = commandNames.length - 1; i >= 0; i--) {
-          const name = commandNames[i];
+        for (let i = entries.length - 1; i >= 0; i--) {
+          const entry = entries[i];
 
-          if (name === undefined) {
+          if (!entry) {
             continue;
           }
 
-          const command = commands[name];
+          const [name, command] = entry;
 
-          if (command?.type === 'group') {
+          if (command.type === 'group') {
             stack.push({
               commands: command.subcommands,
               key: `${key}.${i}`,
@@ -282,13 +283,7 @@ export class BashCompletionProvider extends CompletionProvider {
       const subcommandCases: string[] = [];
       const subcommandCompletions: Completions[] = [];
 
-      for (const name of commandNames) {
-        const command = commands[name];
-
-        if (!command) {
-          continue;
-        }
-
+      for (const [name, command] of entries) {
         const completions = command.type === 'group'
           ? built.get(`${key}.${commandNames.indexOf(name)}`)
           : this.completeCommand(command, [...levels, name]);

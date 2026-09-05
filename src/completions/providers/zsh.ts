@@ -1,6 +1,5 @@
 // biome-ignore-all lint/suspicious/noTemplateCurlyInString: used for completion scripts
 
-import { visibleCommands } from '../../commands/data.js';
 import type { Flag, Flags } from '../../flags/types.js';
 import { sortEntries } from '../../utils.js';
 import { encodeFlagPath } from '../custom.js';
@@ -77,11 +76,7 @@ export class ZshCompletionProvider extends CompletionProvider {
     tree: CommandTree,
     levels: string[]
   ): CompletionFunction[] {
-    return sortEntries(visibleCommands(tree)).flatMap(([name, command]) => {
-      if (!command) {
-        return [];
-      }
-
+    return this.visibleCommandEntries(tree).flatMap(([name, command]) => {
       const path = [...levels, name];
 
       const body = command.type === 'group'
@@ -100,11 +95,10 @@ export class ZshCompletionProvider extends CompletionProvider {
     levels: string[] = []
   ): ScriptLines {
     const wordIndex = levels.length + 2;
-    const entries = sortEntries(visibleCommands(tree))
-      .filter(([, command]) => command);
+    const entries = this.visibleCommandEntries(tree);
 
     const commands = entries.map(([name, command]) =>
-      `${name}:${command?.description ?? ''}`
+      `${name}:${command.description}`
     );
 
     const cases = entries.map(([name]) =>
