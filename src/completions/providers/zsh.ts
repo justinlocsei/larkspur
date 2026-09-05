@@ -221,7 +221,8 @@ export class ZshCompletionProvider extends CompletionProvider {
    */
   private nameFunction(type: FunctionType, ...levels: string[]): string {
     return [
-      `_${this.asIdentifier(this.cli.name)}`,
+      '',
+      this.asIdentifier(this.cli.name),
       type,
       ...levels
     ].join('__');
