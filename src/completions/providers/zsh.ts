@@ -24,6 +24,15 @@ import {
  */
 type FunctionType = 'command' | 'entry' | 'user_fn';
 
+/**
+ * A stack frame used when building command completions
+ */
+type CommandFrame = {
+  commands: CommandTree;
+  levels: string[];
+  visited: boolean;
+};
+
 export class ZshCompletionProvider extends CompletionProvider {
   provideScript(): CompletionScript {
     const entry = this.defineFunction(
@@ -38,7 +47,7 @@ export class ZshCompletionProvider extends CompletionProvider {
         `#compdef ${this.quote(this.cli.name)}`,
         '',
         ...this.buildUserFunction().lines,
-        ...this.buildCommandCompletions(this.commands, []).flatMap(
+        ...this.buildCommandCompletions(this.commands).flatMap(
           f => ['', ...f.lines]
         ),
         '',
@@ -70,21 +79,52 @@ export class ZshCompletionProvider extends CompletionProvider {
   }
 
   /**
-   * Produce completions for a command tree
+   * Produce completion functions for all commands in a tree
    */
-  private buildCommandCompletions(
-    tree: CommandTree,
-    levels: string[]
-  ): CompletionFunction[] {
-    return this.visibleCommandEntries(tree).map(([name, command]) => {
-      const path = [...levels, name];
+  private buildCommandCompletions(commands: CommandTree): CompletionFunction[] {
+    const functions: CompletionFunction[] = [];
+    const stack: CommandFrame[] = [{ commands, levels: [], visited: false }];
 
-      const body = command.type === 'group'
-        ? this.renderTreeCompletions(command.subcommands, path)
-        : this.renderHandlerCompletions(command, path);
+    while (stack.length > 0) {
+      const frame = stack[stack.length - 1];
 
-      return this.defineFunction('command', path, body);
-    });
+      if (!frame) {
+        break;
+      }
+
+      const { commands: tree, levels } = frame;
+      const entries = this.visibleCommandEntries(tree);
+
+      if (!frame.visited) {
+        frame.visited = true;
+
+        for (const [name, command] of entries.toReversed()) {
+          if (command.type === 'group') {
+            stack.push({
+              commands: command.subcommands,
+              levels: [...levels, name],
+              visited: false
+            });
+          }
+        }
+
+        continue;
+      }
+
+      stack.pop();
+
+      for (const [name, command] of entries) {
+        const path = [...levels, name];
+
+        const body = command.type === 'group'
+          ? this.renderTreeCompletions(command.subcommands, path)
+          : this.renderHandlerCompletions(command, path);
+
+        functions.push(this.defineFunction('command', path, body));
+      }
+    }
+
+    return functions;
   }
 
   /**
