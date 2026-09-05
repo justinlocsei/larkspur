@@ -50,7 +50,7 @@ export class ZshCompletionProvider extends CompletionProvider {
     return this.defineFunction(
       'entry',
       [],
-      this.renderCommandDispatch(tree)
+      this.renderCommandTree(tree)
     );
   }
 
@@ -86,7 +86,7 @@ export class ZshCompletionProvider extends CompletionProvider {
       const path = [...levels, name];
 
       const body = command.type === 'group'
-        ? this.renderCommandDispatch(command.subcommands, path)
+        ? this.renderCommandTree(command.subcommands, path)
         : this.renderHandler(command, path);
 
       return ['', ...this.defineFunction('command', path, body)];
@@ -94,9 +94,9 @@ export class ZshCompletionProvider extends CompletionProvider {
   }
 
   /**
-   * Render command-name dispatch for a tree level
+   * Render completions for a command tree
    */
-  private renderCommandDispatch(
+  private renderCommandTree(
     tree: CommandTree,
     levels: string[] = []
   ): ScriptLines {
