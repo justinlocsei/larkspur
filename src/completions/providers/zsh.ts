@@ -76,14 +76,14 @@ export class ZshCompletionProvider extends CompletionProvider {
     tree: CommandTree,
     levels: string[]
   ): CompletionFunction[] {
-    return this.visibleCommandEntries(tree).flatMap(([name, command]) => {
+    return this.visibleCommandEntries(tree).map(([name, command]) => {
       const path = [...levels, name];
 
       const body = command.type === 'group'
         ? this.renderTreeCompletions(command.subcommands, path)
         : this.renderHandlerCompletions(command, path);
 
-      return [this.defineFunction('command', path, body)];
+      return this.defineFunction('command', path, body);
     });
   }
 
