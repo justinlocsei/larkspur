@@ -145,7 +145,7 @@ export class ZshCompletionProvider extends CompletionProvider {
     };
 
     const specs = sortEntries(flags).flatMap(([name, flag]) =>
-      this.flagSpecs(name, flag, levels)
+      this.renderFlagSpecs(name, flag, levels)
     );
 
     return [
@@ -159,9 +159,13 @@ export class ZshCompletionProvider extends CompletionProvider {
   /**
    * Define completion specs for a named flag
    */
-  private flagSpecs(name: string, flag: Flag, levels: string[]): string[] {
+  private renderFlagSpecs(
+    name: string,
+    flag: Flag,
+    levels: string[]
+  ): string[] {
     const suffix = isScalarFlag(flag)
-      ? this.valueSpec(name, flag, levels)
+      ? this.renderValueSpec(name, flag, levels)
       : '';
 
     return getFlagForms(name, flag)
@@ -172,7 +176,7 @@ export class ZshCompletionProvider extends CompletionProvider {
   /**
    * Define a spec for a flag's value
    */
-  private valueSpec(name: string, flag: Flag, levels: string[]): string {
+  private renderValueSpec(name: string, flag: Flag, levels: string[]): string {
     const { type } = flag;
 
     if (isScalarFlag(flag) && flag.completion) {
