@@ -33,10 +33,10 @@ export class ZshCompletionProvider extends CompletionProvider {
       script: [
         `#compdef ${this.quote(this.cli.name)}`,
         '',
-        this.renderUserFunction(),
+        ...this.renderUserFunction(),
         ...this.renderCommands(this.commands, []),
         '',
-        this.renderEntry(this.commands),
+        ...this.renderEntry(this.commands),
         '',
         `${entryPoint} "$@"`
       ]
@@ -89,7 +89,7 @@ export class ZshCompletionProvider extends CompletionProvider {
         ? this.renderGroup(command.subcommands, path)
         : this.renderHandler(command, path);
 
-      return [this.defineFunction('command', path, body), ''];
+      return ['', ...this.defineFunction('command', path, body)];
     });
   }
 
