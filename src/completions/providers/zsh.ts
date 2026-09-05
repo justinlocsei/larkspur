@@ -189,7 +189,7 @@ export class ZshCompletionProvider extends CompletionProvider {
     const choices = choicesForFlag(flag);
 
     return choices
-      ? `${value}(${choices.map(String).map(this.quote).join(' ')})`
+      ? `${value}(${choices.map(v => this.quote(String(v))).join(' ')})`
       : value;
   }
 
