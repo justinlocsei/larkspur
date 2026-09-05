@@ -58,15 +58,18 @@ export class ZshCompletionProvider extends CompletionProvider {
    * Render the helper function for user completions
    */
   private renderUserFunction(): ScriptLines {
+    const choices = [
+      'choices=("${(@f)$(',
+      this.quote(this.cli.name),
+      this.quote(this.config.completion.group),
+      'provide --flag "$flag_path" --current "$current" --shell zsh)}")'
+    ].join(' ');
+
     return this.defineFunction('user_fn', [], [
       'local flag_path=$1',
       'local current="${words[CURRENT]#*=}"',
       'local -a choices',
-      'choices=("${(@f)$('
-      + this.quote(this.cli.name)
-      + ' '
-      + this.quote(this.config.completion.group)
-      + ' provide --flag "$flag_path" --current "$current" --shell zsh)}")',
+      choices,
       "_describe 'value' choices"
     ]);
   }
