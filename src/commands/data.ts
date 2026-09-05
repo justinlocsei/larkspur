@@ -14,20 +14,13 @@ export function getCommand(
 }
 
 /**
- * A command tree with only visible commands
- */
-export type VisibleCommands = Record<string, Command>;
-
-/**
  * Filter hidden handlers from a tree
  */
-export function visibleCommands(tree: CommandTree): VisibleCommands {
+export function visibleCommands(tree: CommandTree): CommandTree {
   return Object.fromEntries(
-    Object.entries(tree).filter((entry): entry is [string, Command] => {
-      const [, command] = entry;
-
-      return command !== undefined
-        && (command.type === 'group' || !command.hidden);
-    })
+    Object.entries(tree).filter(([_, command]) =>
+      command !== undefined
+      && (command.type === 'group' || !command.hidden)
+    )
   );
 }
