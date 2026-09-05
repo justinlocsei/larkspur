@@ -7,7 +7,8 @@ import { encodeFlagPath } from '../custom.js';
 import type {
   CommandHandler,
   CommandTree,
-  CompletionScript
+  CompletionScript,
+  ScriptLines
 } from '../provider.js';
 import {
   CompletionProvider,
@@ -35,7 +36,7 @@ export class ZshCompletionProvider extends CompletionProvider {
         this.renderUserFunction(),
         ...this.renderCommands(this.commands, []),
         '',
-        ...this.renderEntry(this.commands),
+        this.renderEntry(this.commands),
         '',
         `${entryPoint} "$@"`
       ]
@@ -45,62 +46,35 @@ export class ZshCompletionProvider extends CompletionProvider {
   /**
    * Render the entry point for completions
    */
-  private renderEntry(tree: CommandTree): string[] {
-    const entries = sortEntries(visibleCommands(tree))
-      .filter(([, command]) => command);
-
-    const commands = entries.map(([name, command]) =>
-      `${name}:${command?.description ?? ''}`
+  private renderEntry(tree: CommandTree): ScriptLines {
+    return this.defineFunction(
+      'entry',
+      [],
+      this.renderCommandDispatch(tree, 2)
     );
-
-    const cases = entries.map(([name]) =>
-      `    ${this.quote(name)}) ${this.commandFunction([name])} ;;`
-    );
-
-    return [
-      `${this.nameFunction('entry')}() {`,
-      '  local state',
-      "  _arguments -C '1:command:->command' '*::arg:->args'",
-      '  case $state in',
-      '  command)',
-      `    local -a command_names=(${
-        commands.map(value => this.quote(value)).join(' ')
-      })`,
-      "    _describe 'command' command_names",
-      '    ;;',
-      '  args)',
-      '    case "$words[2]" in',
-      ...cases,
-      '    esac',
-      '    ;;',
-      '  esac',
-      '}'
-    ];
   }
 
   /**
    * Render the helper function for user completions
    */
-  private renderUserFunction(): string {
-    return [
-      `${this.nameFunction('user_fn')}() {`,
-      '  local flag_path=$1',
-      '  local current="${words[CURRENT]#*=}"',
-      '  local -a choices',
-      '  choices=("${(@f)$('
+  private renderUserFunction(): ScriptLines {
+    return this.defineFunction('user_fn', [], [
+      'local flag_path=$1',
+      'local current="${words[CURRENT]#*=}"',
+      'local -a choices',
+      'choices=("${(@f)$('
       + this.quote(this.cli.name)
       + ' '
       + this.quote(this.config.completion.group)
       + ' provide --flag "$flag_path" --current "$current" --shell zsh)}")',
-      "  _describe 'value' choices",
-      '}'
-    ].join('\n');
+      "_describe 'value' choices"
+    ]);
   }
 
   /**
    * Render completion for a command tree
    */
-  private renderCommands(tree: CommandTree, levels: string[]): string[] {
+  private renderCommands(tree: CommandTree, levels: string[]): ScriptLines {
     return sortEntries(visibleCommands(tree)).flatMap(([name, command]) => {
       if (!command) {
         return [];
@@ -108,23 +82,29 @@ export class ZshCompletionProvider extends CompletionProvider {
 
       const path = [...levels, name];
 
-      const rendered = command.type === 'group'
+      const body = command.type === 'group'
         ? this.renderGroup(command.subcommands, path)
         : this.renderHandler(command, path);
 
-      return [
-        `${this.commandFunction(path)}() {`,
-        ...rendered,
-        '}',
-        ''
-      ];
+      return [this.defineFunction('command', path, body), ''];
     });
   }
 
   /**
    * Render completion for a command group
    */
-  private renderGroup(tree: CommandTree, levels: string[]): string[] {
+  private renderGroup(tree: CommandTree, levels: string[]): ScriptLines {
+    return this.renderCommandDispatch(tree, 3, levels);
+  }
+
+  /**
+   * Render command-name dispatch for a tree level
+   */
+  private renderCommandDispatch(
+    tree: CommandTree,
+    wordIndex: number,
+    levels: string[] = []
+  ): ScriptLines {
     const entries = sortEntries(visibleCommands(tree))
       .filter(([, command]) => command);
 
@@ -133,32 +113,41 @@ export class ZshCompletionProvider extends CompletionProvider {
     );
 
     const cases = entries.map(([name]) =>
-      `    ${this.quote(name)}) ${this.commandFunction([...levels, name])} ;;`
+      `${this.quote(name)}) ${this.commandFunction([...levels, name])} ;;`
     );
 
     return [
-      '  local state',
-      "  _arguments -C '1:command:->command' '*::arg:->args'",
-      '  case $state in',
-      '  command)',
-      `    local -a command_names=(${
-        commands.map(value => this.quote(value)).join(' ')
-      })`,
-      "    _describe 'command' command_names",
-      '    ;;',
-      '  args)',
-      '    case "$words[3]" in',
-      ...cases,
-      '    esac',
-      '    ;;',
-      '  esac'
+      'local state',
+      "_arguments -C '1:command:->command' '*::arg:->args'",
+      'case $state in',
+      [
+        'command)',
+        [
+          `local -a command_names=(${
+            commands.map(value => this.quote(value)).join(' ')
+          })`,
+          "_describe 'command' command_names"
+        ],
+        ';;',
+        'args)',
+        [
+          `case "$words[${wordIndex}]" in`,
+          cases,
+          'esac'
+        ],
+        ';;'
+      ],
+      'esac'
     ];
   }
 
   /**
    * Render completion for a command handler
    */
-  private renderHandler(command: CommandHandler, levels: string[]): string[] {
+  private renderHandler(
+    command: CommandHandler,
+    levels: string[]
+  ): ScriptLines {
     const flags: Flags = {
       ...useSharedFlags(),
       ...(command.flags || {})
@@ -169,9 +158,9 @@ export class ZshCompletionProvider extends CompletionProvider {
     );
 
     return [
-      '  _arguments \\',
-      ...specs.map((spec, index) =>
-        `    ${this.quote(spec)}${index < specs.length - 1 ? ' \\' : ''}`
+      '_arguments \\',
+      specs.map((spec, index) =>
+        `${this.quote(spec)}${index < specs.length - 1 ? ' \\' : ''}`
       )
     ];
   }
@@ -196,7 +185,7 @@ export class ZshCompletionProvider extends CompletionProvider {
     if (isScalarFlag(flag) && flag.completion) {
       const path = this.quote(encodeFlagPath(levels, name));
 
-      return `:${name}:${this.nameFunction} ${path}`;
+      return `:${name}:${this.nameFunction('user_fn')} ${path}`;
     }
 
     const choices = choicesForFlag(flag);
@@ -204,6 +193,17 @@ export class ZshCompletionProvider extends CompletionProvider {
     return choices
       ? `:${name}:(${choices.map(String).map(this.quote).join(' ')})`
       : `:${name}:`;
+  }
+
+  /**
+   * Define a completion function
+   */
+  private defineFunction(
+    type: FunctionType,
+    levels: string[],
+    body: ScriptLines
+  ): ScriptLines {
+    return [`${this.nameFunction(type, ...levels)}() {`, body, '}'];
   }
 
   /**
