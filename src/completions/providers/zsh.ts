@@ -178,19 +178,19 @@ export class ZshCompletionProvider extends CompletionProvider {
    * Define a spec for a flag's value
    */
   private renderValueSpec(name: string, flag: Flag, levels: string[]): string {
-    const { type } = flag;
+    const value = `:${flag.type}:`;
 
     if (isScalarFlag(flag) && flag.completion) {
       const path = this.quote(encodeFlagPath(levels, name));
 
-      return `:${type}:${this.nameFunction('user_fn')} ${path}`;
+      return `${value}${this.nameFunction('user_fn')} ${path}`;
     }
 
     const choices = choicesForFlag(flag);
 
     return choices
-      ? `:${type}:(${choices.map(String).map(this.quote).join(' ')})`
-      : `:${type}:`;
+      ? `${value}(${choices.map(String).map(this.quote).join(' ')})`
+      : value;
   }
 
   /**
