@@ -98,7 +98,7 @@ export class ZshCompletionProvider extends CompletionProvider {
     const entries = this.visibleCommandEntries(tree);
 
     const commandNames = entries
-      .map(([name, command]) => `${name}:${command.description}`)
+      .map(([name, c]) => `${name}:${this.escapeDescribe(c.description)}`)
       .map(v => this.quote(v))
       .join(' ');
 
@@ -171,7 +171,7 @@ export class ZshCompletionProvider extends CompletionProvider {
 
     return getFlagForms(name, flag)
       .map(flagToSetter)
-      .map(f => `${f}[${flag.description}]${suffix}`);
+      .map(f => `${f}[${this.escapeArguments(flag.description)}]${suffix}`);
   }
 
   /**
@@ -219,5 +219,22 @@ export class ZshCompletionProvider extends CompletionProvider {
       type,
       ...levels
     ].join('__');
+  }
+
+  /**
+   * Escape text passed to _describe
+   */
+  private escapeDescribe(text: string): string {
+    return text.replace(/[\r\n]+/g, ' ');
+  }
+
+  /**
+   * Escape text passed to _arguments
+   */
+  private escapeArguments(text: string): string {
+    return this.escapeDescribe(text)
+      .replace(/\\/g, '\\\\')
+      .replace(/\]/g, '\\]')
+      .replace(/\[/g, '\\[');
   }
 }
