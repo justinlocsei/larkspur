@@ -1,30 +1,28 @@
 import C, { run } from 'larkspur';
 
-const alfa = ['alfa-dev', 'alfa-prod', 'alfa-staging'];
-const beta = ['bravo-dev', 'bravo-prod'];
-
 await run({
-  alfa: C(
-    'Alfa',
-    {
-      env: C.flag('string', 'Alfa', {
-        completion: ({ current }) => alfa.filter(v => v.startsWith(current))
-      })
-    },
-    async ({ env }) => {
-      console.log(`alfa:${env}`);
-    }
+  bare: C('@bare-handler', async () => {}),
+  flags: C(
+    '@flag-handler',
+    { root: C.flag('string', '@root') },
+    async () => {}
   ),
-
-  bravo: C(
-    'Bravo',
-    {
-      env: C.flag('string', 'Bravo', {
-        completion: ({ current }) => beta.filter(v => v.startsWith(current))
-      })
-    },
-    async ({ env }) => {
-      console.log(`bravo:${env}`);
-    }
-  )
+  group: C.group('@group\n@newline', {
+    nested: C(
+      '@nested',
+      {
+        count: C.flag('number', '@count'),
+        custom: C.flag('string', '@custom', {
+          completion: async () => ['custom-alfa', 'custom-bravo']
+        }),
+        disabled: C.flag('boolean', '@disabled'),
+        enabled: C.flag('boolean', '@enabled', { default: true }),
+        mode: C.flag('choice', '@mode', {
+          choices: ['mode-alfa', 'mode-bravo']
+        }),
+        title: C.flag('string', "@title it's a: [value]")
+      },
+      async () => {}
+    )
+  })
 });
