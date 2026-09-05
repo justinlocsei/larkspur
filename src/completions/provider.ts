@@ -1,5 +1,7 @@
-import type { CommandTree } from '../commands/types.js';
+import { visibleCommands } from '../commands/data.js';
+import type { Command, CommandTree } from '../commands/types.js';
 import type { Config, Context, Metadata } from '../types.js';
+import { sortEntries } from '../utils.js';
 import type { ScriptLines } from './scripts.js';
 import { formatScript } from './scripts.js';
 
@@ -71,6 +73,17 @@ export abstract class CompletionProvider {
    * Provide the lines of the completion script for the shell
    */
   abstract provideScript(): CompletionScript;
+
+  /**
+   * List visible commands in a tree, sorted by name
+   */
+  protected visibleCommandEntries(
+    tree: CommandTree
+  ): [string, Command][] {
+    return sortEntries(visibleCommands(tree)).filter(
+      (entry): entry is [string, Command] => entry[1] !== undefined
+    );
+  }
 
   /**
    * Allow text to be safely used as an identifier
