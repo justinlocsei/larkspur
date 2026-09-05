@@ -34,7 +34,7 @@ export class ZshCompletionProvider extends CompletionProvider {
         `#compdef ${this.quote(this.cli.name)}`,
         '',
         ...this.renderUserFunction(),
-        ...this.renderCommands(this.commands, []),
+        ...this.completeCommands(this.commands, []),
         '',
         ...this.renderEntry(this.commands),
         '',
@@ -50,7 +50,7 @@ export class ZshCompletionProvider extends CompletionProvider {
     return this.defineFunction(
       'entry',
       [],
-      this.renderCommandTree(tree)
+      this.renderTreeCompletions(tree)
     );
   }
 
@@ -75,9 +75,9 @@ export class ZshCompletionProvider extends CompletionProvider {
   }
 
   /**
-   * Render completion for a command tree
+   * Produce completions for a command tree
    */
-  private renderCommands(tree: CommandTree, levels: string[]): ScriptLines {
+  private completeCommands(tree: CommandTree, levels: string[]): ScriptLines {
     return sortEntries(visibleCommands(tree)).flatMap(([name, command]) => {
       if (!command) {
         return [];
@@ -86,17 +86,17 @@ export class ZshCompletionProvider extends CompletionProvider {
       const path = [...levels, name];
 
       const body = command.type === 'group'
-        ? this.renderCommandTree(command.subcommands, path)
-        : this.renderHandler(command, path);
+        ? this.renderTreeCompletions(command.subcommands, path)
+        : this.renderHandlerCompletions(command, path);
 
       return ['', ...this.defineFunction('command', path, body)];
     });
   }
 
   /**
-   * Render completions for a command tree
+   * Render a completion function for a command tree
    */
-  private renderCommandTree(
+  private renderTreeCompletions(
     tree: CommandTree,
     levels: string[] = []
   ): ScriptLines {
@@ -138,9 +138,9 @@ export class ZshCompletionProvider extends CompletionProvider {
   }
 
   /**
-   * Render completion for a command handler
+   * Render a completion function for a command handler
    */
-  private renderHandler(
+  private renderHandlerCompletions(
     command: CommandHandler,
     levels: string[]
   ): ScriptLines {
