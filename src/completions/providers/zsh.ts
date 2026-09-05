@@ -26,7 +26,7 @@ type FunctionType = 'command' | 'entry' | 'user_fn';
 
 export class ZshCompletionProvider extends CompletionProvider {
   provideScript(): CompletionScript {
-    const entryPoint = `_${this.asIdentifier(this.cli.name)}`;
+    const entryPoint = this.nameFunction('entry');
 
     return {
       entryPoint,
