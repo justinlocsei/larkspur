@@ -3,7 +3,6 @@
 import type { Flag, Flags } from '../../flags/types.js';
 import { sortEntries } from '../../utils.js';
 import { encodeFlagPath } from '../custom.js';
-import { quote } from '../scripts.js';
 import type {
   CommandHandler,
   CommandTree,
@@ -19,6 +18,7 @@ import {
   isScalarFlag,
   useSharedFlags
 } from '../provider.js';
+import { quote } from '../scripts.js';
 
 /**
  * A type for a completion function
