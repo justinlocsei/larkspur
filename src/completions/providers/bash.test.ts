@@ -28,6 +28,7 @@ testProvider(BashCompletionProvider, {
     "'mode-alfa'",
     "'group:nested:custom'"
   ],
+  resolvedFlags: [],
   scalars: [
     '--count=*)',
     '--title=*)'

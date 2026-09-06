@@ -44,6 +44,7 @@ const TEST_LABELS = {
   groups: 'builds functions for groups and handlers',
   nested: 'builds functions for nested handlers',
   quoting: 'quotes values used in the generated script',
+  resolvedFlags: 'prompts for flags after a value is resolved',
   scalars: 'completes scalar flags'
 };
 

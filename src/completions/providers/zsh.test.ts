@@ -23,6 +23,10 @@ testProvider(ZshCompletionProvider, {
     '__test_cli__command__group__nested() {',
     "'nested') __test_cli__command__group__nested ;;"
   ],
+  resolvedFlags: [
+    '[[ "$words[CURRENT-1]" == (--count|--custom|--mode|--title) ]]',
+    '[[ "$words[CURRENT]" == --* ]] && [[ "$words[CURRENT]" != (--disabled|--no-enabled|--help) ]]'
+  ],
   quoting: [
     "#compdef 'test-cli'",
     "compdef __test_cli__entry 'test-cli'",
