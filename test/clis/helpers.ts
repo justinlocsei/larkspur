@@ -93,14 +93,18 @@ export function test(
   };
 
   const testCompletions: TestCompletions = async (shell, cases) => {
-    const result = run('completions', 'generate', '--shell', shell);
+    const script = run('completions', 'generate', '--shell', shell);
 
-    assert.equal(result.status, 0);
-    assert.isEmpty(result.stderr);
+    assert.equal(script.status, 0);
+    assert.isEmpty(script.stderr);
 
     for (const [inputs, outputs] of cases) {
       assert.sameMembers(
-        await runShellCompletions(shell, file, inputs, result.stdout),
+        await runShellCompletions(shell, {
+          cliName: file,
+          inputs,
+          script: script.stdout
+        }),
         outputs,
         `${shell} completions for: ${inputs.join(' ')}`
       );
