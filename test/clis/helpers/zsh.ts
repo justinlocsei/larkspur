@@ -4,7 +4,7 @@ import { assert } from 'vitest';
 
 import { createNameGenerator } from '../../../src/completions/fns.js';
 import { quote } from '../../../src/completions/scripts.js';
-import { useTempDir } from '../../../src/tests.js';
+import type { CompletionsTester } from './completions.js';
 
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs/promises';
@@ -84,64 +84,53 @@ function parseZshCompletionReply(output: string): string[] {
 /**
  * Request completions for a set of inputs from bash
  */
-export async function runZshCompletions({
-  cliName,
-  inputs,
-  prepareDir,
-  script
-}: {
-  cliName: string;
-  inputs: string[];
-  prepareDir: (dir: string) => Promise<{ preamble?: string[] }>;
-  script: string;
-}): Promise<string[]> {
-  return useTempDir(async dir => {
-    const { preamble = [] } = await prepareDir(dir);
-    const entryPoint = createNameGenerator(cliName)('entry');
-    const lines = script.split('\n');
+export const runZshCompletions: CompletionsTester = async (run) => {
+  const { cliName, dir, inputs } = run;
 
-    if (lines[0]?.startsWith('#compdef')) {
-      lines.shift();
-    }
+  const entryPoint = createNameGenerator(cliName)('entry');
+  const lines = run.script.split('\n');
 
-    const entryIndex = lines.findLastIndex(line => line.match(/^(\S+) "\$@"$/));
+  if (lines[0]?.startsWith('#compdef')) {
+    lines.shift();
+  }
 
-    if (entryIndex >= 0) {
-      lines.splice(entryIndex, 1);
-    }
+  const entryIndex = lines.findLastIndex(line => line.match(/^(\S+) "\$@"$/));
 
-    const scriptPath = path.join(dir, 'completion.zsh');
-    const sessionPath = path.join(dir, 'session.zsh');
-    const driverPath = path.join(dir, 'driver.zsh');
+  if (entryIndex >= 0) {
+    lines.splice(entryIndex, 1);
+  }
 
-    await fs.writeFile(scriptPath, lines.join('\n'));
+  const scriptPath = path.join(dir, 'completion.zsh');
+  const sessionPath = path.join(dir, 'session.zsh');
+  const driverPath = path.join(dir, 'driver.zsh');
 
-    await fs.writeFile(
-      sessionPath,
-      [
-        'emulate -L zsh',
-        'autoload -Uz compinit',
-        'compinit -C -D',
-        renderSession(scriptPath, entryPoint)
-      ].join('\n')
-    );
+  await fs.writeFile(scriptPath, lines.join('\n'));
 
-    await fs.writeFile(
-      driverPath,
-      renderDriver(sessionPath, cliName, inputs, preamble)
-    );
+  await fs.writeFile(
+    sessionPath,
+    [
+      'emulate -L zsh',
+      'autoload -Uz compinit',
+      'compinit -C -D',
+      renderSession(scriptPath, entryPoint)
+    ].join('\n')
+  );
 
-    const { status, stderr, stdout } = spawnSync('zsh', [driverPath], {
-      encoding: 'utf8',
-      timeout: 10_000
-    });
+  await fs.writeFile(
+    driverPath,
+    renderDriver(sessionPath, cliName, inputs, run.preamble)
+  );
 
-    assert.equal(
-      status,
-      0,
-      `zsh completions failed: ${inputs.join(' ')}\n${stderr}`
-    );
-
-    return parseZshCompletionReply(stdout);
+  const { status, stderr, stdout } = spawnSync('zsh', [driverPath], {
+    encoding: 'utf8',
+    timeout: 10_000
   });
-}
+
+  assert.equal(
+    status,
+    0,
+    `zsh completions failed: ${inputs.join(' ')}\n${stderr}`
+  );
+
+  return parseZshCompletionReply(stdout);
+};
