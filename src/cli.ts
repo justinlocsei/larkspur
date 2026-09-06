@@ -53,8 +53,8 @@ export async function run(
     config,
     description,
     logging: log = {
-      error: m => console.error(m),
-      info: m => console.info(m)
+      error: m => console.error(m || ''),
+      info: m => console.info(m || '')
     },
     onError = () => (process.exitCode = 1),
     name = inferName(args)
