@@ -254,6 +254,13 @@ export class ZshCompletionProvider extends CompletionProvider {
   }
 
   /**
+   * Build an alternation pattern for a set of values
+   */
+  private alternate(values: string[]): string {
+    return `(${values.join('|')})`;
+  }
+
+  /**
    * Escape text passed to _arguments
    */
   private escapeArguments(text: string): string {
