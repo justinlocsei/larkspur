@@ -1,5 +1,10 @@
 import { assert, it } from 'vitest';
 
+import { parseCompletions } from '../../src/completions/output.js';
+import type { SupportedShell } from '../../src/completions/shells.js';
+import type { CompletionCase } from './helpers/shells.js';
+import { runShellCompletions } from './helpers/shells.js';
+
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 
@@ -48,6 +53,10 @@ type CheckOutput = (...args: string[]) => string;
 export type TestActions = {
   checkOutput: CheckOutput;
   run: RunCLI;
+  testCompletions: (
+    shell: SupportedShell,
+    cases: CompletionCase[]
+  ) => Promise<void>;
 };
 
 /**
@@ -56,6 +65,8 @@ export type TestActions = {
 export type CustomTests = Partial<
   Record<string, (actions: TestActions) => void | Promise<void>>
 >;
+
+export const parseProvideOutput = parseCompletions;
 
 /**
  * Define tests for a CLI
@@ -76,7 +87,32 @@ export function test(
     return result.stdout;
   };
 
-  const actions: TestActions = { checkOutput, run };
+  const testCompletions = async (
+    shell: SupportedShell,
+    cases: CompletionCase[]
+  ): Promise<void> => {
+    const result = run('completions', 'generate', '--shell', shell);
+
+    assert.equal(result.status, 0);
+    assert.isEmpty(result.stderr);
+
+    for (const { expected, inputs } of cases) {
+      const actual = await runShellCompletions(
+        shell,
+        file,
+        inputs,
+        result.stdout
+      );
+
+      assert.sameMembers(
+        actual,
+        expected,
+        `${shell} completions for: ${inputs.join(' ')}`
+      );
+    }
+  };
+
+  const actions: TestActions = { checkOutput, run, testCompletions };
 
   if (valid) {
     it('shows help', () => {
