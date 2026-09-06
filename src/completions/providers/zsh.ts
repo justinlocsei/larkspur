@@ -1,7 +1,7 @@
 // biome-ignore-all lint/suspicious/noTemplateCurlyInString: used for completion scripts
 
 import type { Flag, Flags } from '../../flags/types.js';
-import { sortEntries } from '../../utils.js';
+import { compact, sortEntries, transformValues } from '../../utils.js';
 import { encodeFlagPath } from '../custom.js';
 import type {
   CommandHandler,
@@ -188,12 +188,57 @@ export class ZshCompletionProvider extends CompletionProvider {
       this.renderFlagSpecs(name, flag, levels)
     );
 
+    const flagNames = sortEntries(flags)
+      .flatMap(([name, flag]) => getFlagForms(name, flag).map(flagToSetter))
+      .map(name => quote(name))
+      .join(' ');
+
+    const patterns = this.partitionSetterPatterns(flags);
+
+    const flagOrValue = compact([
+      '[[ "$words[CURRENT]" == --*=* ]]',
+      patterns.scalar && `[[ "$words[CURRENT-1]" == ${patterns.scalar} ]]`,
+      patterns.boolean
+        ? `{ [[ "$words[CURRENT]" == --* ]] && [[ "$words[CURRENT]" != ${patterns.boolean} ]]; }`
+        : '[[ "$words[CURRENT]" == --* ]]'
+    ]);
+
     return [
-      '_arguments \\',
-      specs.map((spec, index) =>
-        `${quote(spec)}${index < specs.length - 1 ? ' \\' : ''}`
-      )
+      `if ${flagOrValue.join(' || ')}; then`,
+      '  _arguments \\',
+      [
+        ...specs,
+        '*: :->args'
+      ].map((spec, index, all) =>
+        `  ${quote(spec)}${index < all.length - 1 ? ' \\' : ''}`
+      ),
+      'else',
+      `  local -a flag_names=(${flagNames})`,
+      "  _describe 'option' flag_names",
+      'fi'
     ];
+  }
+
+  /**
+   * Create grouped setter patterns for scalar and boolean flags
+   */
+  private partitionSetterPatterns(flags: Flags) {
+    const setters = sortEntries(flags).reduce<
+      Record<'boolean' | 'scalar', string[]>
+    >(
+      (previous, [name, flag]) => {
+        const setters = getFlagForms(name, flag).map(flagToSetter);
+        previous[isScalarFlag(flag) ? 'scalar' : 'boolean'].push(...setters);
+
+        return previous;
+      },
+      { boolean: [], scalar: [] }
+    );
+
+    return transformValues(
+      setters,
+      vs => vs.length > 0 ? `(${vs.join('|')})` : undefined
+    );
   }
 
   /**
@@ -251,13 +296,6 @@ export class ZshCompletionProvider extends CompletionProvider {
    */
   private escapeDescribe(text: string): string {
     return text.replace(/[\r\n]+/g, ' ');
-  }
-
-  /**
-   * Build an alternation pattern for a set of values
-   */
-  private alternate(values: string[]): string {
-    return `(${values.join('|')})`;
   }
 
   /**
