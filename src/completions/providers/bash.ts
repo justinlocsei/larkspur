@@ -2,12 +2,14 @@
 
 import { compact, drain } from '../../utils.js';
 import { encodeFlagPath } from '../custom.js';
+import type { NameGenerator } from '../fns.js';
 import type {
   Command,
   CommandHandler,
   CommandTree,
   CompletionFunction,
   CompletionScript,
+  CompletionSource,
   Flags,
   FunctionType,
   ScriptLines
@@ -47,6 +49,28 @@ type Frame = {
 };
 
 export class BashCompletionProvider extends CompletionProvider {
+  private fns: NameGenerator;
+
+  /**
+   * Create a generator for bash function names
+   */
+  static createNameGenerator(cliName: string): NameGenerator {
+    const sanitize = (text: string): string =>
+      text
+        .toLowerCase()
+        .replace(/[^a-z0-9_]/g, ' ')
+        .trim()
+        .replace(/\s+/g, '_');
+
+    return (type, levels = []) =>
+      ['', sanitize(cliName), type, ...levels.map(sanitize)].join('__');
+  }
+
+  constructor(cli: CompletionSource) {
+    super(cli);
+    this.fns = BashCompletionProvider.createNameGenerator(this.cli.name);
+  }
+
   /**
    * Provide bash completions
    */

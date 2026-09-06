@@ -3,11 +3,13 @@
 import type { Flag, Flags } from '../../flags/types.js';
 import { compact, sortEntries, transformValues } from '../../utils.js';
 import { encodeFlagPath } from '../custom.js';
+import type { NameGenerator } from '../fns.js';
 import type {
   CommandHandler,
   CommandTree,
   CompletionFunction,
   CompletionScript,
+  CompletionSource,
   FunctionType,
   ScriptLines
 } from '../provider.js';
@@ -31,6 +33,23 @@ type CommandFrame = {
 };
 
 export class ZshCompletionProvider extends CompletionProvider {
+  private fns: NameGenerator;
+
+  /**
+   * Create a generator for zsh function names
+   */
+  static createNameGenerator(cliName: string): NameGenerator {
+    return (type, levels = []) =>
+      (type === 'entry' && levels.length === 0)
+        ? `_${cliName}`
+        : [`_${cliName}`, type, ...levels].join('__');
+  }
+
+  constructor(cli: CompletionSource) {
+    super(cli);
+    this.fns = ZshCompletionProvider.createNameGenerator(this.cli.name);
+  }
+
   provideScript(): CompletionScript {
     const entry = this.defineFunction(
       'entry',

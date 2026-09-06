@@ -58,7 +58,7 @@ type TestLabel = keyof typeof TEST_LABELS;
  */
 export function testProvider(
   Provider: CompletionProviderClass,
-  expectations: Record<TestLabel, string[]>
+  expectations: Record<TestLabel, string[]> & { entryPoint: string }
 ): void {
   function buildScript(commands = createCompletionCommands()) {
     return new Provider({
@@ -82,7 +82,7 @@ export function testProvider(
       it(description, () => {
         const result = buildScript();
 
-        assert.equal(result.entryPoint, '__test_cli__entry');
+        assert.equal(result.entryPoint, expectations.entryPoint);
         assert.isNotEmpty(result.script);
 
         const { script } = result;
