@@ -254,9 +254,15 @@ export class ZshCompletionProvider extends CompletionProvider {
       ? this.renderValueSpec(name, flag, levels)
       : '';
 
+    const description = `[${this.escapeArguments(flag.description)}]`;
+
     return getFlagForms(name, flag)
       .map(flagToSetter)
-      .map(f => `${f}[${this.escapeArguments(flag.description)}]${suffix}`);
+      .map(f =>
+        isScalarFlag(flag)
+          ? `${f}=${description}${suffix}`
+          : `${f}${description}`
+      );
   }
 
   /**

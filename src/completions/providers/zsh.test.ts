@@ -7,7 +7,7 @@ testProvider(ZshCompletionProvider, {
     "'--no-enabled[@enabled]'"
   ],
   choices: [
-    "'--mode[@mode]:choice:(",
+    "'--mode=[@mode]:choice:(",
     'mode-alfa',
     'mode-bravo'
   ],
@@ -38,8 +38,8 @@ testProvider(ZshCompletionProvider, {
     '(( $# )) && __test_cli__entry "$@"'
   ],
   scalars: [
-    "'--count[@count]:number:",
-    "'--title[@title it",
-    "'--root[@root]:string:"
+    "'--count=[@count]:number:",
+    "'--title=[@title it",
+    "'--root=[@root]:string:"
   ]
 });
