@@ -2,7 +2,6 @@
 
 import { compact, drain } from '../../utils.js';
 import { encodeFlagPath } from '../custom.js';
-import { quote } from '../scripts.js';
 import type {
   Command,
   CommandHandler,
@@ -20,6 +19,7 @@ import {
   isScalarFlag,
   useSharedFlags
 } from '../provider.js';
+import { quote } from '../scripts.js';
 
 /**
  * A type for a completion function

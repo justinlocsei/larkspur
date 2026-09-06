@@ -95,7 +95,6 @@ export abstract class CompletionProvider {
       .trim()
       .replace(/\s+/g, '_');
   }
-
 }
 
 /**
