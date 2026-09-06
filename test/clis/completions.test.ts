@@ -72,8 +72,8 @@ test('completions', {
               flags
             ],
             [
-              ['group', 'nested', '--mode', 'mode-alfa', ' '],
-              flags
+              ['group', 'nested', '--count', '1', '--c'],
+              ['--count', '--custom']
             ]
           ]);
         }
