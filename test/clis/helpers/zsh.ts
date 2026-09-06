@@ -11,13 +11,28 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 /**
- * Render the text of a script to establish a pseudo-interactive session
+ * Render a single zpty driver that loads completions and captures compadd results
  */
-function renderSession(scriptPath: string, entryPoint: string): string {
+function renderHarness(
+  completionPath: string,
+  entryPoint: string,
+  cliName: string,
+  inputs: string[],
+  preamble: string[]
+): string {
+  const input = [cliName, ...inputs].join(' ');
+
   return [
     'emulate -L zsh',
-    `source ${quote(scriptPath)}`,
-    `compdef ${entryPoint} completions`,
+    'zmodload zsh/zpty',
+    ...preamble,
+    `session=$(mktemp)`,
+    `cat > "$session" <<'SESSION'`,
+    'emulate -L zsh',
+    'autoload -Uz compinit',
+    'compinit -C -D',
+    `source ${quote(completionPath)}`,
+    `compdef ${entryPoint} ${quote(cliName)}`,
     'typeset -aU completions=()',
     'compadd() {',
     '  local -a reply',
@@ -35,30 +50,15 @@ function renderSession(scriptPath: string, entryPoint: string): string {
     'zle -C poc-widget complete-word poc-widget',
     "bindkey '^I' poc-widget",
     'print -n ready',
-    'vared -c tmp'
-  ].join('\n');
-}
-
-/**
- * Render a script to drive a pseudo-interactive session
- */
-function renderDriver(
-  sessionPath: string,
-  cliName: string,
-  inputs: string[],
-  preamble: string[]
-): string {
-  const input = [cliName, ...inputs].join(' ');
-
-  return [
-    'emulate -L zsh',
-    ...preamble,
-    'zmodload zsh/zpty',
-    `zpty pty zsh -f ${quote(sessionPath)}`,
+    'vared -c tmp',
+    'SESSION',
+    'zpty -d pty 2>/dev/null',
+    'zpty -b pty zsh -f "$session"',
     "zpty -r pty boot '*ready*' || exit 1",
     `zpty -w pty ${quote(input)}$'\\t'`,
     "zpty -r pty output $'*\\C-C*' || exit 1",
     'zpty -d pty',
+    'rm -f "$session"',
     'print -r -- "$output"'
   ].join('\n');
 }
@@ -82,7 +82,7 @@ function parseZshCompletionReply(output: string): string[] {
 }
 
 /**
- * Request completions for a set of inputs from bash
+ * Request completions for a set of inputs from zsh
  */
 export const runZshCompletions: CompletionsTester = async (run) => {
   const { cliName, dir, inputs } = run;
@@ -100,28 +100,23 @@ export const runZshCompletions: CompletionsTester = async (run) => {
     lines.splice(entryIndex, 1);
   }
 
-  const scriptPath = path.join(dir, 'completion.zsh');
-  const sessionPath = path.join(dir, 'session.zsh');
-  const driverPath = path.join(dir, 'driver.zsh');
+  const completionPath = path.join(dir, 'completion.zsh');
+  const harnessPath = path.join(dir, 'harness.zsh');
 
-  await fs.writeFile(scriptPath, lines.join('\n'));
-
-  await fs.writeFile(
-    sessionPath,
-    [
-      'emulate -L zsh',
-      'autoload -Uz compinit',
-      'compinit -C -D',
-      renderSession(scriptPath, entryPoint)
-    ].join('\n')
-  );
+  await fs.writeFile(completionPath, lines.join('\n'));
 
   await fs.writeFile(
-    driverPath,
-    renderDriver(sessionPath, cliName, inputs, run.preamble)
+    harnessPath,
+    renderHarness(
+      completionPath,
+      entryPoint,
+      cliName,
+      inputs,
+      run.preamble
+    )
   );
 
-  const { status, stderr, stdout } = spawnSync('zsh', [driverPath], {
+  const { status, stderr, stdout } = spawnSync('zsh', [harnessPath], {
     encoding: 'utf8',
     timeout: 10_000
   });
