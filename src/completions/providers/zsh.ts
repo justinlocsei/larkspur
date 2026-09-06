@@ -205,16 +205,17 @@ export class ZshCompletionProvider extends CompletionProvider {
 
     return [
       `if ${flagOrValue.join(' || ')}; then`,
-      '  _arguments \\',
       [
-        ...specs,
-        '*: :->args'
-      ].map((spec, index, all) =>
-        `  ${quote(spec)}${index < all.length - 1 ? ' \\' : ''}`
-      ),
+        '_arguments \\',
+        [...specs, '*: :->args'].map((spec, index, all) =>
+          `${quote(spec)}${index < all.length - 1 ? ' \\' : ''}`
+        )
+      ],
       'else',
-      `  local -a flag_names=(${flagNames})`,
-      "  _describe 'option' flag_names",
+      [
+        `local -a flag_names=(${flagNames})`,
+        "_describe 'option' flag_names"
+      ],
       'fi'
     ];
   }
