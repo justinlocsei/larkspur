@@ -20,7 +20,7 @@ function createCompletionCommands(): CommandTree {
       nested: C(
         '@nested',
         {
-          count: C.flag('number', '@count'),
+          count: C.flag('number', '@count', { allowMany: true }),
           custom: C.flag('string', '@custom', {
             completion: async () => ['custom-alfa', 'custom-bravo']
           }),

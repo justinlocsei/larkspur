@@ -38,7 +38,7 @@ testProvider(ZshCompletionProvider, {
     '(( $# )) && __test_cli__entry "$@"'
   ],
   scalars: [
-    "'--count=[@count]:number:",
+    "'*--count=[@count]:number:",
     "'--title=[@title it",
     "'--root=[@root]:string:"
   ]

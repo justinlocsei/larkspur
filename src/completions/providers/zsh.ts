@@ -260,7 +260,7 @@ export class ZshCompletionProvider extends CompletionProvider {
       .map(flagToSetter)
       .map(f =>
         isScalarFlag(flag)
-          ? `${f}=${description}${suffix}`
+          ? `${flag.allowMany ? '*' : ''}${f}=${description}${suffix}`
           : `${f}${description}`
       );
   }
