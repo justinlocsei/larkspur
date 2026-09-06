@@ -187,14 +187,14 @@ export class BashCompletionProvider extends CompletionProvider {
   ): CompletionFunction {
     return {
       lines,
-      name: this.nameFunction(type, ...levels)
+      name: this.nameFunction(type, levels)
     };
   }
 
   /**
    * Produce the name of a function
    */
-  private nameFunction(type: FunctionType, ...levels: string[]): string {
+  private nameFunction(type: FunctionType, levels: string[] = []): string {
     return [
       '',
       this.asIdentifier(this.cli.name),
