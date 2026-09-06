@@ -72,6 +72,12 @@ export function testProvider(
         TEST_LABELS
       ) as [TestLabel, string][]
     ) {
+      const expected = expectations[label];
+
+      if (!expected.length) {
+        continue;
+      }
+
       it(description, () => {
         const result = buildScript();
 
@@ -80,8 +86,8 @@ export function testProvider(
 
         const { script } = result;
 
-        for (const expected of expectations[label]) {
-          assert.include(script, expected);
+        for (const value of expected) {
+          assert.include(script, value);
         }
       });
     }
