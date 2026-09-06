@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+// @ts-check
+
 import C, { run } from 'larkspur';
 
 const desc = 'A flag';
