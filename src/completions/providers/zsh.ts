@@ -160,24 +160,14 @@ export class ZshCompletionProvider extends CompletionProvider {
     );
 
     return [
-      'local state',
-      "_arguments -C '1:command:->command' '*::arg:->args'",
-      'case $state in',
+      `case "$words[${wordIndex}]" in`,
+      cases,
+      '*)',
       [
-        'command)',
-        [
-          `local -a command_names=(${commandNames})`,
-          "_describe 'command' command_names"
-        ],
-        ';;',
-        'args)',
-        [
-          `case "$words[${wordIndex}]" in`,
-          cases,
-          'esac'
-        ],
-        ';;'
+        `local -a command_names=(${commandNames})`,
+        "_describe 'command' command_names"
       ],
+      ';;',
       'esac'
     ];
   }
