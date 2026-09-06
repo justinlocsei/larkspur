@@ -25,6 +25,7 @@ testProvider(ZshCompletionProvider, {
   ],
   quoting: [
     "#compdef 'test-cli'",
+    "compdef __test_cli__entry 'test-cli'",
     "'group:@group @newline'",
     '\\[value\\]',
     "it'\\''s a:",

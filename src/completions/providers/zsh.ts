@@ -50,6 +50,7 @@ export class ZshCompletionProvider extends CompletionProvider {
         '',
         ...entry.lines,
         '',
+        `compdef ${entry.name} ${quote(this.cli.name)}`,
         `${entry.name} "$@"`
       ]
     };
