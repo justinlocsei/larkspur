@@ -48,15 +48,20 @@ type RunCLI = (...args: string[]) => TestResult;
 type CheckOutput = (...args: string[]) => string;
 
 /**
+ * A function to test shell completions
+ */
+type TestCompletions = (
+  shell: SupportedShell,
+  cases: CompletionCase[]
+) => Promise<void>;
+
+/**
  * The actions available for custom tests
  */
 export type TestActions = {
   checkOutput: CheckOutput;
   run: RunCLI;
-  testCompletions: (
-    shell: SupportedShell,
-    cases: CompletionCase[]
-  ) => Promise<void>;
+  testCompletions: TestCompletions;
 };
 
 /**
@@ -87,26 +92,16 @@ export function test(
     return result.stdout;
   };
 
-  const testCompletions = async (
-    shell: SupportedShell,
-    cases: CompletionCase[]
-  ): Promise<void> => {
+  const testCompletions: TestCompletions = async (shell, cases) => {
     const result = run('completions', 'generate', '--shell', shell);
 
     assert.equal(result.status, 0);
     assert.isEmpty(result.stderr);
 
-    for (const { expected, inputs } of cases) {
-      const actual = await runShellCompletions(
-        shell,
-        file,
-        inputs,
-        result.stdout
-      );
-
+    for (const [inputs, outputs] of cases) {
       assert.sameMembers(
-        actual,
-        expected,
+        await runShellCompletions(shell, file, inputs, result.stdout),
+        outputs,
         `${shell} completions for: ${inputs.join(' ')}`
       );
     }
