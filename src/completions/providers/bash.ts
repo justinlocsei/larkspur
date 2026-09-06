@@ -9,6 +9,7 @@ import type {
   CompletionFunction,
   CompletionScript,
   Flags,
+  FunctionType,
   ScriptLines
 } from '../provider.js';
 import {
@@ -20,11 +21,6 @@ import {
   useSharedFlags
 } from '../provider.js';
 import { quote } from '../scripts.js';
-
-/**
- * A type for a completion function
- */
-type FunctionType = 'command' | 'entry' | 'user_fn' | 'words';
 
 /**
  * Generated completions
@@ -187,20 +183,8 @@ export class BashCompletionProvider extends CompletionProvider {
   ): CompletionFunction {
     return {
       lines,
-      name: this.nameFunction(type, levels)
+      name: this.fns(type, levels)
     };
-  }
-
-  /**
-   * Produce the name of a function
-   */
-  private nameFunction(type: FunctionType, levels: string[] = []): string {
-    return [
-      '',
-      this.asIdentifier(this.cli.name),
-      type,
-      ...levels.map(l => this.asIdentifier(l))
-    ].join('__');
   }
 
   /**
@@ -212,7 +196,7 @@ export class BashCompletionProvider extends CompletionProvider {
     variable: string
   ): string {
     return [
-      this.nameFunction(type),
+      this.fns(type),
       ...inputs.map(i => quote(i)),
       `"${variable}"`
     ].join(' ');

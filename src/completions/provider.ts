@@ -2,6 +2,8 @@ import { visibleCommands } from '../commands/data.js';
 import type { Command, CommandTree } from '../commands/types.js';
 import type { Config, Context, Metadata } from '../types.js';
 import { sortEntries } from '../utils.js';
+import type { FunctionType, NameGenerator } from './fns.js';
+import { createNameGenerator } from './fns.js';
 import type { ScriptLines } from './scripts.js';
 import { formatScript } from './scripts.js';
 
@@ -15,7 +17,7 @@ export {
 export { useSharedFlags } from '../flags/shared.js';
 export type { Flags } from '../flags/types.js';
 
-export type { CommandTree, ScriptLines };
+export type { CommandTree, FunctionType, ScriptLines };
 
 /**
  * A generic completion function
@@ -45,6 +47,7 @@ export abstract class CompletionProvider {
   protected cli: Metadata;
   protected commands: CommandTree;
   protected config: Config;
+  protected fns: NameGenerator;
 
   /**
    * Create a generator for completions of a CLI's commands
@@ -55,6 +58,7 @@ export abstract class CompletionProvider {
     this.cli = context.meta;
     this.commands = commands;
     this.config = context.config;
+    this.fns = createNameGenerator(this.cli.name);
   }
 
   /**
@@ -83,17 +87,6 @@ export abstract class CompletionProvider {
     return sortEntries(visibleCommands(tree)).filter(
       (entry): entry is [string, Command] => entry[1] !== undefined
     );
-  }
-
-  /**
-   * Allow text to be safely used as an identifier
-   */
-  protected asIdentifier(text: string): string {
-    return text
-      .toLowerCase()
-      .replace(/[^a-z0-9_]/g, ' ')
-      .trim()
-      .replace(/\s+/g, '_');
   }
 }
 

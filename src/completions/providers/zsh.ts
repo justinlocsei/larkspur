@@ -8,6 +8,7 @@ import type {
   CommandTree,
   CompletionFunction,
   CompletionScript,
+  FunctionType,
   ScriptLines
 } from '../provider.js';
 import {
@@ -19,11 +20,6 @@ import {
   useSharedFlags
 } from '../provider.js';
 import { quote } from '../scripts.js';
-
-/**
- * A type for a completion function
- */
-type FunctionType = 'command' | 'entry' | 'user_fn';
 
 /**
  * A stack frame used when building command completions
@@ -146,7 +142,7 @@ export class ZshCompletionProvider extends CompletionProvider {
     const cases = entries.map(([name]) =>
       [
         `${quote(name)})`,
-        this.nameFunction('command', [...levels, name]),
+        this.fns('command', [...levels, name]),
         ';;'
       ].join(' ')
     );
@@ -224,7 +220,7 @@ export class ZshCompletionProvider extends CompletionProvider {
     if (isScalarFlag(flag) && flag.completion) {
       const path = quote(encodeFlagPath(levels, name));
 
-      return `${value}${this.nameFunction('user_fn')} ${path}`;
+      return `${value}${this.fns('user_fn')} ${path}`;
     }
 
     const choices = choicesForFlag(flag);
@@ -242,24 +238,12 @@ export class ZshCompletionProvider extends CompletionProvider {
     levels: string[],
     body: ScriptLines
   ): CompletionFunction {
-    const name = this.nameFunction(type, levels);
+    const name = this.fns(type, levels);
 
     return {
       lines: [`${name}() {`, body, '}'],
       name
     };
-  }
-
-  /**
-   * Produce the name of a function
-   */
-  private nameFunction(type: FunctionType, levels: string[] = []): string {
-    return [
-      '',
-      this.asIdentifier(this.cli.name),
-      type,
-      ...levels
-    ].join('__');
   }
 
   /**
