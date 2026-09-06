@@ -76,9 +76,9 @@ export function test(
   tests: CustomTests = {},
   { valid = true }: { valid?: boolean } = {}
 ): void {
-  const run: RunCLI = (...args: string[]) => testCLI(file, ...args);
+  const run: RunCLI = (...args) => testCLI(file, ...args);
 
-  const checkOutput: CheckOutput = (...args: string[]) => {
+  const checkOutput: CheckOutput = (...args) => {
     const result = run(...args);
 
     assert.equal(result.status, 0);
