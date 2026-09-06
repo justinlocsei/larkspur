@@ -187,7 +187,7 @@ export class BashCompletionProvider extends CompletionProvider {
   ): CompletionFunction {
     return {
       lines,
-      name: this.nameFunction(type, ...levels.map(p => this.asIdentifier(p)))
+      name: this.nameFunction(type, ...levels)
     };
   }
 
@@ -199,7 +199,7 @@ export class BashCompletionProvider extends CompletionProvider {
       '',
       this.asIdentifier(this.cli.name),
       type,
-      ...levels
+      ...levels.map(l => this.asIdentifier(l))
     ].join('__');
   }
 
