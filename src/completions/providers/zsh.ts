@@ -56,18 +56,22 @@ export class ZshCompletionProvider extends CompletionProvider {
   }
 
   /**
-   * Build the helper function for user completions
+   * Build a helper function for a user completion flag
    */
-  private buildUserFunction(): CompletionFunction {
+  private buildUserFunction(
+    flagName: string,
+    levels: string[]
+  ): CompletionFunction {
     const choices = [
       'choices=("${(@f)$(',
       quote(this.cli.name),
       quote(this.config.completion.group),
-      'provide --flag "$flag_path" --current "$current" --shell zsh )}")'
+      'provide --flag',
+      quote(encodeFlagPath(levels, flagName)),
+      '--current "$current" --shell zsh )}")'
     ].join(' ');
 
-    return this.defineFunction('user_fn', [], [
-      'local flag_path=$1',
+    return this.defineFunction('user_fn', [...levels, flagName], [
       'local current="${words[CURRENT]#*=}"',
       'local -a choices',
       choices,
@@ -112,6 +116,14 @@ export class ZshCompletionProvider extends CompletionProvider {
 
       for (const [name, command] of entries) {
         const path = [...levels, name];
+
+        if (command.type === 'handler' && command.flags) {
+          for (const [flagName, flag] of sortEntries(command.flags)) {
+            if (isScalarFlag(flag) && flag.completion) {
+              functions.push(this.buildUserFunction(flagName, path));
+            }
+          }
+        }
 
         const body = command.type === 'group'
           ? this.renderTreeCompletions(command.subcommands, path)
@@ -218,9 +230,7 @@ export class ZshCompletionProvider extends CompletionProvider {
     const value = `:${flag.type}:`;
 
     if (isScalarFlag(flag) && flag.completion) {
-      const path = quote(encodeFlagPath(levels, name));
-
-      return `${value}${this.fns('user_fn')} ${path}`;
+      return `${value}${this.fns('user_fn', [...levels, name])}`;
     }
 
     const choices = choicesForFlag(flag);

@@ -12,7 +12,8 @@ testProvider(ZshCompletionProvider, {
     'mode-bravo'
   ],
   custom: [
-    "__test_cli__user_fn '\\''group:nested:custom'\\''"
+    '__test_cli__user_fn__group__nested__custom() {',
+    "provide --flag 'group:nested:custom'"
   ],
   groups: [
     '__test_cli__command__bare() {',
