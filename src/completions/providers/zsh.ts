@@ -189,7 +189,7 @@ export class ZshCompletionProvider extends CompletionProvider {
     return [
       '_arguments \\',
       specs.map((spec, index) =>
-        `${this.quote(spec)}${index < specs.length - 1 ? ' \\' : ''}`
+        `${quote(spec)}${index < specs.length - 1 ? ' \\' : ''}`
       )
     ];
   }

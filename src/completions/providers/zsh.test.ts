@@ -21,7 +21,7 @@ testProvider(ZshCompletionProvider, {
   ],
   nested: [
     '__test_cli__command__group__nested() {',
-    "'nested' __test_cli__command__group__nested ;;"
+    "'nested') __test_cli__command__group__nested ;;"
   ],
   quoting: [
     "#compdef 'test-cli'",
