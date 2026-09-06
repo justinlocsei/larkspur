@@ -42,16 +42,15 @@ export class ZshCompletionProvider extends CompletionProvider {
       entryPoint: entry.name,
       script: [
         `#compdef ${quote(this.cli.name)}`,
+        `compdef ${entry.name} ${quote(this.cli.name)}`,
         '',
-        ...this.buildUserFunction().lines,
         ...this.buildCommandCompletions(this.commands).flatMap(
           f => ['', ...f.lines]
         ),
         '',
         ...entry.lines,
         '',
-        `compdef ${entry.name} ${quote(this.cli.name)}`,
-        `${entry.name} "$@"`
+        `(( $# )) && ${entry.name} "$@"`
       ]
     };
   }

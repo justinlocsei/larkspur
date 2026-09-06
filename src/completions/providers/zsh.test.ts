@@ -34,7 +34,7 @@ testProvider(ZshCompletionProvider, {
     '\\[value\\]',
     "it'\\''s a:",
     'mode-bravo',
-    '__test_cli__entry "$@"'
+    '(( $# )) && __test_cli__entry "$@"'
   ],
   scalars: [
     "'--count[@count]:number:",
