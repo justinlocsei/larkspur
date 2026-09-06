@@ -1,7 +1,7 @@
 import { assert, describe, it } from 'vitest';
 
 import type { ScriptLines } from './scripts.js';
-import { formatScript } from './scripts.js';
+import { formatScript, quote } from './scripts.js';
 
 describe('formatScript', () => {
   it('flattens lines', () => {
@@ -30,5 +30,15 @@ describe('formatScript', () => {
     }
 
     assert.isString(formatScript(lines, 2));
+  });
+});
+
+describe('quote', () => {
+  it('wraps simple strings in single quotes', () => {
+    assert.equal(quote('alfa'), "'alfa'");
+  });
+
+  it('escapes embedded single quotes', () => {
+    assert.equal(quote("it's"), "'it'\\''s'");
   });
 });

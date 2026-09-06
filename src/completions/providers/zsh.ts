@@ -3,6 +3,7 @@
 import type { Flag, Flags } from '../../flags/types.js';
 import { sortEntries } from '../../utils.js';
 import { encodeFlagPath } from '../custom.js';
+import { quote } from '../scripts.js';
 import type {
   CommandHandler,
   CommandTree,
@@ -44,7 +45,7 @@ export class ZshCompletionProvider extends CompletionProvider {
     return {
       entryPoint: entry.name,
       script: [
-        `#compdef ${this.quote(this.cli.name)}`,
+        `#compdef ${quote(this.cli.name)}`,
         '',
         ...this.buildUserFunction().lines,
         ...this.buildCommandCompletions(this.commands).flatMap(
@@ -64,8 +65,8 @@ export class ZshCompletionProvider extends CompletionProvider {
   private buildUserFunction(): CompletionFunction {
     const choices = [
       'choices=("${(@f)$(',
-      this.quote(this.cli.name),
-      this.quote(this.config.completion.group),
+      quote(this.cli.name),
+      quote(this.config.completion.group),
       'provide --flag "$flag_path" --current "$current" --shell zsh )}")'
     ].join(' ');
 
@@ -139,12 +140,12 @@ export class ZshCompletionProvider extends CompletionProvider {
 
     const commandNames = entries
       .map(([name, c]) => `${name}:${this.escapeDescribe(c.description)}`)
-      .map(v => this.quote(v))
+      .map(v => quote(v))
       .join(' ');
 
     const cases = entries.map(([name]) =>
       [
-        this.quote(name),
+        `${quote(name)})`,
         this.nameFunction('command', [...levels, name]),
         ';;'
       ].join(' ')
@@ -221,7 +222,7 @@ export class ZshCompletionProvider extends CompletionProvider {
     const value = `:${flag.type}:`;
 
     if (isScalarFlag(flag) && flag.completion) {
-      const path = this.quote(encodeFlagPath(levels, name));
+      const path = quote(encodeFlagPath(levels, name));
 
       return `${value}${this.nameFunction('user_fn')} ${path}`;
     }
@@ -229,7 +230,7 @@ export class ZshCompletionProvider extends CompletionProvider {
     const choices = choicesForFlag(flag);
 
     return choices
-      ? `${value}(${choices.map(v => this.quote(String(v))).join(' ')})`
+      ? `${value}(${choices.map(v => quote(String(v))).join(' ')})`
       : value;
   }
 

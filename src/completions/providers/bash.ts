@@ -2,6 +2,7 @@
 
 import { compact, drain } from '../../utils.js';
 import { encodeFlagPath } from '../custom.js';
+import { quote } from '../scripts.js';
 import type {
   Command,
   CommandHandler,
@@ -62,7 +63,7 @@ export class BashCompletionProvider extends CompletionProvider {
       script: [
         ...this.renderCompletions(fn, completions),
         '',
-        `complete -o default -F ${fn.entry.name} ${this.quote(this.cli.name)}`
+        `complete -o default -F ${fn.entry.name} ${quote(this.cli.name)}`
       ]
     };
   }
@@ -164,8 +165,8 @@ export class BashCompletionProvider extends CompletionProvider {
           ['COMPREPLY+=("$value")'],
           'fi'
         ],
-        `done < <(${this.quote(this.cli.name)} ${
-          this.quote(this.config.completion.group)
+        `done < <(${quote(this.cli.name)} ${
+          quote(this.config.completion.group)
         } provide --flag "$flag_path" --current "$complete_on" --shell bash)`
       ]
     );
@@ -212,7 +213,7 @@ export class BashCompletionProvider extends CompletionProvider {
   ): string {
     return [
       this.nameFunction(type),
-      ...inputs.map(i => this.quote(i)),
+      ...inputs.map(i => quote(i)),
       `"${variable}"`
     ].join(' ');
   }
