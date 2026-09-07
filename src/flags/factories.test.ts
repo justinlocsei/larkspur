@@ -27,6 +27,13 @@ describe('buildFlag', () => {
     T.assert<T.Equivalent<typeof string, StringFlag>>(true);
   });
 
+  it('supports default values for basic flags', () => {
+    buildFlag('boolean', description, { default: true });
+    buildFlag('number', description, { default: 1 });
+    buildFlag('path', description, { default: '/tmp' });
+    buildFlag('string', description, { default: 'value' });
+  });
+
   it('supports complex boolean flags', () => {
     const flag = buildFlag('boolean', description, {
       default: true
@@ -47,19 +54,22 @@ describe('buildFlag', () => {
   it('supports complex number flags', () => {
     const flag = buildFlag('number', description, {
       allowMany: true,
-      default: 1,
+      default: [1],
       required: true
     });
 
     assert.deepEqual(flag, {
       allowMany: true,
-      default: 1,
+      default: [1],
       description,
       required: true,
       type: 'number'
     });
 
     T.assert<T.Assignable<typeof flag, NumberFlag>>(true);
+
+    // @ts-expect-error Scalar defaults require an array when allowMany is true
+    buildFlag('number', description, { allowMany: true, default: 1 });
 
     // @ts-expect-error Extra options are not allowed
     buildFlag('number', description, { other: 'value' });
@@ -81,19 +91,22 @@ describe('buildFlag', () => {
   it('supports path flags', () => {
     const flag = buildFlag('path', description, {
       allowMany: true,
-      default: '/tmp',
+      default: ['/tmp'],
       required: true
     });
 
     assert.deepEqual(flag, {
       allowMany: true,
-      default: '/tmp',
+      default: ['/tmp'],
       description,
       required: true,
       type: 'path'
     });
 
     T.assert<T.Assignable<typeof flag, PathFlag>>(true);
+
+    // @ts-expect-error Scalar defaults require an array when allowMany is true
+    buildFlag('path', description, { allowMany: true, default: '/tmp' });
 
     // @ts-expect-error Extra options are not allowed
     buildFlag('path', description, { other: 'value' });
@@ -102,19 +115,22 @@ describe('buildFlag', () => {
   it('supports string flags', () => {
     const flag = buildFlag('string', description, {
       allowMany: true,
-      default: 'value',
+      default: ['value'],
       required: true
     });
 
     assert.deepEqual(flag, {
       allowMany: true,
-      default: 'value',
+      default: ['value'],
       description,
       required: true,
       type: 'string'
     });
 
     T.assert<T.Assignable<typeof flag, StringFlag>>(true);
+
+    // @ts-expect-error Scalar defaults require an array when allowMany is true
+    buildFlag('string', description, { allowMany: true, default: 'value' });
 
     // @ts-expect-error Extra options are not allowed
     buildFlag('string', description, { other: 'value' });
