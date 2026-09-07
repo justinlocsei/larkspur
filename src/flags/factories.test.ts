@@ -65,6 +65,19 @@ describe('buildFlag', () => {
     buildFlag('number', description, { other: 'value' });
   });
 
+  it('supports array defaults for repeatable scalar flags', () => {
+    const flag = buildFlag('number', description, {
+      allowMany: true,
+      default: [1, 2]
+    });
+
+    assert.deepEqual(flag.default, [1, 2]);
+    assert.isTrue(flag.allowMany);
+
+    // @ts-expect-error Array defaults require allowMany
+    buildFlag('number', description, { default: [1, 2] });
+  });
+
   it('supports path flags', () => {
     const flag = buildFlag('path', description, {
       allowMany: true,
@@ -198,6 +211,29 @@ describe('buildFlag', () => {
     buildFlag('choice', description, {
       choices: ['alfa', 'bravo'],
       default: 'charlie'
+    });
+  });
+
+  it('supports array defaults constrained to choices', () => {
+    const flag = buildFlag('choice', description, {
+      allowMany: true,
+      choices: ['alfa', 'bravo'],
+      default: ['alfa', 'bravo']
+    });
+
+    assert.deepEqual(flag.default, ['alfa', 'bravo']);
+
+    // @ts-expect-error Array defaults require allowMany
+    buildFlag('choice', description, {
+      choices: ['alfa', 'bravo'],
+      default: ['alfa']
+    });
+
+    // @ts-expect-error Array defaults must contain valid choices
+    buildFlag('choice', description, {
+      allowMany: true,
+      choices: ['alfa', 'bravo'],
+      default: ['charlie']
     });
   });
 

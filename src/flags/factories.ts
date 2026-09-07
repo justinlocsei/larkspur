@@ -15,7 +15,17 @@ import type {
 /**
  * Constrain provided options to a flag's known options
  */
-type ValidOptions<T extends Flag, O> = Exact<FlagOptions<T>, O>;
+type ValidOptions<T extends Flag, O> =
+  & Exact<FlagOptions<T>, O>
+  & ValidDefaultOptions<O>;
+
+/**
+ * Require value lists for defaults of multi-value flags
+ */
+type ValidDefaultOptions<O> =
+  O extends { default: readonly unknown[] }
+    ? O extends { allowMany: true } ? O : never
+    : O;
 
 /**
  * Build a command flag
