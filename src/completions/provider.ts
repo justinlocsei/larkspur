@@ -1,24 +1,24 @@
-import { visibleCommands } from '../commands/data.js';
-import type { Command, CommandTree } from '../commands/types.js';
-import { formatList } from '../text.js';
-import type { Config, Context, Metadata } from '../types.js';
-import { sortEntries } from '../utils.js';
-import type { ScriptLines } from './scripts.js';
-import { formatScript } from './scripts.js';
-import type { SupportedShell } from './shells.js';
-import { getShellMetadata } from './shells.js';
+import { visibleCommands } from '../commands/data.ts';
+import type { Command, CommandTree } from '../commands/types.ts';
+import { formatList } from '../text.ts';
+import type { Config, Context, Metadata } from '../types.ts';
+import { sortEntries } from '../utils.ts';
+import type { ScriptLines } from './scripts.ts';
+import { formatScript } from './scripts.ts';
+import type { SupportedShell } from './shells.ts';
+import { getShellMetadata } from './shells.ts';
 
-export type { Command, CommandHandler } from '../commands/types.js';
+export type { Command, CommandHandler } from '../commands/types.ts';
 export {
   choicesForFlag,
   flagToSetter,
   getFlagForms,
   isScalarFlag,
   isSimpleScalarFlag
-} from '../flags/data.js';
-export { useSharedFlags } from '../flags/shared.js';
-export type { Flags } from '../flags/types.js';
-export type { FunctionType, NameGenerator } from './fns.js';
+} from '../flags/data.ts';
+export { useSharedFlags } from '../flags/shared.ts';
+export type { Flags } from '../flags/types.ts';
+export type { FunctionType, NameGenerator } from './fns.ts';
 
 export type { CommandTree, ScriptLines, SupportedShell };
 

@@ -1,7 +1,7 @@
 import { assert, describe, it } from 'vitest';
 
-import { coerceError, OperationalError } from './errors.js';
-import { checkConversion } from './tests.js';
+import { coerceError, OperationalError } from './errors.ts';
+import { checkConversion } from './tests.ts';
 
 describe('coerceError', () => {
   it('coerces a range of values to an error', () => {

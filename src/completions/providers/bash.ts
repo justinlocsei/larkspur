@@ -1,8 +1,8 @@
 // biome-ignore-all lint/suspicious/noTemplateCurlyInString: used for completion scripts
 
-import { compact, drain } from '../../utils.js';
-import { encodeFlagPath } from '../custom.js';
-import type { NameGenerator } from '../fns.js';
+import { compact, drain } from '../../utils.ts';
+import { encodeFlagPath } from '../custom.ts';
+import type { NameGenerator } from '../fns.ts';
 import type {
   Command,
   CommandHandler,
@@ -14,7 +14,7 @@ import type {
   FunctionType,
   ScriptLines,
   SupportedShell
-} from '../provider.js';
+} from '../provider.ts';
 import {
   CompletionProvider,
   choicesForFlag,
@@ -23,8 +23,8 @@ import {
   isScalarFlag,
   isSimpleScalarFlag,
   useSharedFlags
-} from '../provider.js';
-import { quote } from '../scripts.js';
+} from '../provider.ts';
+import { quote } from '../scripts.ts';
 
 /**
  * Generated completions

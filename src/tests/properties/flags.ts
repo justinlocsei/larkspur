@@ -1,14 +1,14 @@
 import { fc } from '@fast-check/vitest';
 
-import C from '../../factory.js';
+import C from '../../factory.ts';
 import type {
   BooleanFlag,
   ChoiceFlag,
   NumberFlag,
   PathFlag,
   StringFlag
-} from '../../flags/types.js';
-import { description, flagName } from './definition.js';
+} from '../../flags/types.ts';
+import { description, flagName } from './definition.ts';
 
 /**
  * Options for defining a flag arbitrary

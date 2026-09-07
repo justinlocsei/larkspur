@@ -1,9 +1,9 @@
 import { assert, describe, it } from 'vitest';
 
-import { checkConversion, createTestContext } from '../../tests.js';
-import type { FunctionType } from '../fns.js';
-import { BashCompletionProvider } from './bash.js';
-import { testProvider } from './tests.js';
+import { checkConversion, createTestContext } from '../../tests.ts';
+import type { FunctionType } from '../fns.ts';
+import { BashCompletionProvider } from './bash.ts';
+import { testProvider } from './tests.ts';
 
 describe('createNameGenerator', () => {
   it('produces names for completion functions', () => {

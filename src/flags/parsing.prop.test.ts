@@ -1,11 +1,11 @@
 import { fc, test } from '@fast-check/vitest';
 import { assert } from 'vitest';
 
-import { NormalizedArgs } from '../args.js';
-import C from '../factory.js';
-import { flagName } from '../tests/properties.js';
-import type { FlagParsing } from './parsing.js';
-import { parseFlags } from './parsing.js';
+import { NormalizedArgs } from '../args.ts';
+import C from '../factory.ts';
+import { flagName } from '../tests/properties.ts';
+import type { FlagParsing } from './parsing.ts';
+import { parseFlags } from './parsing.ts';
 
 const description = 'description';
 

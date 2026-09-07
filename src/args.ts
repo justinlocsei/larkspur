@@ -1,5 +1,5 @@
-import { flagToSetter, SETTER_PREFIX } from './flags/data.js';
-import { IDENTIFIER } from './validation.js';
+import { flagToSetter, SETTER_PREFIX } from './flags/data.ts';
+import { IDENTIFIER } from './validation.ts';
 
 const QUOTED = /^['"]([^'"]*)['"]$/;
 const COMBINED_FLAG = new RegExp(`^${SETTER_PREFIX}(${IDENTIFIER})=(.*)`);

@@ -1,9 +1,9 @@
 import { assert, describe, it } from 'vitest';
 
-import type { CommandTree } from '../../commands/types.js';
-import C from '../../factory.js';
-import { createTestContext } from '../../tests.js';
-import type { CompletionProviderClass } from '../provider.js';
+import type { CommandTree } from '../../commands/types.ts';
+import C from '../../factory.ts';
+import { createTestContext } from '../../tests.ts';
+import type { CompletionProviderClass } from '../provider.ts';
 
 /**
  * Create commands that cover the essential parts of the completion system

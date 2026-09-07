@@ -1,4 +1,4 @@
-import type { OneOrMany, Require } from '../types/utils.js';
+import type { OneOrMany, Require } from '../types/utils.ts';
 import type {
   BooleanFlag,
   ChoiceFlag,
@@ -11,7 +11,7 @@ import type {
   ScalarFlag,
   StringFlag,
   SupportedValue
-} from './types.js';
+} from './types.ts';
 
 /**
  * Flag fields that describe an implicit or explicit default value

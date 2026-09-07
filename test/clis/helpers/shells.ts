@@ -1,8 +1,8 @@
-import type { SupportedShell } from '../../../src/completions/shells.js';
-import { runBashCompletions } from './bash.js';
-import type { CompletionsTest, CompletionsTester } from './completions.js';
-import { testCompletions } from './completions.js';
-import { runZshCompletions } from './zsh.js';
+import type { SupportedShell } from '../../../src/completions/shells.ts';
+import { runBashCompletions } from './bash.ts';
+import type { CompletionsTest, CompletionsTester } from './completions.ts';
+import { testCompletions } from './completions.ts';
+import { runZshCompletions } from './zsh.ts';
 
 /**
  * A test case for completions

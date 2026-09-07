@@ -2,14 +2,14 @@ import type {
   ParsedCommand,
   ParsingResult,
   RunResult
-} from './commands/parsing.js';
-import { parseCommand } from './commands/parsing.js';
-import type { EntryPoint } from './commands/types.js';
-import { withCompletionCommands } from './completions/commands.js';
-import { coerceError, OperationalError } from './errors.js';
-import { buildHelp } from './help.js';
-import type { Context } from './types.js';
-import { validateCommands } from './validation.js';
+} from './commands/parsing.ts';
+import { parseCommand } from './commands/parsing.ts';
+import type { EntryPoint } from './commands/types.ts';
+import { withCompletionCommands } from './completions/commands.ts';
+import { coerceError, OperationalError } from './errors.ts';
+import { buildHelp } from './help.ts';
+import type { Context } from './types.ts';
+import { validateCommands } from './validation.ts';
 
 /**
  * A request to run a CLI

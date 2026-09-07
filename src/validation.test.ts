@@ -1,14 +1,14 @@
 import { assert, describe, it } from 'vitest';
 
-import type { CommandTree } from './commands/types.js';
-import { OperationalError } from './errors.js';
-import C from './factory.js';
-import { checkConversion, ensure } from './tests.js';
+import type { CommandTree } from './commands/types.ts';
+import { OperationalError } from './errors.ts';
+import C from './factory.ts';
+import { checkConversion, ensure } from './tests.ts';
 import {
   isValidCommandName,
   isValidFlagName,
   validateCommands
-} from './validation.js';
+} from './validation.ts';
 
 const description = 'description';
 const handler = async () => {};

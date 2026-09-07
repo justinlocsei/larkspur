@@ -2,10 +2,10 @@ import type {
   CompletionProvider,
   CompletionProviderClass,
   CompletionSource
-} from './provider.js';
-import { BashCompletionProvider } from './providers/bash.js';
-import { ZshCompletionProvider } from './providers/zsh.js';
-import type { SupportedShell } from './shells.js';
+} from './provider.ts';
+import { BashCompletionProvider } from './providers/bash.ts';
+import { ZshCompletionProvider } from './providers/zsh.ts';
+import type { SupportedShell } from './shells.ts';
 
 const PROVIDERS: Record<SupportedShell, CompletionProviderClass> = {
   bash: BashCompletionProvider,

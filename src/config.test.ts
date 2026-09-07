@@ -1,6 +1,6 @@
 import { assert, describe, it } from 'vitest';
 
-import { resolveConfig } from './config.js';
+import { resolveConfig } from './config.ts';
 
 describe('resolveConfig', () => {
   it('returns defaults for an empty configuration', () => {

@@ -1,4 +1,4 @@
-import type { EnvironmentVariables } from '../types.js';
+import type { EnvironmentVariables } from '../types.ts';
 
 export const SUPPORTED_SHELLS = ['bash', 'zsh'] as const;
 

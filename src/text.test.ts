@@ -1,8 +1,8 @@
 import { assert, describe, it } from 'vitest';
 
-import { checkConversion } from './tests.js';
-import type { ListJoiner } from './text.js';
-import { formatDescription, formatList } from './text.js';
+import { checkConversion } from './tests.ts';
+import type { ListJoiner } from './text.ts';
+import { formatDescription, formatList } from './text.ts';
 
 describe('formatDescription', () => {
   it('collapses newlines to spaces', () => {

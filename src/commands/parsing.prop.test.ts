@@ -1,10 +1,10 @@
 import { fc, test } from '@fast-check/vitest';
 import { assert } from 'vitest';
 
-import C from '../factory.js';
-import { argv, identifier, singleCommand } from '../tests/properties.js';
-import { parseCommand } from './parsing.js';
-import type { CommandTree } from './types.js';
+import C from '../factory.ts';
+import { argv, identifier, singleCommand } from '../tests/properties.ts';
+import { parseCommand } from './parsing.ts';
+import type { CommandTree } from './types.ts';
 
 const description = 'description';
 const handler = async () => {};

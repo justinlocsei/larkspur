@@ -1,4 +1,4 @@
-import { useTempDir } from '../../../src/tests.js';
+import { useTempDir } from '../../../src/tests.ts';
 
 import fs from 'node:fs/promises';
 import path from 'node:path';

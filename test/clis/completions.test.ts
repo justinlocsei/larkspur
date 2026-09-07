@@ -1,5 +1,5 @@
-import { listShells } from '../../src/completions/shells.js';
-import { assert, parseProvideOutput, test } from './helpers.js';
+import { listShells } from '../../src/completions/shells.ts';
+import { assert, parseProvideOutput, test } from './helpers.ts';
 
 test('completions', {
   ...Object.fromEntries(

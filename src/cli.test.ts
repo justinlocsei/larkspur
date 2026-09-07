@@ -1,11 +1,11 @@
 import { assert, describe, it } from 'vitest';
 
-import type { EntryPointProvider, RunOptions } from './cli.js';
-import { run } from './cli.js';
-import type { EntryPoint } from './commands/types.js';
-import { OperationalError } from './errors.js';
-import C from './factory.js';
-import { ensure, testLogging } from './tests.js';
+import type { EntryPointProvider, RunOptions } from './cli.ts';
+import { run } from './cli.ts';
+import type { EntryPoint } from './commands/types.ts';
+import { OperationalError } from './errors.ts';
+import C from './factory.ts';
+import { ensure, testLogging } from './tests.ts';
 
 const filename = import.meta.filename;
 

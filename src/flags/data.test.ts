@@ -1,7 +1,7 @@
 import { assert, describe, it } from 'vitest';
 
-import C from '../factory.js';
-import { checkConversion } from '../tests.js';
+import C from '../factory.ts';
+import { checkConversion } from '../tests.ts';
 import {
   choicesForFlag,
   flagToSetter,
@@ -9,8 +9,8 @@ import {
   isFlagSetter,
   isScalarFlag,
   isSimpleScalarFlag
-} from './data.js';
-import type { Flag, FlagChoices } from './types.js';
+} from './data.ts';
+import type { Flag, FlagChoices } from './types.ts';
 
 const description = 'description';
 

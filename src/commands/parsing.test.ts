@@ -1,19 +1,19 @@
 import { assert, describe, it } from 'vitest';
 
-import { OperationalError } from '../errors.js';
-import C from '../factory.js';
-import { extractValues } from '../flags/parsing.js';
-import type { Flag, SupportedValue } from '../flags/types.js';
+import { OperationalError } from '../errors.ts';
+import C from '../factory.ts';
+import { extractValues } from '../flags/parsing.ts';
+import type { Flag, SupportedValue } from '../flags/types.ts';
 import {
   checkConversionAsync,
   createTestContext,
   ensure,
   T
-} from '../tests.js';
-import type { DistributiveOmit } from '../types/utils.js';
-import { transformValues } from '../utils.js';
-import { parseCommand } from './parsing.js';
-import type { CommandTree } from './types.js';
+} from '../tests.ts';
+import type { DistributiveOmit } from '../types/utils.ts';
+import { transformValues } from '../utils.ts';
+import { parseCommand } from './parsing.ts';
+import type { CommandTree } from './types.ts';
 
 const description = 'description';
 const handler = async () => {};

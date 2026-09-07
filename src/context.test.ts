@@ -1,6 +1,6 @@
 import { assert, describe, it } from 'vitest';
 
-import { createContext } from './context.js';
+import { createContext } from './context.ts';
 
 describe('createContext', () => {
   it('combines metadata with configuration', () => {

@@ -1,13 +1,13 @@
-import type { CommandGroup, EntryPoint } from '../commands/types.js';
-import { OperationalError } from '../errors.js';
-import C from '../factory.js';
-import type { Context } from '../types.js';
+import type { CommandGroup, EntryPoint } from '../commands/types.ts';
+import { OperationalError } from '../errors.ts';
+import C from '../factory.ts';
+import type { Context } from '../types.ts';
 import {
   buildInstallationInstructions,
   buildShellCompletions
-} from './build.js';
-import { provideCompletions } from './custom.js';
-import { detectShell, SUPPORTED_SHELLS } from './shells.js';
+} from './build.ts';
+import { provideCompletions } from './custom.ts';
+import { detectShell, SUPPORTED_SHELLS } from './shells.ts';
 
 /**
  * Define a command group to manage completions

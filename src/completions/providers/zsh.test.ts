@@ -1,9 +1,9 @@
 import { assert, describe, it } from 'vitest';
 
-import { checkConversion, createTestContext } from '../../tests.js';
-import type { FunctionType } from '../fns.js';
-import { testProvider } from './tests.js';
-import { ZshCompletionProvider } from './zsh.js';
+import { checkConversion, createTestContext } from '../../tests.ts';
+import type { FunctionType } from '../fns.ts';
+import { testProvider } from './tests.ts';
+import { ZshCompletionProvider } from './zsh.ts';
 
 describe('createNameGenerator', () => {
   it('produces names for completion functions', () => {

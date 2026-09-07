@@ -1,11 +1,11 @@
 import { assert, describe, it } from 'vitest';
 
-import { listShells } from './completions/shells.js';
-import { OperationalError } from './errors.js';
-import C from './factory.js';
-import type { RunRequest } from './runner.js';
-import { runCLI } from './runner.js';
-import { createTestContext } from './tests.js';
+import { listShells } from './completions/shells.ts';
+import { OperationalError } from './errors.ts';
+import C from './factory.ts';
+import type { RunRequest } from './runner.ts';
+import { runCLI } from './runner.ts';
+import { createTestContext } from './tests.ts';
 
 const description = 'description';
 const handler = async () => {};

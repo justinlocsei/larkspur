@@ -1,13 +1,13 @@
 import { assert, describe, it } from 'vitest';
 
-import C from '../factory.js';
-import type { UserCompletion } from '../flags/types.js';
-import { createTestContext } from '../tests.js';
+import C from '../factory.ts';
+import type { UserCompletion } from '../flags/types.ts';
+import { createTestContext } from '../tests.ts';
 import {
   decodeFlagPath,
   encodeFlagPath,
   provideCompletions
-} from './custom.js';
+} from './custom.ts';
 
 const description = 'description';
 

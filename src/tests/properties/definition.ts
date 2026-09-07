@@ -1,6 +1,6 @@
 import { fc } from '@fast-check/vitest';
 
-import { IDENTIFIER_PATTERN, NEGATE_BOOLEAN } from '../../validation.js';
+import { IDENTIFIER_PATTERN, NEGATE_BOOLEAN } from '../../validation.ts';
 
 export const identifier = fc.stringMatching(IDENTIFIER_PATTERN);
 

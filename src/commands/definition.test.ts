@@ -1,8 +1,8 @@
 import { assert, describe, it } from 'vitest';
 
-import C from '../factory.js';
-import { T } from '../tests.js';
-import { defineCommandGroup, defineCommandHandler } from './definition.js';
+import C from '../factory.ts';
+import { T } from '../tests.ts';
+import { defineCommandGroup, defineCommandHandler } from './definition.ts';
 
 const description = 'description';
 const handler = async () => {};

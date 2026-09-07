@@ -1,7 +1,7 @@
 import { assert, describe, it } from 'vitest';
 
-import { NormalizedArgs } from './args.js';
-import { checkConversion } from './tests.js';
+import { NormalizedArgs } from './args.ts';
+import { checkConversion } from './tests.ts';
 
 describe('NormalizeArgs', () => {
   function checkArgs(tests: Array<[string[], string[]]>) {

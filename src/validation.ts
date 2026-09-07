@@ -1,9 +1,9 @@
-import type { Command, CommandTree } from './commands/types.js';
-import { OperationalError } from './errors.js';
-import { flagToSetter } from './flags/data.js';
-import { NEGATE_BOOLEAN } from './flags/names.js';
-import type { Flags } from './flags/types.js';
-import { drain, sortEntries } from './utils.js';
+import type { Command, CommandTree } from './commands/types.ts';
+import { OperationalError } from './errors.ts';
+import { flagToSetter } from './flags/data.ts';
+import { NEGATE_BOOLEAN } from './flags/names.ts';
+import type { Flags } from './flags/types.ts';
+import { drain, sortEntries } from './utils.ts';
 
 export { NEGATE_BOOLEAN };
 

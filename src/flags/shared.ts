@@ -1,5 +1,5 @@
-import { useFlags } from './definition.js';
-import type { Flags } from './types.js';
+import { useFlags } from './definition.ts';
+import type { Flags } from './types.ts';
 
 // Flags available to all commands in a tree
 const GLOBAL_FLAGS = useFlags({

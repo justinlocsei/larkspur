@@ -1,14 +1,14 @@
 import { assert, describe, it } from 'vitest';
 
-import { checkConversion } from '../tests.js';
-import type { EnvironmentVariables } from '../types.js';
-import type { SupportedShell } from './shells.js';
+import { checkConversion } from '../tests.ts';
+import type { EnvironmentVariables } from '../types.ts';
+import type { SupportedShell } from './shells.ts';
 import {
   detectShell,
   getShellMetadata,
   listShells,
   SHELL_VARIABLES
-} from './shells.js';
+} from './shells.ts';
 
 describe('detectShell', () => {
   it('uses environment variables to detect a supported shell', () => {

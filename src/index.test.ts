@@ -1,6 +1,6 @@
 import { assert, describe, it } from 'vitest';
 
-import C, { run } from './index.js';
+import C, { run } from './index.ts';
 
 describe('the public API', () => {
   it('exposes command factories', () => {

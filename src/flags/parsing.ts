@@ -1,10 +1,10 @@
-import type { NormalizedArgs } from '../args.js';
-import { expandPath } from '../paths.js';
-import type { OneOrMany } from '../types/utils.js';
-import { sortEntries } from '../utils.js';
-import { flagToSetter, isFlagSetter, isScalarFlag } from './data.js';
-import { NEGATE_BOOLEAN } from './names.js';
-import type { SharedFlags } from './shared.js';
+import type { NormalizedArgs } from '../args.ts';
+import { expandPath } from '../paths.ts';
+import type { OneOrMany } from '../types/utils.ts';
+import { sortEntries } from '../utils.ts';
+import { flagToSetter, isFlagSetter, isScalarFlag } from './data.ts';
+import { NEGATE_BOOLEAN } from './names.ts';
+import type { SharedFlags } from './shared.ts';
 import type {
   BooleanFlag,
   ChoiceFlag,
@@ -19,8 +19,8 @@ import type {
   ScalarValue,
   SimpleScalarFlag,
   StringFlag
-} from './types.js';
-import type { SpecificValueOf, ValueOf, ValuesOf } from './values.js';
+} from './types.ts';
+import type { SpecificValueOf, ValueOf, ValuesOf } from './values.ts';
 
 import path from 'node:path';
 

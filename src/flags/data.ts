@@ -1,10 +1,10 @@
-import { NEGATE_BOOLEAN } from './names.js';
+import { NEGATE_BOOLEAN } from './names.ts';
 import type {
   Flag,
   FlagChoices,
   ScalarFlag,
   SimpleScalarFlag
-} from './types.js';
+} from './types.ts';
 
 // The text used before a flag name to mark it as a setter
 export const SETTER_PREFIX = '--';

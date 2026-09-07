@@ -1,8 +1,8 @@
 import { assert, describe, it } from 'vitest';
 
-import { buildCommandHandler } from '../commands/factories.js';
-import { ensure, T } from '../tests.js';
-import { buildFlag } from './factories.js';
+import { buildCommandHandler } from '../commands/factories.ts';
+import { ensure, T } from '../tests.ts';
+import { buildFlag } from './factories.ts';
 import type {
   BooleanFlag,
   ChoiceFlag,
@@ -10,7 +10,7 @@ import type {
   NumberFlag,
   PathFlag,
   StringFlag
-} from './types.js';
+} from './types.ts';
 
 const description = 'description';
 

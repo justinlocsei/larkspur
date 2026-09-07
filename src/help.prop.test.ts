@@ -1,12 +1,12 @@
 import { test } from '@fast-check/vitest';
 
-import { buildHelp } from './help.js';
+import { buildHelp } from './help.ts';
 import {
   fetchCommandGroup,
   fetchCommandHandler
-} from './tests/properties/commands.js';
-import { entryPoint } from './tests/properties.js';
-import { createTestContext } from './tests.js';
+} from './tests/properties/commands.ts';
+import { entryPoint } from './tests/properties.ts';
+import { createTestContext } from './tests.ts';
 
 test.prop([entryPoint()])(
   'command trees always produce help messages',

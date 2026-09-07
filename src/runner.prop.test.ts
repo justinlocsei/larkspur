@@ -1,10 +1,10 @@
 import { test } from '@fast-check/vitest';
 import { assert } from 'vitest';
 
-import type { RunRequest, RunResponse } from './runner.js';
-import { runCLI } from './runner.js';
-import { argv, entryPoint, singleCommand } from './tests/properties.js';
-import { createTestContext, inspect } from './tests.js';
+import type { RunRequest, RunResponse } from './runner.ts';
+import { runCLI } from './runner.ts';
+import { argv, entryPoint, singleCommand } from './tests/properties.ts';
+import { createTestContext, inspect } from './tests.ts';
 
 async function mustRun(
   type: RunResponse['type'],

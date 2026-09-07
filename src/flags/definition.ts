@@ -1,4 +1,4 @@
-import type { Flag, Flags } from './types.js';
+import type { Flag, Flags } from './types.ts';
 
 /**
  * Treat an input value as a CLI flag

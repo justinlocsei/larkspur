@@ -1,4 +1,4 @@
-import type { DeepPartial } from './utils.js';
+import type { DeepPartial } from './utils.ts';
 
 /**
  * Formatting options for help messages

@@ -1,8 +1,8 @@
 import { assert, describe, it } from 'vitest';
 
-import { createTestContext } from '../tests.js';
-import { useProvider } from './providers.js';
-import { listShells } from './shells.js';
+import { createTestContext } from '../tests.ts';
+import { useProvider } from './providers.ts';
+import { listShells } from './shells.ts';
 
 describe('useProvider', () => {
   for (const shell of listShells()) {

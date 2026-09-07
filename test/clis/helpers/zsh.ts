@@ -2,8 +2,8 @@
 
 import { assert } from 'vitest';
 
-import { quote } from '../../../src/completions/scripts.js';
-import type { CompletionsTester } from './completions.js';
+import { quote } from '../../../src/completions/scripts.ts';
+import type { CompletionsTester } from './completions.ts';
 
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs/promises';

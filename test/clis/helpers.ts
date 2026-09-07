@@ -1,9 +1,9 @@
 import { assert, it } from 'vitest';
 
-import { parseCompletions } from '../../src/completions/output.js';
-import type { SupportedShell } from '../../src/completions/shells.js';
-import type { CompletionCase } from './helpers/shells.js';
-import { runShellCompletions } from './helpers/shells.js';
+import { parseCompletions } from '../../src/completions/output.ts';
+import type { SupportedShell } from '../../src/completions/shells.ts';
+import type { CompletionCase } from './helpers/shells.ts';
+import { runShellCompletions } from './helpers/shells.ts';
 
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';

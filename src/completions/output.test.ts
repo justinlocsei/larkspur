@@ -1,6 +1,6 @@
 import { assert, describe, it } from 'vitest';
 
-import { formatCompletions, parseCompletions } from './output.js';
+import { formatCompletions, parseCompletions } from './output.ts';
 
 describe('formatCompletions', () => {
   it('formats values as a newline-delimited list', () => {

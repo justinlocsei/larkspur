@@ -1,10 +1,10 @@
 import { assert, describe, it } from 'vitest';
 
-import type { HelpScope } from './commands/parsing.js';
-import C from './factory.js';
-import { buildHelp } from './help.js';
-import { createTestContext } from './tests.js';
-import type { Metadata } from './types.js';
+import type { HelpScope } from './commands/parsing.ts';
+import C from './factory.ts';
+import { buildHelp } from './help.ts';
+import { createTestContext } from './tests.ts';
+import type { Metadata } from './types.ts';
 
 async function handler() {}
 

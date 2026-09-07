@@ -1,7 +1,7 @@
 import { assert, describe, it } from 'vitest';
 
-import { T } from '../tests.js';
-import { buildCommandGroup, buildCommandHandler } from './factories.js';
+import { T } from '../tests.ts';
+import { buildCommandGroup, buildCommandHandler } from './factories.ts';
 
 const description = 'description';
 const handler = async () => {};

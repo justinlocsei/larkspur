@@ -1,4 +1,4 @@
-import { assert, test } from './helpers.js';
+import { assert, test } from './helpers.ts';
 
 test('basic', {
   'runs named commands': ({ checkOutput }) => {

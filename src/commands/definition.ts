@@ -1,5 +1,5 @@
-import type { Flags } from '../flags/types.js';
-import type { CommandGroup, CommandHandler } from './types.js';
+import type { Flags } from '../flags/types.ts';
+import type { CommandGroup, CommandHandler } from './types.ts';
 
 /**
  * A request for a command handler

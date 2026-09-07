@@ -1,6 +1,6 @@
 import { assert } from 'vitest';
 
-import { coerceError } from '../errors.js';
+import { coerceError } from '../errors.ts';
 
 /**
  * Add a message to an assertion error

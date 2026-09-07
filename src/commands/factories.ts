@@ -1,14 +1,14 @@
-import type { Flags } from '../flags/types.js';
+import type { Flags } from '../flags/types.ts';
 import type {
   CommandGroupRequest,
   CommandHandlerRequest
-} from './definition.js';
-import { defineCommandGroup, defineCommandHandler } from './definition.js';
+} from './definition.ts';
+import { defineCommandGroup, defineCommandHandler } from './definition.ts';
 import type {
   CommandHandler,
   CommandTree,
   CommmandHandlerFn
-} from './types.js';
+} from './types.ts';
 
 /**
  * Build a command handler

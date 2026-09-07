@@ -1,13 +1,13 @@
 import { assert, describe, it } from 'vitest';
 
-import { NormalizedArgs } from '../args.js';
-import C from '../factory.js';
-import { checkConversion, ensure, inspect } from '../tests.js';
-import type { DistributiveOmit } from '../types/utils.js';
-import { useFlag, useFlags } from './definition.js';
-import type { FlagParsing, ParsingOptions } from './parsing.js';
-import { extractValues, getSharedFlagValue, parseFlags } from './parsing.js';
-import { useSharedFlags } from './shared.js';
+import { NormalizedArgs } from '../args.ts';
+import C from '../factory.ts';
+import { checkConversion, ensure, inspect } from '../tests.ts';
+import type { DistributiveOmit } from '../types/utils.ts';
+import { useFlag, useFlags } from './definition.ts';
+import type { FlagParsing, ParsingOptions } from './parsing.ts';
+import { extractValues, getSharedFlagValue, parseFlags } from './parsing.ts';
+import { useSharedFlags } from './shared.ts';
 import type {
   Flags,
   ScalarValidator,
@@ -15,7 +15,7 @@ import type {
   SimpleFlag,
   SimpleScalarFlag,
   SupportedValue
-} from './types.js';
+} from './types.ts';
 
 import os from 'node:os';
 import path from 'node:path';

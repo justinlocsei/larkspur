@@ -1,24 +1,24 @@
-import { NormalizedArgs } from '../args.js';
-import { OperationalError } from '../errors.js';
-import type { FlagParsing, ParsedFlags } from '../flags/parsing.js';
+import { NormalizedArgs } from '../args.ts';
+import { OperationalError } from '../errors.ts';
+import type { FlagParsing, ParsedFlags } from '../flags/parsing.ts';
 import {
   extractValues,
   getSharedFlagValue,
   ParsingError,
   parseFlags
-} from '../flags/parsing.js';
-import { useSharedFlags } from '../flags/shared.js';
-import type { Flags } from '../flags/types.js';
-import type { ValuesOf } from '../flags/values.js';
-import type { Variant } from '../types/utils.js';
-import type { Context } from '../types.js';
-import { getCommand } from './data.js';
+} from '../flags/parsing.ts';
+import { useSharedFlags } from '../flags/shared.ts';
+import type { Flags } from '../flags/types.ts';
+import type { ValuesOf } from '../flags/values.ts';
+import type { Variant } from '../types/utils.ts';
+import type { Context } from '../types.ts';
+import { getCommand } from './data.ts';
 import type {
   ArgParsingDetails,
   CommandGroup,
   CommandHandler,
   CommandTree
-} from './types.js';
+} from './types.ts';
 
 /**
  * An executable command extracted from CLI args

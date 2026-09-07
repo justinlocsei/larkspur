@@ -1,6 +1,6 @@
-import type { CompletionSource } from './provider.js';
-import { useProvider } from './providers.js';
-import type { SupportedShell } from './shells.js';
+import type { CompletionSource } from './provider.ts';
+import { useProvider } from './providers.ts';
+import type { SupportedShell } from './shells.ts';
 
 /**
  * Build shell-specific completions for a CLI

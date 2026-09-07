@@ -1,18 +1,18 @@
 import { fc } from '@fast-check/vitest';
 
-import { getCommand } from '../../commands/data.js';
+import { getCommand } from '../../commands/data.ts';
 import type {
   Command,
   CommandGroup,
   CommandHandler,
   CommandTree
-} from '../../commands/types.js';
-import C from '../../factory.js';
-import type { Flags } from '../../flags/types.js';
-import type { Variant } from '../../types/utils.js';
-import { description, identifier } from './definition.js';
-import type { FlagOptions as FlagArbitraryOptions } from './flags.js';
-import { flags } from './flags.js';
+} from '../../commands/types.ts';
+import C from '../../factory.ts';
+import type { Flags } from '../../flags/types.ts';
+import type { Variant } from '../../types/utils.ts';
+import { description, identifier } from './definition.ts';
+import type { FlagOptions as FlagArbitraryOptions } from './flags.ts';
+import { flags } from './flags.ts';
 
 /**
  * A tree with a single command

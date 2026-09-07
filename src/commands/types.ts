@@ -1,7 +1,7 @@
-import type { ProvidedFlagNames } from '../flags/parsing.js';
-import type { FlagContext, Flags } from '../flags/types.js';
-import type { ValuesOf } from '../flags/values.js';
-import type { Context } from '../types.js';
+import type { ProvidedFlagNames } from '../flags/parsing.ts';
+import type { FlagContext, Flags } from '../flags/types.ts';
+import type { ValuesOf } from '../flags/values.ts';
+import type { Context } from '../types.ts';
 
 /**
  * Define a command

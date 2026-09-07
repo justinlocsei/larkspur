@@ -1,15 +1,15 @@
 import { afterEach, assert, describe, it, vi } from 'vitest';
 
-import type { ParsingResult } from '../commands/parsing.js';
-import { parseCommand } from '../commands/parsing.js';
-import type { EntryPoint } from '../commands/types.js';
-import C from '../factory.js';
-import { createTestContext, ensure } from '../tests.js';
+import type { ParsingResult } from '../commands/parsing.ts';
+import { parseCommand } from '../commands/parsing.ts';
+import type { EntryPoint } from '../commands/types.ts';
+import C from '../factory.ts';
+import { createTestContext, ensure } from '../tests.ts';
 import {
   defineCompletionCommands,
   withCompletionCommands
-} from './commands.js';
-import { listShells, SHELL_VARIABLES } from './shells.js';
+} from './commands.ts';
+import { listShells, SHELL_VARIABLES } from './shells.ts';
 
 function runCompletionCommand(args: string[]): ParsingResult {
   return parseCommand(['completions', ...args], {

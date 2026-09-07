@@ -1,6 +1,6 @@
-import { resolveConfig } from './config.js';
-import type { UserConfig } from './types/config.js';
-import type { Context, Metadata } from './types.js';
+import { resolveConfig } from './config.ts';
+import type { UserConfig } from './types/config.ts';
+import type { Context, Metadata } from './types.ts';
 
 /**
  * Build a CLI execution context

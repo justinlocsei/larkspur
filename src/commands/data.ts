@@ -1,4 +1,4 @@
-import type { Command, CommandTree } from './types.js';
+import type { Command, CommandTree } from './types.ts';
 
 /**
  * Get a named command from a tree

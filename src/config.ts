@@ -3,7 +3,7 @@ import type {
   Config,
   HelpConfig,
   UserConfig
-} from './types/config.js';
+} from './types/config.ts';
 
 /**
  * Build a full configuration object from user data

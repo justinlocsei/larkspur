@@ -1,4 +1,4 @@
-import type { DistributiveReadonly, Exact } from '../types/utils.js';
+import type { DistributiveReadonly, Exact } from '../types/utils.ts';
 import type {
   BooleanFlag,
   ChoiceFlag,
@@ -10,7 +10,7 @@ import type {
   ScalarValue,
   SimpleFlag,
   StringFlag
-} from './types.js';
+} from './types.ts';
 
 /**
  * Constrain provided options to a flag's known options

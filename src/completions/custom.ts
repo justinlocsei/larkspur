@@ -1,10 +1,10 @@
-import { getCommand } from '../commands/data.js';
-import type { CommandHandler, CommandTree } from '../commands/types.js';
-import { isSimpleScalarFlag } from '../flags/data.js';
-import type { SimpleScalarFlag } from '../flags/types.js';
-import type { Require } from '../types/utils.js';
-import { formatCompletions } from './output.js';
-import type { CompletionSource } from './provider.js';
+import { getCommand } from '../commands/data.ts';
+import type { CommandHandler, CommandTree } from '../commands/types.ts';
+import { isSimpleScalarFlag } from '../flags/data.ts';
+import type { SimpleScalarFlag } from '../flags/types.ts';
+import type { Require } from '../types/utils.ts';
+import { formatCompletions } from './output.ts';
+import type { CompletionSource } from './provider.ts';
 
 /**
  * Encode a path to a command flag

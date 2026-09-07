@@ -1,7 +1,7 @@
 import { assert, describe, it } from 'vitest';
 
-import { expandPath } from './paths.js';
-import { checkConversion } from './tests.js';
+import { expandPath } from './paths.ts';
+import { checkConversion } from './tests.ts';
 
 import { homedir } from 'node:os';
 import path from 'node:path';

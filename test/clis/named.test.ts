@@ -1,4 +1,4 @@
-import { assert, test } from './helpers.js';
+import { assert, test } from './helpers.ts';
 
 test('named', {
   'shows the custom name': ({ checkOutput }) => {

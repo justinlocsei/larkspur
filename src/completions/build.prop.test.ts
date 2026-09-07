@@ -1,10 +1,10 @@
 import { fc, test } from '@fast-check/vitest';
 import { assert } from 'vitest';
 
-import { description, entryPoint } from '../tests/properties.js';
-import { createTestContext } from '../tests.js';
-import { buildShellCompletions } from './build.js';
-import { SUPPORTED_SHELLS } from './shells.js';
+import { description, entryPoint } from '../tests/properties.ts';
+import { createTestContext } from '../tests.ts';
+import { buildShellCompletions } from './build.ts';
+import { SUPPORTED_SHELLS } from './shells.ts';
 
 for (const shell of SUPPORTED_SHELLS) {
   test.prop([fc.string(), description, entryPoint()])(

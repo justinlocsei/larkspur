@@ -1,13 +1,13 @@
-import { visibleCommands } from './commands/data.js';
-import type { HelpScope } from './commands/parsing.js';
-import type { CommandTree } from './commands/types.js';
-import { choicesForFlag, flagToSetter } from './flags/data.js';
-import { NEGATE_BOOLEAN } from './flags/names.js';
-import { useSharedFlags } from './flags/shared.js';
-import type { Flag, Flags } from './flags/types.js';
-import { formatDescription } from './text.js';
-import type { Context } from './types.js';
-import { compact, isEmpty, sortEntries, transformValues } from './utils.js';
+import { visibleCommands } from './commands/data.ts';
+import type { HelpScope } from './commands/parsing.ts';
+import type { CommandTree } from './commands/types.ts';
+import { choicesForFlag, flagToSetter } from './flags/data.ts';
+import { NEGATE_BOOLEAN } from './flags/names.ts';
+import { useSharedFlags } from './flags/shared.ts';
+import type { Flag, Flags } from './flags/types.ts';
+import { formatDescription } from './text.ts';
+import type { Context } from './types.ts';
+import { compact, isEmpty, sortEntries, transformValues } from './utils.ts';
 
 /**
  * A flag formatted for display

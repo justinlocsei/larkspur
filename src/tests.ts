@@ -1,14 +1,14 @@
-import type { LogLevel } from './cli.js';
-import { createContext } from './context.js';
-import type { UserConfig } from './types/config.js';
-import type { Context, Metadata } from './types.js';
+import type { LogLevel } from './cli.ts';
+import { createContext } from './context.ts';
+import type { UserConfig } from './types/config.ts';
+import type { Context, Metadata } from './types.ts';
 
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 
-export * as ensure from './tests/assertions.js';
-export * as T from './tests/types.js';
+export * as ensure from './tests/assertions.ts';
+export * as T from './tests/types.ts';
 
 /**
  * Produce a readable representation of an object

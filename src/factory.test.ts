@@ -1,6 +1,6 @@
 import { assert, describe, it } from 'vitest';
 
-import C from './factory.js';
+import C from './factory.ts';
 
 const description = 'description';
 const handler = async () => {};

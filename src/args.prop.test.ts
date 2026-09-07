@@ -1,8 +1,8 @@
 import { test } from '@fast-check/vitest';
 import { assert } from 'vitest';
 
-import { NormalizedArgs } from './args.js';
-import { argv } from './tests/properties.js';
+import { NormalizedArgs } from './args.ts';
+import { argv } from './tests/properties.ts';
 
 test.prop([argv])('normalization is idempotent', args => {
   const normalized = new NormalizedArgs(args).args;

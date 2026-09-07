@@ -1,6 +1,6 @@
-import { checkConversion } from '../../src/tests.js';
-import type { TestActions } from './helpers.js';
-import { assert, test } from './helpers.js';
+import { checkConversion } from '../../src/tests.ts';
+import type { TestActions } from './helpers.ts';
+import { assert, test } from './helpers.ts';
 
 function checkFlags(
   { run }: TestActions,

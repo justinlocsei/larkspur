@@ -1,8 +1,8 @@
 import { describe, it } from 'vitest';
 
-import { T } from '../tests.js';
-import { useFlag, useFlags } from './definition.js';
-import type { ValueOf, ValuesOf } from './values.js';
+import { T } from '../tests.ts';
+import { useFlag, useFlags } from './definition.ts';
+import type { ValueOf, ValuesOf } from './values.ts';
 
 const description = 'description';
 

@@ -1,8 +1,8 @@
 import {
   buildCommandGroup,
   buildCommandHandler
-} from './commands/factories.js';
-import { buildFlag } from './flags/factories.js';
+} from './commands/factories.ts';
+import { buildFlag } from './flags/factories.ts';
 
 /**
  * A factory for CLI commands and supporting types

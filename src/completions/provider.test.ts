@@ -1,10 +1,10 @@
 import { assert, describe, it } from 'vitest';
 
-import C from '../factory.js';
-import { createTestContext } from '../tests.js';
-import type { CompletionScript } from './provider.js';
-import { CompletionProvider } from './provider.js';
-import type { SupportedShell } from './shells.js';
+import C from '../factory.ts';
+import { createTestContext } from '../tests.ts';
+import type { CompletionScript } from './provider.ts';
+import { CompletionProvider } from './provider.ts';
+import type { SupportedShell } from './shells.ts';
 
 class TestCompletionProvider extends CompletionProvider {
   buildInstallationInstructions(): string {

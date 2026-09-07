@@ -1,6 +1,6 @@
 import { assert, describe, it } from 'vitest';
 
-import { useSharedFlags } from './shared.js';
+import { useSharedFlags } from './shared.ts';
 
 describe('useSharedFlags', () => {
   it('returns the global flags', () => {

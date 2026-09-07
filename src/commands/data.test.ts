@@ -1,8 +1,8 @@
 import { assert, describe, it } from 'vitest';
 
-import C from '../factory.js';
-import { getCommand, visibleCommands } from './data.js';
-import type { CommandTree } from './types.js';
+import C from '../factory.ts';
+import { getCommand, visibleCommands } from './data.ts';
+import type { CommandTree } from './types.ts';
 
 const handler = async () => {};
 
