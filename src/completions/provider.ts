@@ -10,7 +10,8 @@ export {
   choicesForFlag,
   flagToSetter,
   getFlagForms,
-  isScalarFlag
+  isScalarFlag,
+  isSimpleScalarFlag
 } from '../flags/data.js';
 export { useSharedFlags } from '../flags/shared.js';
 export type { Flags } from '../flags/types.js';
