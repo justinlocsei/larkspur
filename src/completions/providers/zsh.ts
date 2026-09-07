@@ -19,6 +19,7 @@ import {
   flagToSetter,
   getFlagForms,
   isScalarFlag,
+  isSimpleScalarFlag,
   useSharedFlags
 } from '../provider.js';
 import { quote } from '../scripts.js';
@@ -138,7 +139,7 @@ export class ZshCompletionProvider extends CompletionProvider {
 
         if (command.type === 'handler' && command.flags) {
           for (const [flagName, flag] of sortEntries(command.flags)) {
-            if (isScalarFlag(flag) && flag.completion) {
+            if (isSimpleScalarFlag(flag) && flag.completion) {
               functions.push(this.buildUserFunction(flagName, path));
             }
           }
@@ -290,7 +291,7 @@ export class ZshCompletionProvider extends CompletionProvider {
   private renderValueSpec(name: string, flag: Flag, levels: string[]): string {
     const value = `:${flag.type}:`;
 
-    if (isScalarFlag(flag) && flag.completion) {
+    if (isSimpleScalarFlag(flag) && flag.completion) {
       return `${value}${this.fns('user_fn', [...levels, name])}`;
     }
 

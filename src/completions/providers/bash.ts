@@ -20,6 +20,7 @@ import {
   flagToSetter,
   getFlagForms,
   isScalarFlag,
+  isSimpleScalarFlag,
   useSharedFlags
 } from '../provider.js';
 import { quote } from '../scripts.js';
@@ -391,7 +392,7 @@ export class BashCompletionProvider extends CompletionProvider {
 
     const customCompletions = Object.entries(flags).reduce(
       (previous: CustomCompletions, [name, flag]) => {
-        if (isScalarFlag(flag) && flag.completion) {
+        if (isSimpleScalarFlag(flag) && flag.completion) {
           previous[name] = encodeFlagPath(levels, name);
         }
 
