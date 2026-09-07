@@ -39,17 +39,26 @@ export type UserCompletion = (
  */
 type ScalarFields = {
   allowMany?: boolean;
-  completion?: UserCompletion;
   required?: true;
+};
+
+/**
+ * A flag that provides completions
+ */
+export type CompletionProvider = {
+  completion?: UserCompletion;
 };
 
 /**
  * Options for simple scalar flags
  */
-export type SimpleScalarOptions<T extends ScalarValue> = ScalarFields & {
-  default?: T;
-  isValid?: ScalarValidator<T>;
-};
+export type SimpleScalarOptions<T extends ScalarValue> =
+  & ScalarFields
+  & CompletionProvider
+  & {
+    default?: T;
+    isValid?: ScalarValidator<T>;
+  };
 
 /**
  * Define a simple scalar flag
