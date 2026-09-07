@@ -1,7 +1,11 @@
 import { assert, describe, it } from 'vitest';
 
 import { T } from '../tests.ts';
-import { buildCommandGroup, buildCommandHandler } from './factories.ts';
+import {
+  buildCommandGroup,
+  buildCommandHandler,
+  buildCommandTree
+} from './factories.ts';
 
 const description = 'description';
 const handler = async () => {};
@@ -106,5 +110,19 @@ describe('buildCommandGroup', () => {
     assert.equal(group.description, description);
     assert.equal(group.type, 'group');
     assert.isDefined(group.subcommands.child);
+  });
+});
+
+describe('buildCommandTree', () => {
+  it('returns the given command tree', () => {
+    const tree = buildCommandTree({
+      child: buildCommandHandler(description, handler)
+    });
+
+    const { child } = tree;
+
+    assert.isDefined(child);
+    assert.equal(child.description, description);
+    assert.equal(child.type, 'handler');
   });
 });

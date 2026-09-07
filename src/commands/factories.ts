@@ -65,3 +65,10 @@ export function buildCommandGroup(
     ? defineCommandGroup({ description, subcommands })
     : defineCommandGroup(description);
 }
+
+/**
+ * Build a command tree
+ */
+export function buildCommandTree(tree: CommandTree): CommandTree {
+  return tree;
+}
