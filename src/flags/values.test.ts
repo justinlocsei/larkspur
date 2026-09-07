@@ -1,5 +1,6 @@
 import { describe, it } from 'vitest';
 
+import C from '../factory.ts';
 import { T } from '../tests.ts';
 import { useFlag, useFlags } from './definition.ts';
 import type { ValueOf, ValuesOf } from './values.ts';
@@ -154,6 +155,30 @@ describe('ValuesOf', () => {
           number: number;
           path?: string;
           string: string;
+        },
+        ValuesOf<typeof flags, 'narrow'>
+      >
+    >(true);
+  });
+
+  it('marks array defaults as guaranteed repeatable values', () => {
+    const flags = useFlags({
+      numbers: C.flag('number', description, {
+        allowMany: true,
+        default: [1, 2]
+      }),
+      choices: C.flag('choice', description, {
+        allowMany: true,
+        choices: ['alfa', 'bravo'],
+        default: ['alfa', 'bravo']
+      })
+    });
+
+    T.assert<
+      T.Equivalent<
+        {
+          choices: Array<'alfa' | 'bravo'>;
+          numbers: number[];
         },
         ValuesOf<typeof flags, 'narrow'>
       >

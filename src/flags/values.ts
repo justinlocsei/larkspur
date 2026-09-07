@@ -9,14 +9,13 @@ import type {
   NumberFlag,
   PathFlag,
   ScalarFlag,
-  StringFlag,
-  SupportedValue
+  StringFlag
 } from './types.ts';
 
 /**
  * Flag fields that describe an implicit or explicit default value
  */
-type DefaultFields = BooleanFlag | { default: SupportedValue };
+type DefaultFields = BooleanFlag | { default: unknown };
 
 /**
  * Flag fields that guarantee the presence of a value after parsing
