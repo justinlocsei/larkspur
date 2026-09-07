@@ -9,10 +9,11 @@ export default C({
   flags: {
     suite: C.flag('choice', 'Only run the given test suites', {
       allowMany: true,
-      choices: SUITES
+      choices: SUITES,
+      default: SUITES
     })
   },
-  handler: async ({ suite: suites = SUITES }, { args }) => {
+  handler: async ({ suite: suites }, { args }) => {
     for (const suite of suites) {
       run(
         'vitest',

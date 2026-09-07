@@ -8,10 +8,11 @@ export default C(
   {
     only: C.flag('choice', 'Only run the given checks', {
       allowMany: true,
-      choices: CHECKS
+      choices: CHECKS,
+      default: CHECKS
     })
   },
-  async ({ only = CHECKS }) => {
+  async ({ only }) => {
     if (only.includes('code')) {
       run('biome', 'lint', '.');
     }
