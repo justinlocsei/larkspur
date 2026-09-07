@@ -2,7 +2,7 @@
 
 import { assert } from 'vitest';
 
-import { createNameGenerator } from '../../../src/completions/fns.js';
+import { BashCompletionProvider } from '../../../src/completions/providers/bash.js';
 import { quote } from '../../../src/completions/scripts.js';
 import type { CompletionsTester } from './completions.js';
 
@@ -29,7 +29,7 @@ export const runBashCompletions: CompletionsTester = async (run) => {
     `COMP_LINE=${quote(args.join(' '))}`,
     `COMP_WORDS=(${words})`,
     inputs.at(-1) === ' ' ? 'COMP_WORDS+=("")' : '',
-    createNameGenerator(cliName)('entry'),
+    BashCompletionProvider.createNameGenerator(cliName)('entry'),
     'printf "%s\\n" "${COMPREPLY[@]}"'
   ].join('\n');
 

@@ -2,7 +2,7 @@
 
 import { assert } from 'vitest';
 
-import { createNameGenerator } from '../../../src/completions/fns.js';
+import { ZshCompletionProvider } from '../../../src/completions/providers/zsh.js';
 import { quote } from '../../../src/completions/scripts.js';
 import type { CompletionsTester } from './completions.js';
 
@@ -87,7 +87,10 @@ function parseZshCompletionReply(output: string): string[] {
 export const runZshCompletions: CompletionsTester = async (run) => {
   const { cliName, dir, inputs } = run;
 
-  const entryPoint = createNameGenerator(cliName)('entry');
+  const entryPoint = ZshCompletionProvider.createNameGenerator(cliName)(
+    'entry'
+  );
+
   const lines = run.script.split('\n');
 
   if (lines[0]?.startsWith('#compdef')) {
