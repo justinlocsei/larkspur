@@ -7,18 +7,11 @@ type CoreFlagFields<T extends string> = {
 };
 
 /**
- * Optional fields shared by all flags
- */
-type OptionalFlagFields<T> = {
-  default?: T;
-};
-
-/**
  * Define a flag
  */
 type IsFlag<TType extends string, TValue> =
   & CoreFlagFields<TType>
-  & OptionalFlagFields<TValue>;
+  & { default?: TValue };
 
 /**
  * The context for a user-provided completion function
@@ -56,7 +49,7 @@ export type SimpleScalarOptions<T extends ScalarValue> =
   & ScalarFields
   & CompletionProvider
   & {
-    default?: T;
+    default?: DefaultFor<T>;
     isValid?: ScalarValidator<T>;
   };
 
@@ -64,7 +57,7 @@ export type SimpleScalarOptions<T extends ScalarValue> =
  * Define a simple scalar flag
  */
 type IsSimpleScalarFlag<T extends string, V extends ScalarValue> =
-  & IsFlag<T, V>
+  & CoreFlagFields<T>
   & SimpleScalarOptions<V>;
 
 /**
@@ -100,9 +93,12 @@ export type StringFlag = IsSimpleScalarFlag<'string', string>;
 export type ChoiceFlag<
   C extends readonly ScalarValue[] = readonly ScalarValue[]
 > =
-  & IsFlag<'choice', C[number]>
+  & CoreFlagFields<'choice'>
   & ScalarFields
-  & { choices: C };
+  & {
+    choices: C;
+    default?: DefaultFor<C[number]>;
+  };
 
 /**
  * Get the values for a choice flag
@@ -143,6 +139,11 @@ export type IsRequired<T extends Flag> = T & { required: true };
  * A value for a scalar flag
  */
 export type ScalarValue = number | string;
+
+/**
+ * The accepted default value for a scalar flag
+ */
+type DefaultFor<T extends ScalarValue> = T | readonly T[];
 
 /**
  * The most inclusive value for all supported flags
