@@ -2,7 +2,6 @@
 
 import { assert } from 'vitest';
 
-import { ZshCompletionProvider } from '../../../src/completions/providers/zsh.js';
 import { quote } from '../../../src/completions/scripts.js';
 import type { CompletionsTester } from './completions.js';
 
@@ -15,7 +14,6 @@ import path from 'node:path';
  */
 function renderHarness(
   completionPath: string,
-  entryPoint: string,
   cliName: string,
   inputs: string[],
   preamble: string[]
@@ -32,7 +30,6 @@ function renderHarness(
     'autoload -Uz compinit',
     'compinit -C -D',
     `source ${quote(completionPath)}`,
-    `compdef ${entryPoint} ${quote(cliName)}`,
     'typeset -aU completions=()',
     'compadd() {',
     '  local -a reply',
@@ -87,36 +84,14 @@ function parseZshCompletionReply(output: string): string[] {
 export const runZshCompletions: CompletionsTester = async (run) => {
   const { cliName, dir, inputs } = run;
 
-  const entryPoint = ZshCompletionProvider.createNameGenerator(cliName)(
-    'entry'
-  );
-
-  const lines = run.script.split('\n');
-
-  if (lines[0]?.startsWith('#compdef')) {
-    lines.shift();
-  }
-
-  const entryIndex = lines.findLastIndex(line => line.match(/^(\S+) "\$@"$/));
-
-  if (entryIndex >= 0) {
-    lines.splice(entryIndex, 1);
-  }
-
   const completionPath = path.join(dir, 'completion.zsh');
   const harnessPath = path.join(dir, 'harness.zsh');
 
-  await fs.writeFile(completionPath, lines.join('\n'));
+  await fs.writeFile(completionPath, run.script);
 
   await fs.writeFile(
     harnessPath,
-    renderHarness(
-      completionPath,
-      entryPoint,
-      cliName,
-      inputs,
-      run.preamble
-    )
+    renderHarness(completionPath, cliName, inputs, run.preamble)
   );
 
   const { status, stderr, stdout } = spawnSync('zsh', [harnessPath], {
