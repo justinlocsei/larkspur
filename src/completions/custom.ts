@@ -1,7 +1,7 @@
 import { getCommand } from '../commands/data.js';
 import type { CommandHandler, CommandTree } from '../commands/types.js';
-import { isScalarFlag } from '../flags/data.js';
-import type { ScalarFlag } from '../flags/types.js';
+import { isSimpleScalarFlag } from '../flags/data.js';
+import type { SimpleScalarFlag } from '../flags/types.js';
 import type { Require } from '../types/utils.js';
 import { formatCompletions } from './output.js';
 import type { CompletionSource } from './provider.js';
@@ -41,7 +41,7 @@ export function decodeFlagPath(
 /**
  * A flag with a user completion function
  */
-type CompletionFlag = Require<ScalarFlag, 'completion'>;
+type CompletionFlag = Require<SimpleScalarFlag, 'completion'>;
 
 /**
  * A resolved flag with a user completion function
@@ -98,7 +98,7 @@ function resolveFlag(
     ? command.flags[decoded.flag]
     : undefined;
 
-  return flag && isScalarFlag(flag) && flag.completion
+  return flag && isSimpleScalarFlag(flag) && flag.completion
     ? { command, flag: flag as CompletionFlag }
     : undefined;
 }
