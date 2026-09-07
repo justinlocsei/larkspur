@@ -128,13 +128,13 @@ describe('buildFlag', () => {
     assert.isDefined(command.flags?.value);
   });
 
-  it('supports custom completions on choice flags', () => {
-    const flag = buildFlag('choice', description, {
+  it('forbids custom completions on choice flags', () => {
+    // @ts-expect-error Choice flags cannot be built with completions
+    buildFlag('choice', description, {
       choices: ['alfa', 'bravo'],
+      // @ts-expect-error Completion functions are forbidden
       completion: ({ current }) => [current]
     });
-
-    assert.isFunction(flag.completion);
   });
 
   it('supports choice flags', () => {
