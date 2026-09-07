@@ -143,7 +143,7 @@ export type ScalarValue = number | string;
 /**
  * The accepted default value for a scalar flag
  */
-type DefaultFor<T extends ScalarValue> = T | readonly T[];
+export type DefaultFor<T extends ScalarValue> = T | readonly T[];
 
 /**
  * The most inclusive value for all supported flags
