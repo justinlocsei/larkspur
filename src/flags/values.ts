@@ -2,6 +2,7 @@ import type { OneOrMany, Require } from '../types/utils.ts';
 import type {
   BooleanFlag,
   ChoiceFlag,
+  DefaultFor,
   Flag,
   FlagContext,
   Flags,
@@ -9,6 +10,7 @@ import type {
   NumberFlag,
   PathFlag,
   ScalarFlag,
+  ScalarValue,
   StringFlag
 } from './types.ts';
 
@@ -62,3 +64,12 @@ export type ValuesOf<
   { [K in keyof TFlags]?: ValueOf<TFlags[K], TContext> },
   NamesOf<TFlags, GuaranteedFields>
 >;
+
+/**
+ * Determine whether a default value is a multi-value one
+ */
+export function isMultiValueDefault<T extends ScalarValue>(
+  value: DefaultFor<T>
+): value is readonly T[] {
+  return Array.isArray(value);
+}

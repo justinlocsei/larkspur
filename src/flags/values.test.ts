@@ -1,9 +1,11 @@
-import { describe, it } from 'vitest';
+import { assert, describe, it } from 'vitest';
 
 import C from '../factory.ts';
 import { T } from '../tests.ts';
 import { useFlag, useFlags } from './definition.ts';
+import type { DefaultFor } from './types.ts';
 import type { ValueOf, ValuesOf } from './values.ts';
+import { isMultiValueDefault } from './values.ts';
 
 const description = 'description';
 
@@ -183,5 +185,25 @@ describe('ValuesOf', () => {
         ValuesOf<typeof flags, 'narrow'>
       >
     >(true);
+  });
+});
+
+describe('isMultiValueDefault', () => {
+  it('returns true for array defaults', () => {
+    assert.isTrue(isMultiValueDefault([1, 2]));
+    assert.isTrue(isMultiValueDefault(['alfa', 'bravo']));
+  });
+
+  it('returns false for scalar defaults', () => {
+    assert.isFalse(isMultiValueDefault(1));
+    assert.isFalse(isMultiValueDefault('alfa'));
+  });
+
+  it('preserves the type of an array value', () => {
+    const numbers: DefaultFor<number> = [1, 2];
+
+    if (isMultiValueDefault(numbers)) {
+      T.assert<T.Equivalent<typeof numbers, readonly number[]>>(true);
+    }
   });
 });
