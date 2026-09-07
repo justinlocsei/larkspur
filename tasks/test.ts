@@ -3,20 +3,26 @@ import { run } from './helpers.ts';
 
 const SUITES = ['integration', 'properties', 'unit'] as const;
 
-const test = (project: string) =>
-  run('vitest', 'run', '--project', project, '--reporter', 'verbose');
-
-export default C(
-  'Run tests',
-  {
+export default C({
+  allowUnused: true,
+  description: 'Run tests',
+  flags: {
     suite: C.flag('choice', 'Only run the given test suites', {
       allowMany: true,
       choices: SUITES
     })
   },
-  async ({ suite: suites = SUITES }) => {
+  handler: async ({ suite: suites = SUITES }, { args }) => {
     for (const suite of suites) {
-      test(suite);
+      run(
+        'vitest',
+        'run',
+        '--project',
+        suite,
+        '--reporter',
+        'verbose',
+        ...args.extra
+      );
     }
   }
-);
+});
