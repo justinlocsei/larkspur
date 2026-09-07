@@ -5,6 +5,7 @@ import { choicesForFlag, flagToSetter } from './flags/data.js';
 import { NEGATE_BOOLEAN } from './flags/names.js';
 import { useSharedFlags } from './flags/shared.js';
 import type { Flag, Flags } from './flags/types.js';
+import { formatDescription } from './text.js';
 import type { Context } from './types.js';
 import { compact, isEmpty, sortEntries, transformValues } from './utils.js';
 
@@ -75,21 +76,21 @@ function scopeToDisplay(
       return {
         commands: {},
         path: scope.path,
-        title: scope.command.description
+        title: formatDescription(scope.command.description)
       };
 
     case 'group':
       return {
         commands: visibleCommands(scope.group.subcommands),
         path: scope.path,
-        title: scope.group.description
+        title: formatDescription(scope.group.description)
       };
 
     case 'root':
       return {
         commands: visibleCommands(scope.commands),
         path: [],
-        title: description
+        title: description && formatDescription(description)
       };
   }
 }
@@ -179,7 +180,7 @@ class HelpMessage {
         const { description } = command;
 
         return {
-          description,
+          description: formatDescription(description),
           label: compact([id, command.type === 'group' && '<command>']).join(
             ' '
           )
@@ -297,7 +298,7 @@ class HelpMessage {
       this.indent,
       setter.padEnd(offset),
       this.gutter,
-      flag.description
+      formatDescription(flag.description)
     ].join('');
 
     const extra: string[] = [];
