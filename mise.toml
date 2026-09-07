@@ -1,2 +1,2 @@
 [env]
-_.path = "./test/clis/bin"
+_.path = ["./bin", "./test/clis/bin"]
