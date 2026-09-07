@@ -1,7 +1,7 @@
 // biome-ignore-all lint/suspicious/noTemplateCurlyInString: used for completion scripts
 
 import type { Flag, Flags } from '../../flags/types.js';
-import { formatDescription, formatList } from '../../text.js';
+import { formatDescription } from '../../text.js';
 import { compact, sortEntries, transformValues } from '../../utils.js';
 import { encodeFlagPath } from '../custom.js';
 import type { NameGenerator } from '../fns.js';
@@ -12,7 +12,8 @@ import type {
   CompletionScript,
   CompletionSource,
   FunctionType,
-  ScriptLines
+  ScriptLines,
+  SupportedShell
 } from '../provider.js';
 import {
   CompletionProvider,
@@ -24,7 +25,6 @@ import {
   useSharedFlags
 } from '../provider.js';
 import { quote } from '../scripts.js';
-import { getShellMetadata } from '../shells.js';
 
 /**
  * A stack frame used when building command completions
@@ -81,14 +81,11 @@ export class ZshCompletionProvider extends CompletionProvider {
    * Show source and fpath installation instructions
    */
   buildInstallationInstructions(): string {
-    const { group } = this.config.completion;
-
-    const profiles = formatList(getShellMetadata('zsh').profiles, 'or');
-    const generate = `${this.cli.name} ${group} generate --shell zsh`;
+    const generate = this.generateCommand();
     const fpath = `~/.zsh/completions`;
 
     return `
-Add the following to your zsh profile (${profiles}):
+Add the following to your zsh profile (${this.listProfiles()}):
 
   autoload -Uz compinit
   compinit
@@ -106,6 +103,13 @@ the generated script and refresh it when the CLI changes:
 Then add this line before loading compinit:
 
   fpath=(${fpath} $fpath)`.trim();
+  }
+
+  /**
+   * Provide the current shell
+   */
+  protected provideShell(): SupportedShell {
+    return 'zsh';
   }
 
   /**

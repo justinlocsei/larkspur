@@ -4,10 +4,15 @@ import C from '../factory.js';
 import { createTestContext } from '../tests.js';
 import type { CompletionScript } from './provider.js';
 import { CompletionProvider } from './provider.js';
+import type { SupportedShell } from './shells.js';
 
 class TestCompletionProvider extends CompletionProvider {
   buildInstallationInstructions(): string {
     return '';
+  }
+
+  protected provideShell(): SupportedShell {
+    return 'bash';
   }
 
   provideScript(): CompletionScript {

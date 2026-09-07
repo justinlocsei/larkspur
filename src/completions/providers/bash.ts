@@ -1,6 +1,5 @@
 // biome-ignore-all lint/suspicious/noTemplateCurlyInString: used for completion scripts
 
-import { formatList } from '../../text.js';
 import { compact, drain } from '../../utils.js';
 import { encodeFlagPath } from '../custom.js';
 import type { NameGenerator } from '../fns.js';
@@ -13,7 +12,8 @@ import type {
   CompletionSource,
   Flags,
   FunctionType,
-  ScriptLines
+  ScriptLines,
+  SupportedShell
 } from '../provider.js';
 import {
   CompletionProvider,
@@ -25,7 +25,6 @@ import {
   useSharedFlags
 } from '../provider.js';
 import { quote } from '../scripts.js';
-import { getShellMetadata } from '../shells.js';
 
 /**
  * Generated completions
@@ -95,17 +94,19 @@ export class BashCompletionProvider extends CompletionProvider {
    * Recommend an eval-based installation
    */
   buildInstallationInstructions(): string {
-    const { group } = this.config.completion;
-
-    const profiles = formatList(getShellMetadata('bash').profiles, 'or');
-    const generate = `${this.cli.name} ${group} generate --shell bash`;
-
     return `
-Add this line to your bash profile (${profiles}):
+Add this line to your bash profile (${this.listProfiles()}):
 
-  eval "$(${generate})"
+  eval "$(${this.generateCommand()})"
 
 To use these completions, reload your profile or start a new shell.`.trim();
+  }
+
+  /**
+   * Provide the current shell
+   */
+  protected provideShell(): SupportedShell {
+    return 'bash';
   }
 
   /**

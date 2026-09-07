@@ -1,9 +1,12 @@
 import { visibleCommands } from '../commands/data.js';
 import type { Command, CommandTree } from '../commands/types.js';
+import { formatList } from '../text.js';
 import type { Config, Context, Metadata } from '../types.js';
 import { sortEntries } from '../utils.js';
 import type { ScriptLines } from './scripts.js';
 import { formatScript } from './scripts.js';
+import type { SupportedShell } from './shells.js';
+import { getShellMetadata } from './shells.js';
 
 export type { Command, CommandHandler } from '../commands/types.js';
 export {
@@ -17,7 +20,7 @@ export { useSharedFlags } from '../flags/shared.js';
 export type { Flags } from '../flags/types.js';
 export type { FunctionType, NameGenerator } from './fns.js';
 
-export type { CommandTree, ScriptLines };
+export type { CommandTree, ScriptLines, SupportedShell };
 
 /**
  * A generic completion function
@@ -80,6 +83,27 @@ export abstract class CompletionProvider {
    * Build installation instructions for the shell
    */
   abstract buildInstallationInstructions(): string;
+
+  /**
+   * Provide the name of the current shell
+   */
+  protected abstract provideShell(): SupportedShell;
+
+  /**
+   * List profile paths for the current shell
+   */
+  protected listProfiles(): string {
+    return formatList(getShellMetadata(this.provideShell()).profiles, 'or');
+  }
+
+  /**
+   * Build the command to generate a completion script
+   */
+  protected generateCommand(): string {
+    const { group } = this.config.completion;
+
+    return `${this.cli.name} ${group} generate --shell ${this.provideShell()}`;
+  }
 
   /**
    * List visible commands in a tree, sorted by name
