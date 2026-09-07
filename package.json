@@ -20,17 +20,11 @@
     "node": ">=22.0.0"
   },
   "scripts": {
-    "build": "tsdown",
-    "check": "npm run check:code && npm run check:format && npm run check:types",
-    "check:code": "biome lint .",
-    "check:format": "biome ci --linter-enabled=false . && dprint check",
-    "check:types": "tsc --noEmit",
-    "format": "biome check --write --linter-enabled=false . && dprint fmt",
+    "build": "node tasks/index.ts build",
+    "check": "node tasks/index.ts check",
+    "format": "node tasks/index.ts format",
     "prepublishOnly": "npm run build",
-    "test": "vitest run --project unit --reporter verbose",
-    "test:all": "npm run test && npm run test:integration && npm run test:properties",
-    "test:properties": "vitest run --project properties --reporter verbose",
-    "test:integration": "vitest run --project integration --reporter verbose"
+    "test": "node tasks/index.ts test"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.9",
