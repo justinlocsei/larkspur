@@ -77,33 +77,35 @@ export class ZshCompletionProvider extends CompletionProvider {
     };
   }
 
+  /**
+   * Show source and fpath installation instructions
+   */
   buildInstallationInstructions(): string {
     const { group } = this.config.completion;
+
     const profiles = formatList(getShellMetadata('zsh').profiles, 'or');
     const generate = `${this.cli.name} ${group} generate --shell zsh`;
-    const completionFile = `_${this.cli.name}`;
+    const fpath = `~/.zsh/completions`;
 
-    return [
-      `Add the following to your zsh profile (${profiles}):`,
-      '',
-      '  autoload -Uz compinit',
-      '  compinit',
-      '',
-      `  source <(${generate})`,
-      '',
-      'Completions are regenerated each time you start an interactive shell.',
-      '',
-      'To install a static completion file for fpath autoloading instead, save',
-      'the generated script and refresh it when the CLI changes:',
-      '',
-      `  ${generate} > ~/.zsh/completions/${completionFile}`,
-      '',
-      'Then add these lines before compinit:',
-      '',
-      '  fpath=(~/.zsh/completions $fpath)',
-      '  autoload -Uz compinit',
-      '  compinit'
-    ].join('\n');
+    return `
+Add the following to your zsh profile (${profiles}):
+
+  autoload -Uz compinit
+  compinit
+
+  source <(${generate})>
+
+Completions will be generated each time you start an interactive shell.
+
+To install a static completion file for fpath autoloading instead, save
+the generated script and refresh it when the CLI changes:
+
+  mkdir -p ${fpath}
+  ${generate} > ${fpath}/_${this.cli.name}
+
+Then add this line before loading compinit:
+
+  fpath=(${fpath} $fpath)`.trim();
   }
 
   /**

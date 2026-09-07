@@ -1,6 +1,6 @@
 import { assert, describe, it } from 'vitest';
 
-import { checkConversion } from '../../tests.js';
+import { checkConversion, createTestContext } from '../../tests.js';
 import type { FunctionType } from '../fns.js';
 import { testProvider } from './tests.js';
 import { ZshCompletionProvider } from './zsh.js';
@@ -26,6 +26,38 @@ describe('createNameGenerator', () => {
           '_test-cli__user_fn__alfa__br avo'
         ]
       ]
+    );
+  });
+});
+
+describe('buildInstallationInstructions', () => {
+  it('shows installation instructions', () => {
+    const instructions = new ZshCompletionProvider({
+      commands: {},
+      context: createTestContext({ name: 'test-cli' })
+    }).buildInstallationInstructions();
+
+    assert.equal(
+      instructions,
+      `
+Add the following to your zsh profile (~/.zshrc):
+
+  autoload -Uz compinit
+  compinit
+
+  source <(test-cli completions generate --shell zsh)>
+
+Completions will be generated each time you start an interactive shell.
+
+To install a static completion file for fpath autoloading instead, save
+the generated script and refresh it when the CLI changes:
+
+  mkdir -p ~/.zsh/completions
+  test-cli completions generate --shell zsh > ~/.zsh/completions/_test-cli
+
+Then add this line before loading compinit:
+
+  fpath=(~/.zsh/completions $fpath)`.trim()
     );
   });
 });

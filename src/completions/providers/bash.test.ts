@@ -1,6 +1,6 @@
 import { assert, describe, it } from 'vitest';
 
-import { checkConversion } from '../../tests.js';
+import { checkConversion, createTestContext } from '../../tests.js';
 import type { FunctionType } from '../fns.js';
 import { BashCompletionProvider } from './bash.js';
 import { testProvider } from './tests.js';
@@ -24,6 +24,25 @@ describe('createNameGenerator', () => {
         [['user_fn', ['alfa', 'br avo']], '__test_cli__user_fn__alfa__br_avo'],
         [['words', []], '__test_cli__words']
       ]
+    );
+  });
+});
+
+describe('buildInstallationInstructions', () => {
+  it('shows installation instructions', () => {
+    const instructions = new BashCompletionProvider({
+      commands: {},
+      context: createTestContext({ name: 'test-cli' })
+    }).buildInstallationInstructions();
+
+    assert.equal(
+      instructions,
+      `
+Add this line to your bash profile (~/.bashrc or ~/.bash_profile):
+
+  eval "$(test-cli completions generate --shell bash)"
+
+To use these completions, reload your profile or start a new shell.`.trim()
     );
   });
 });
