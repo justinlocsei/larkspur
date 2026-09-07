@@ -147,7 +147,10 @@ export type ScalarValue = number | string;
 /**
  * The most inclusive value for all supported flags
  */
-export type SupportedValue = NonNullable<Flag['default']>;
+export type SupportedValue =
+  | boolean
+  | ScalarValue
+  | ScalarValue[];
 
 /**
  * Extracted choices for a flag
