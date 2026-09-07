@@ -1,5 +1,10 @@
 import { NEGATE_BOOLEAN } from './names.js';
-import type { Flag, FlagChoices, ScalarFlag } from './types.js';
+import type {
+  Flag,
+  FlagChoices,
+  ScalarFlag,
+  SimpleScalarFlag
+} from './types.js';
 
 // The text used before a flag name to mark it as a setter
 export const SETTER_PREFIX = '--';
@@ -46,4 +51,11 @@ export function isFlagSetter(text: string): boolean {
  */
 export function isScalarFlag(flag: Flag): flag is ScalarFlag {
   return flag.type !== 'boolean';
+}
+
+/**
+ * Report whether a flag is a simple scalar flag
+ */
+export function isSimpleScalarFlag(flag: Flag): flag is SimpleScalarFlag {
+  return isScalarFlag(flag) && flag.type !== 'choice';
 }

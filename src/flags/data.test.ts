@@ -7,7 +7,8 @@ import {
   flagToSetter,
   getFlagForms,
   isFlagSetter,
-  isScalarFlag
+  isScalarFlag,
+  isSimpleScalarFlag
 } from './data.js';
 import type { Flag, FlagChoices } from './types.js';
 
@@ -17,6 +18,7 @@ const boolean = C.flag('boolean', description);
 const number = C.flag('number', description);
 const path = C.flag('path', description);
 const string = C.flag('string', description);
+const choice = C.flag('choice', description, { choices: ['alfa'] });
 
 describe('choicesForFlag', () => {
   it('extracts the list of choices from a choice flag', () => {
@@ -60,6 +62,7 @@ describe('getFlagForms', () => {
         [boolean, 'test'],
         [{ default: true, description, type: 'boolean' }, 'no-test'],
         [{ default: false, description, type: 'boolean' }, 'test'],
+        [choice, 'test'],
         [string, 'test'],
         [number, 'test'],
         [path, 'test']
@@ -95,7 +98,23 @@ describe('isScalarFlag', () => {
         [boolean, false],
         [string, true],
         [number, true],
-        [path, true]
+        [path, true],
+        [choice, true]
+      ]
+    );
+  });
+});
+
+describe('isSimpleScalarFlag', () => {
+  it('detects scalar flags', () => {
+    checkConversion<Flag, boolean>(
+      (i, o, m) => assert.equal(isSimpleScalarFlag(i), o, m),
+      [
+        [boolean, false],
+        [string, true],
+        [number, true],
+        [path, true],
+        [choice, false]
       ]
     );
   });
