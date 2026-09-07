@@ -2,7 +2,22 @@ import { assert, describe, it } from 'vitest';
 
 import { checkConversion } from './tests.js';
 import type { ListJoiner } from './text.js';
-import { formatList } from './text.js';
+import { formatDescription, formatList } from './text.js';
+
+describe('formatDescription', () => {
+  it('collapses newlines to spaces', () => {
+    checkConversion<string, string>(
+      (input, output, message) =>
+        assert.equal(formatDescription(input), output, message),
+      [
+        ['alfa bravo', 'alfa bravo'],
+        ['alfa\nbravo', 'alfa bravo'],
+        ['alfa\r\nbravo', 'alfa bravo'],
+        ['alfa bravo\n\ncharlie delta', 'alfa bravo charlie delta']
+      ]
+    );
+  });
+});
 
 describe('formatList', () => {
   it('formats lists', () => {

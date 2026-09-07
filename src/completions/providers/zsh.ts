@@ -2,6 +2,7 @@
 
 import type { Flag, Flags } from '../../flags/types.js';
 import { compact, sortEntries, transformValues } from '../../utils.js';
+import { formatDescription } from '../../text.js';
 import { encodeFlagPath } from '../custom.js';
 import type { NameGenerator } from '../fns.js';
 import type {
@@ -167,7 +168,7 @@ export class ZshCompletionProvider extends CompletionProvider {
     const entries = this.visibleCommandEntries(tree);
 
     const commandNames = entries
-      .map(([name, c]) => `${name}:${this.escapeDescribe(c.description)}`)
+      .map(([name, c]) => `${name}:${formatDescription(c.description)}`)
       .map(v => quote(v))
       .join(' ');
 
@@ -319,17 +320,10 @@ export class ZshCompletionProvider extends CompletionProvider {
   }
 
   /**
-   * Escape text passed to _describe
-   */
-  private escapeDescribe(text: string): string {
-    return text.replace(/[\r\n]+/g, ' ');
-  }
-
-  /**
    * Escape text passed to _arguments
    */
   private escapeArguments(text: string): string {
-    return this.escapeDescribe(text)
+    return formatDescription(text)
       .replace(/\\/g, '\\\\')
       .replace(/\]/g, '\\]')
       .replace(/\[/g, '\\[');

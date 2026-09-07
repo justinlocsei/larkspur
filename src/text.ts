@@ -4,6 +4,13 @@
 export type ListJoiner = 'and' | 'or';
 
 /**
+ * Render a description as a single line of text
+ */
+export function formatDescription(text: string): string {
+  return text.replace(/[\r\n]+/g, ' ');
+}
+
+/**
  * Format a list of items with a terminal joiner
  */
 export function formatList(items: string[], joiner: ListJoiner): string {
