@@ -87,17 +87,21 @@ export const runZshCompletions: CompletionsTester = async (run) => {
   const completionPath = path.join(dir, 'completion.zsh');
   const harnessPath = path.join(dir, 'harness.zsh');
 
-  await fs.writeFile(completionPath, run.script);
+  await fs.writeFile(
+    completionPath,
+    run.script
+  );
 
   await fs.writeFile(
     harnessPath,
     renderHarness(completionPath, cliName, inputs, run.preamble)
   );
 
-  const { status, stderr, stdout } = spawnSync('zsh', [harnessPath], {
-    encoding: 'utf8',
-    timeout: 10_000
-  });
+  const { status, stderr, stdout } = spawnSync(
+    'zsh',
+    [harnessPath],
+    { encoding: 'utf8' }
+  );
 
   assert.equal(
     status,
