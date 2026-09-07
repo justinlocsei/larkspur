@@ -1,4 +1,4 @@
-import { afterEach, assert, describe, it, vi } from 'vitest';
+import { assert, describe, it } from 'vitest';
 
 import type { ParsingResult } from '../commands/parsing.ts';
 import { parseCommand } from '../commands/parsing.ts';
@@ -9,7 +9,7 @@ import {
   defineCompletionCommands,
   withCompletionCommands
 } from './commands.ts';
-import { listShells, SHELL_VARIABLES } from './shells.ts';
+import { listShells } from './shells.ts';
 
 function runCompletionCommand(args: string[]): ParsingResult {
   return parseCommand(['completions', ...args], {
@@ -51,10 +51,6 @@ describe('defineCompletionCommands', () => {
   });
 
   describe('install', () => {
-    afterEach(() => {
-      vi.unstubAllEnvs();
-    });
-
     it('shows installation instructions', async () => {
       const parsed = runCompletionCommand(['install', '--shell', 'bash']);
 
@@ -65,30 +61,11 @@ describe('defineCompletionCommands', () => {
       assert.include(run.output, '--shell bash');
     });
 
-    it('detects the shell when --shell is omitted', async () => {
-      vi.stubEnv('BASH_VERSION', '5.2');
-
+    it('requires a shell', () => {
       const parsed = runCompletionCommand(['install']);
 
-      assert(parsed.type === 'command', 'command not parsed');
-      const run = await parsed.run(createTestContext());
-
-      assert(run.type === 'success', 'command failed');
-      assert.include(run.output, 'bash');
-    });
-
-    it('fails when a supported shell cannot be detected', async () => {
-      for (const variable of SHELL_VARIABLES) {
-        vi.stubEnv(variable, undefined);
-      }
-
-      const parsed = runCompletionCommand(['install']);
-
-      assert(parsed.type === 'command', 'command not parsed');
-      const run = await parsed.run(createTestContext());
-
-      assert(run.type === 'failure', 'command succeeded');
-      assert.include(run.error.message, 'not supported');
+      assert(parsed.type === 'error', 'missing shell was allowed');
+      assert.include(parsed.message, 'shell');
     });
   });
 

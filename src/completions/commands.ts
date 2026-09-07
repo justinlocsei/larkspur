@@ -7,7 +7,7 @@ import {
   buildShellCompletions
 } from './build.ts';
 import { provideCompletions } from './custom.ts';
-import { detectShell, SUPPORTED_SHELLS } from './shells.ts';
+import { SUPPORTED_SHELLS } from './shells.ts';
 
 /**
  * Define a command group to manage completions
@@ -30,20 +30,12 @@ export function defineCompletionCommands(): CommandGroup {
       'show installation instructions',
       {
         shell: C.flag('choice', 'a supported shell', {
-          choices: SUPPORTED_SHELLS
+          choices: SUPPORTED_SHELLS,
+          required: true
         })
       },
-      async (flags, { commands, context }) => {
-        const shell = flags.shell || detectShell(process.env);
-
-        if (!shell) {
-          throw new OperationalError(
-            'Completions are not supported for the current shell.'
-          );
-        }
-
-        return buildInstallationInstructions(shell, { commands, context });
-      }
+      async ({ shell }, { commands, context }) =>
+        buildInstallationInstructions(shell, { commands, context })
     ),
 
     provide: C({

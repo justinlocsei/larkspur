@@ -1,5 +1,3 @@
-import type { EnvironmentVariables } from '../types.ts';
-
 export const SUPPORTED_SHELLS = ['bash', 'zsh'] as const;
 
 /**
@@ -11,7 +9,6 @@ export type SupportedShell = (typeof SUPPORTED_SHELLS)[number];
  * Information about a supported shell
  */
 type ShellMetadata = {
-  environmentVariables: string[];
   profiles: string[];
   signature: string;
 };
@@ -25,43 +22,20 @@ type AvailableShell = ShellMetadata & {
 
 const SHELL_METADATA: Record<SupportedShell, ShellMetadata> = {
   bash: {
-    environmentVariables: ['BASH', 'BASH_VERSION'],
     profiles: ['~/.bashrc', '~/.bash_profile'],
     signature: 'COMPREPLY'
   },
   zsh: {
-    environmentVariables: ['ZSH_VERSION'],
     profiles: ['~/.zshrc'],
     signature: '#compdef'
   }
 };
-
-export const SHELL_VARIABLES = SUPPORTED_SHELLS
-  .flatMap((shell) => getShellMetadata(shell).environmentVariables)
-  .sort();
 
 /**
  * Get metadata for a supported shell
  */
 export function getShellMetadata(shell: SupportedShell): ShellMetadata {
   return SHELL_METADATA[shell];
-}
-
-/**
- * Detect a supported shell from the environment
- */
-export function detectShell(
-  env: EnvironmentVariables
-): SupportedShell | undefined {
-  for (const shell of SUPPORTED_SHELLS) {
-    const { environmentVariables } = getShellMetadata(shell);
-
-    if (environmentVariables.some((name) => env[name] !== undefined)) {
-      return shell;
-    }
-  }
-
-  return undefined;
 }
 
 /**
