@@ -12,14 +12,16 @@ const REPO_ROOT = path.resolve(
 /**
  * Produce the path to a node_modules executable
  */
-export function localBin(name: string): string {
+function localBin(name: string): string {
   return path.join(REPO_ROOT, 'node_modules', '.bin', name);
 }
 
 /**
  * Run a command
  */
-export function run(command: string, ...args: string[]): void {
+export function run(npmBin: string, ...args: string[]): void {
+  const command = localBin(npmBin);
+
   const result = spawnSync(command, args, {
     cwd: REPO_ROOT,
     stdio: 'inherit'

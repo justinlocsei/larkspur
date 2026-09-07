@@ -1,5 +1,5 @@
 import C from '../src/factory.ts';
-import { localBin, run } from './helpers.ts';
+import { run } from './helpers.ts';
 
 const CHECKS = ['code', 'formatting', 'types'] as const;
 
@@ -13,16 +13,16 @@ export default C(
   },
   async ({ only = CHECKS }) => {
     if (only.includes('code')) {
-      run(localBin('biome'), 'lint', '.');
+      run('biome', 'lint', '.');
     }
 
     if (only.includes('formatting')) {
-      run(localBin('biome'), 'ci', '--linter-enabled=false', '.');
-      run(localBin('dprint'), 'check');
+      run('biome', 'ci', '--linter-enabled=false', '.');
+      run('dprint', 'check');
     }
 
     if (only.includes('types')) {
-      run(localBin('tsc'), '--noEmit');
+      run('tsc', '--noEmit');
     }
   }
 );
