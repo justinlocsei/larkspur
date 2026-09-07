@@ -140,7 +140,7 @@ describe('defineCommand', () => {
         specials: C.flag('choice', description, {
           allowMany: true,
           choices: ['alfa', 'bravo'],
-          default: 'bravo'
+          default: ['bravo']
         }),
         strings: C.flag('string', description, {
           allowMany: true,
