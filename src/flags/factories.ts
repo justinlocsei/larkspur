@@ -22,10 +22,9 @@ type ValidOptions<T extends Flag, O> =
 /**
  * Require value lists for defaults of multi-value flags
  */
-type ValidDefaultOptions<O> =
-  O extends { default: readonly unknown[] }
-    ? O extends { allowMany: true } ? O : never
-    : O;
+type ValidDefaultOptions<O> = O extends { default: readonly unknown[] }
+  ? O extends { allowMany: true } ? O : never
+  : O;
 
 /**
  * Build a command flag
