@@ -9,6 +9,22 @@ import { spawnSync } from 'node:child_process';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
+// Sentinel bytes used by the harness
+const STX = '\u0002';
+const ETX = '\u0003';
+
+/**
+ * Express a byte as a zsh $ literal
+ */
+function zshByte(char: string): string {
+  const hex = char
+    .charCodeAt(0)
+    .toString(16)
+    .padStart(2, '0');
+
+  return `$'\\x${hex}'`;
+}
+
 /**
  * Render a single zpty driver that loads completions and captures compadd results
  */
@@ -19,53 +35,69 @@ function renderHarness(
   preamble: string[]
 ): string {
   const input = [cliName, ...inputs].join(' ');
+  const booted = 'harness-ready';
 
-  return [
-    'emulate -L zsh',
-    'zmodload zsh/zpty',
-    ...preamble,
-    `session=$(mktemp)`,
-    `cat > "$session" <<'SESSION'`,
-    'emulate -L zsh',
-    'autoload -Uz compinit',
-    'compinit -C -D',
-    `source ${quote(completionPath)}`,
-    'typeset -aU completions=()',
-    'compadd() {',
-    '  local -a reply',
-    '  builtin compadd -A reply "$@"',
-    '  completions+=("${reply[@]}")',
-    '}',
-    'poc-widget() {',
-    "  unset 'compstate[vared]'",
-    '  _main_complete',
-    "  print -n $'\\C-B'",
-    '  print -nlr -- "$completions[@]"',
-    "  print -n $'\\C-C'",
-    '  zle -M done',
-    '}',
-    'zle -C poc-widget complete-word poc-widget',
-    "bindkey '^I' poc-widget",
-    'print -n ready',
-    'vared -c tmp',
-    'SESSION',
-    'zpty -d pty 2>/dev/null',
-    'zpty -b pty zsh -f "$session"',
-    "zpty -r pty boot '*ready*' || exit 1",
-    `zpty -w pty ${quote(input)}$'\\t'`,
-    "zpty -r pty output $'*\\C-C*' || exit 1",
-    'zpty -d pty',
-    'rm -f "$session"',
-    'print -r -- "$output"'
-  ].join('\n');
+  return `
+# Establish a pseudo-terminal for test execution
+emulate -L zsh
+zmodload zsh/zpty
+${preamble.join('\n')}
+
+# Write a session script that will run in the pty
+session=$(mktemp)
+cat > "$session" <<'SESSION'
+
+# Load the completion system and the completion script under test
+emulate -L zsh
+autoload -Uz compinit
+compinit -C -D
+source ${quote(completionPath)}
+
+# Intercept compadd to read the suggested completions
+typeset -aU completions=()
+compadd() {
+  local -a reply
+  builtin compadd -A reply "$@"
+  completions+=("\${reply[@]}")
+}
+
+# Replace tab with a widget that captures and prints completions
+capture-output() {
+  unset 'compstate[vared]'
+  _main_complete
+  print -n ${zshByte(STX)}
+  print -nlr -- "$completions[@]"
+  print -n ${zshByte(ETX)}
+  zle -M done
+}
+zle -C capture-output complete-word capture-output
+bindkey '^I' capture-output
+
+# Signal that boot has completed and block on a line editor so tab has a
+# buffer to complete
+print -n ${booted}
+vared -c tmp
+SESSION
+
+# Start zsh with a pty, wait for boot, type the partial command, hit tab,
+# then read output until the widget prints the closing delimiter
+zpty -d pty 2>/dev/null
+zpty -b pty zsh -f "$session"
+zpty -r pty boot '*${booted}*' || exit 1
+zpty -w pty ${quote(input)}$'\\t'
+zpty -r pty output $'*${ETX}*' || exit 1
+zpty -d pty
+rm -f "$session"
+print -r -- "$output"
+  `.trim();
 }
 
 /**
  * Extract completions from the harness's output
  */
 function parseZshCompletionReply(output: string): string[] {
-  const start = output.indexOf('\u0002');
-  const end = output.indexOf('\u0003', start + 1);
+  const start = output.indexOf(STX);
+  const end = output.indexOf(ETX, start + 1);
 
   if (start < 0 || end < 0) {
     return [];
