@@ -340,6 +340,42 @@ describe('parseFlags', () => {
     );
   });
 
+  it('can apply array defaults to repeatable flags', () => {
+    const { flags } = parse([], {
+      choices: {
+        allowMany: true,
+        choices: ['alfa', 'bravo'],
+        default: ['alfa', 'bravo'],
+        description,
+        type: 'choice'
+      },
+      numbers: {
+        allowMany: true,
+        default: [1, 2],
+        description,
+        type: 'number'
+      }
+    });
+
+    assert.deepEqual(flags.choices?.value, ['alfa', 'bravo']);
+    assert.deepEqual(flags.numbers?.value, [1, 2]);
+  });
+
+  it('rejects scalar defaults on repeatable flags', () => {
+    ensure.throws(
+      () =>
+        parse([], {
+          numbers: {
+            allowMany: true,
+            default: 1,
+            description,
+            type: 'number'
+          }
+        }),
+      'array default'
+    );
+  });
+
   it('allows flags to override their default values', () => {
     checkConversion<
       [SimpleFlagType, SupportedValue, string[]],
@@ -661,6 +697,22 @@ describe('parseFlags', () => {
         `Invalid default choice ${invalid} allowed: ${choices}`
       );
     });
+  });
+
+  it('validates every value in an array default for a choice flag', () => {
+    const flag = useFlag({
+      allowMany: true,
+      choices: ['alfa', 'bravo'],
+      default: ['alfa', 'charlie'],
+      description,
+      type: 'choice'
+    });
+
+    ensure.throws(
+      () => parse([], { test: flag }),
+      'Invalid value',
+      'Invalid array default choice allowed'
+    );
   });
 
   it('throws an error if a validator function returns false', () => {

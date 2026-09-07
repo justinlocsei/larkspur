@@ -21,6 +21,7 @@ import type {
   StringFlag
 } from './types.ts';
 import type { SpecificValueOf, ValueOf, ValuesOf } from './values.ts';
+import { isMultiValueDefault } from './values.ts';
 
 import path from 'node:path';
 
@@ -348,6 +349,24 @@ function forbidDuplicates({ name }: ParsingContext): never {
 }
 
 /**
+ * Throw an error when a multi-value flag uses a scalar default
+ */
+function forbidScalarDefault(
+  { name }: ParsingContext,
+  flag: ScalarFlag
+): void {
+  if (
+    flag.allowMany
+    && flag.default !== undefined
+    && !isMultiValueDefault(flag.default)
+  ) {
+    throw new ParsingError(
+      `Non-array default for multi-value flag: ${flagToSetter(name)}`
+    );
+  }
+}
+
+/**
  * Find the last unconsumed index of a flag setter
  */
 function lastFlagIndex(
@@ -438,6 +457,8 @@ function parseScalarInputs<T extends ScalarFlag>(
 
   type Value = SpecificValueOf<T>;
 
+  forbidScalarDefault(context, flag);
+
   let provided: boolean;
   let values: Value[] = [];
 
@@ -462,9 +483,17 @@ function parseScalarInputs<T extends ScalarFlag>(
   } else {
     provided = false;
 
-    values = flag.default !== undefined
-      ? [validate(flag.default as Value, JSON.stringify(flag.default))]
-      : [];
+    let defaults: ScalarValue[];
+
+    if (flag.default === undefined) {
+      defaults = [];
+    } else if (isMultiValueDefault(flag.default)) {
+      defaults = [...flag.default];
+    } else {
+      defaults = [flag.default];
+    }
+
+    values = defaults.map(v => validate(v as Value, JSON.stringify(v)));
   }
 
   if (values.length > 1 && !flag.allowMany) {
