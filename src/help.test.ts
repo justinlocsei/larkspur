@@ -185,6 +185,29 @@ describe('buildHelp', () => {
     );
   });
 
+  it('shows when extra arguments are allowed', () => {
+    checkHelp(
+      {
+        command: C({
+          allowUnused: true,
+          description: '@command',
+          handler
+        }),
+        path: ['command'],
+        type: 'command'
+      },
+      [
+        'Usage: testing command [flags] [arguments...]',
+        '',
+        '@command',
+        '',
+        'Flags:',
+        '',
+        '  --help  Show help'
+      ]
+    );
+  });
+
   it('can show help for a grouped command', () => {
     checkHelp(
       {

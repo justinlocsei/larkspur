@@ -162,7 +162,9 @@ class HelpMessage {
       cli.name,
       ...path,
       needsCommand && '<command>',
-      (needsCommand || !isEmpty(flags)) && '[flags]'
+      (needsCommand || !isEmpty(flags)) && '[flags]',
+      scope.type === 'command' && scope.command.allowUnused === true
+      && '[arguments...]'
     ]);
 
     return `Usage: ${usage.join(' ')}`;
