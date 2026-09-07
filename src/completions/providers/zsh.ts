@@ -1,8 +1,8 @@
 // biome-ignore-all lint/suspicious/noTemplateCurlyInString: used for completion scripts
 
 import type { Flag, Flags } from '../../flags/types.js';
-import { compact, sortEntries, transformValues } from '../../utils.js';
 import { formatDescription } from '../../text.js';
+import { compact, sortEntries, transformValues } from '../../utils.js';
 import { encodeFlagPath } from '../custom.js';
 import type { NameGenerator } from '../fns.js';
 import type {
