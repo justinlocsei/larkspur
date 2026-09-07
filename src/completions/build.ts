@@ -1,8 +1,6 @@
-import { formatList } from '../text.js';
 import type { CompletionSource } from './provider.js';
 import { useProvider } from './providers.js';
 import type { SupportedShell } from './shells.js';
-import { getShellMetadata } from './shells.js';
 
 /**
  * Build shell-specific completions for a CLI
@@ -17,17 +15,9 @@ export function buildShellCompletions(
 /**
  * Build installation instructions for shell completions
  */
-export function buildInstallInstructions(
+export function buildInstallationInstructions(
   shell: SupportedShell,
-  { context: { config, meta } }: CompletionSource
+  cli: CompletionSource
 ): string {
-  return [
-    `Add this line to your ${shell} profile (${
-      formatList(getShellMetadata(shell).profiles, 'or')
-    }):`,
-    '',
-    `  eval "$(${meta.name} ${config.completion.group} generate --shell ${shell})"`,
-    '',
-    'To use these completions, reload your profile or start a new shell.'
-  ].join('\n');
+  return useProvider(shell, cli).buildInstallationInstructions();
 }

@@ -1,5 +1,6 @@
 // biome-ignore-all lint/suspicious/noTemplateCurlyInString: used for completion scripts
 
+import { formatList } from '../../text.js';
 import { compact, drain } from '../../utils.js';
 import { encodeFlagPath } from '../custom.js';
 import type { NameGenerator } from '../fns.js';
@@ -24,6 +25,7 @@ import {
   useSharedFlags
 } from '../provider.js';
 import { quote } from '../scripts.js';
+import { getShellMetadata } from '../shells.js';
 
 /**
  * Generated completions
@@ -87,6 +89,20 @@ export class BashCompletionProvider extends CompletionProvider {
         `complete -o default -F ${fn.entry.name} ${quote(this.cli.name)}`
       ]
     };
+  }
+
+  buildInstallationInstructions(): string {
+    const { group } = this.config.completion;
+    const profiles = formatList(getShellMetadata('bash').profiles, 'or');
+    const generate = `${this.cli.name} ${group} generate --shell bash`;
+
+    return [
+      `Add this line to your bash profile (${profiles}):`,
+      '',
+      `  eval "$(${generate})"`,
+      '',
+      'To use these completions, reload your profile or start a new shell.'
+    ].join('\n');
   }
 
   /**

@@ -1,7 +1,7 @@
 // biome-ignore-all lint/suspicious/noTemplateCurlyInString: used for completion scripts
 
 import type { Flag, Flags } from '../../flags/types.js';
-import { formatDescription } from '../../text.js';
+import { formatDescription, formatList } from '../../text.js';
 import { compact, sortEntries, transformValues } from '../../utils.js';
 import { encodeFlagPath } from '../custom.js';
 import type { NameGenerator } from '../fns.js';
@@ -24,6 +24,7 @@ import {
   useSharedFlags
 } from '../provider.js';
 import { quote } from '../scripts.js';
+import { getShellMetadata } from '../shells.js';
 
 /**
  * A stack frame used when building command completions
@@ -74,6 +75,35 @@ export class ZshCompletionProvider extends CompletionProvider {
         `(( $# )) && ${entry.name} "$@"`
       ]
     };
+  }
+
+  buildInstallationInstructions(): string {
+    const { group } = this.config.completion;
+    const profiles = formatList(getShellMetadata('zsh').profiles, 'or');
+    const generate = `${this.cli.name} ${group} generate --shell zsh`;
+    const completionFile = `_${this.cli.name}`;
+
+    return [
+      `Add the following to your zsh profile (${profiles}):`,
+      '',
+      '  autoload -Uz compinit',
+      '  compinit',
+      '',
+      `  source <(${generate})`,
+      '',
+      'Completions are regenerated each time you start an interactive shell.',
+      '',
+      'To install a static completion file for fpath autoloading instead, save',
+      'the generated script and refresh it when the CLI changes:',
+      '',
+      `  ${generate} > ~/.zsh/completions/${completionFile}`,
+      '',
+      'Then add these lines before compinit:',
+      '',
+      '  fpath=(~/.zsh/completions $fpath)',
+      '  autoload -Uz compinit',
+      '  compinit'
+    ].join('\n');
   }
 
   /**

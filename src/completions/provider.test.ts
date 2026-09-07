@@ -6,6 +6,10 @@ import type { CompletionScript } from './provider.js';
 import { CompletionProvider } from './provider.js';
 
 class TestCompletionProvider extends CompletionProvider {
+  buildInstallationInstructions(): string {
+    return '';
+  }
+
   provideScript(): CompletionScript {
     return {
       entryPoint: this.cli.name,

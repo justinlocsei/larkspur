@@ -2,7 +2,10 @@ import type { CommandGroup, EntryPoint } from '../commands/types.js';
 import { OperationalError } from '../errors.js';
 import C from '../factory.js';
 import type { Context } from '../types.js';
-import { buildInstallInstructions, buildShellCompletions } from './build.js';
+import {
+  buildInstallationInstructions,
+  buildShellCompletions
+} from './build.js';
 import { provideCompletions } from './custom.js';
 import { detectShell, SUPPORTED_SHELLS } from './shells.js';
 
@@ -39,7 +42,7 @@ export function defineCompletionCommands(): CommandGroup {
           );
         }
 
-        return buildInstallInstructions(shell, { commands, context });
+        return buildInstallationInstructions(shell, { commands, context });
       }
     ),
 

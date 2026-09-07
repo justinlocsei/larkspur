@@ -77,6 +77,11 @@ export abstract class CompletionProvider {
   abstract provideScript(): CompletionScript;
 
   /**
+   * Build installation instructions for the shell
+   */
+  abstract buildInstallationInstructions(): string;
+
+  /**
    * List visible commands in a tree, sorted by name
    */
   protected visibleCommandEntries(
