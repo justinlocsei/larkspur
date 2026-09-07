@@ -19,13 +19,15 @@ test.prop([singleCommand])(
 );
 
 test.prop([argv, singleCommand])(
-  'unknown arguments after a valid command are allowed',
+  'unknown arguments after a valid command can be permitted',
   (args, command) => {
-    const result = parseCommand(
-      [command.name, ...args],
-      command.tree,
-      { allowUnknownFlags: true }
-    );
+    const result = parseCommand([command.name, ...args], {
+      [command.name]: C({
+        allowUnused: true,
+        description,
+        handler
+      })
+    });
 
     assert.equal(result.type, 'command');
   }

@@ -367,7 +367,17 @@ describe('parseCommand', () => {
     });
   });
 
-  it('exposes parsed and extra args when allowing unknown flags', () => {
+  it('exposes parsed and extra args when unused arguments are allowed', () => {
+    const command = C({
+      allowUnused: true,
+      description,
+      flags: {
+        boolean: { description, type: 'boolean' },
+        string: { description, type: 'string' }
+      },
+      handler
+    });
+
     const cases: Array<[args: string[], extra: string[], parsed: string[]]> = [
       [['command'], [], []],
       [['command', '--other', '--flag'], ['--other', '--flag'], []],
@@ -389,12 +399,7 @@ describe('parseCommand', () => {
     ];
 
     cases.forEach(([input, extra, parsed]) => {
-      const result = parseCommand(input, {
-        command: C(description, {
-          boolean: { description, type: 'boolean' },
-          string: { description, type: 'string' }
-        }, handler)
-      }, { allowUnknownFlags: true });
+      const result = parseCommand(input, { command });
 
       assert(
         result.type === 'command',
@@ -422,13 +427,14 @@ describe('parseCommand', () => {
       ['parent', 'command', '--string', 'value', '--other'],
       {
         parent: C.group(description, {
-          command: C(
+          command: C({
+            allowUnused: true,
             description,
-            {
+            flags: {
               absent: { description, type: 'string' },
               string: { description, type: 'string' }
             },
-            async (_, parsing) => {
+            handler: async (_, parsing) => {
               assert.sameOrderedMembers(parsing.commandPath, [
                 'parent',
                 'command'
@@ -441,10 +447,9 @@ describe('parseCommand', () => {
                 description
               );
             }
-          )
+          })
         })
-      },
-      { allowUnknownFlags: true }
+      }
     );
 
     assert(result.type === 'command', 'Command not parsed');

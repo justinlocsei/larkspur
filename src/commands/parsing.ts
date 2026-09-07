@@ -139,13 +139,11 @@ type FlagParsingResult =
 /**
  * Attempt to find a command invocation in user-provided CLI args
  */
-export function parseCommand(args: string[], commands: CommandTree, {
-  allowUnknownFlags
-}: {
-  allowUnknownFlags?: boolean;
-} = {}): ParsingResult {
+export function parseCommand(
+  args: string[],
+  commands: CommandTree
+): ParsingResult {
   const result = extractCommand({
-    allowUnknownFlags,
     current: {
       args: new NormalizedArgs(args),
       commands,
@@ -253,13 +251,9 @@ type TraversalState = {
 /**
  * Extract a command from a list of arguments
  */
-function extractCommand({
-  allowUnknownFlags = false,
-  current
-}: {
-  allowUnknownFlags?: boolean;
-  current: TraversalState;
-}): InternalParsingResult {
+function extractCommand(
+  { current }: { current: TraversalState }
+): InternalParsingResult {
   while (true) {
     const coreFlags = tryParseFlags(
       current.args,
@@ -330,7 +324,7 @@ function extractCommand({
     const commandFlags = tryParseFlags(
       remainingArgs,
       command.flags || {},
-      { allowUnused: allowUnknownFlags },
+      { allowUnused: command.allowUnused === true },
       { command, path, type: 'command' }
     );
 
