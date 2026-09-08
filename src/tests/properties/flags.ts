@@ -33,6 +33,18 @@ const scalarOptions = <T>(
       : fc.constant(undefined)
   });
 
+/**
+ * Apply a repeatable default value as an array
+ */
+function repeatableDefault<T>(
+  allowMany: boolean | undefined,
+  defaultValue: T | undefined
+): T | T[] | undefined {
+  return allowMany && defaultValue !== undefined
+    ? [defaultValue]
+    : defaultValue;
+}
+
 const booleanFlag = fc.tuple(fc.string(), optionalBoolean).map((
   [description, value]
 ): BooleanFlag => C.flag('boolean', description, { default: value }));
@@ -50,27 +62,41 @@ const choiceFlag = (options: FlagOptions) =>
         C.flag('choice', description, {
           allowMany,
           choices,
-          default: useDefault ? choices[0] : undefined,
+          default: useDefault
+            ? allowMany ? choices : choices[0]
+            : undefined,
           required
         })
     );
 
 const numberFlag = (options: FlagOptions) =>
   scalarOptions(fc.integer(), options).map(
-    ({ description, ...options }): NumberFlag =>
-      C.flag('number', description, options)
+    ({ allowMany, default: defaultValue, description, required }): NumberFlag =>
+      C.flag('number', description, {
+        allowMany,
+        default: repeatableDefault(allowMany, defaultValue),
+        required
+      })
   );
 
 const pathFlag = (options: FlagOptions) =>
   scalarOptions(fc.string(), options).map(
-    ({ description, ...options }): PathFlag =>
-      C.flag('path', description, options)
+    ({ allowMany, default: defaultValue, description, required }): PathFlag =>
+      C.flag('path', description, {
+        allowMany,
+        default: repeatableDefault(allowMany, defaultValue),
+        required
+      })
   );
 
 const stringFlag = (options: FlagOptions) =>
   scalarOptions(fc.string(), options).map(
-    ({ description, ...options }): StringFlag =>
-      C.flag('string', description, options)
+    ({ allowMany, default: defaultValue, description, required }): StringFlag =>
+      C.flag('string', description, {
+        allowMany,
+        default: repeatableDefault(allowMany, defaultValue),
+        required
+      })
   );
 
 const flag = (options: FlagOptions) =>
