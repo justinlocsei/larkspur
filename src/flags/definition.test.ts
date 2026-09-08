@@ -24,6 +24,11 @@ describe('useFlag', () => {
     T.assert<T.Equivalent<NumberFlag, typeof number>>(true);
     T.assert<T.Equivalent<StringFlag, typeof string>>(true);
   });
+
+  it('rejects unknown flag options', () => {
+    // @ts-expect-error Unknown flag options are not allowed
+    useFlag({ allowMany: true, description, type: 'number' });
+  });
 });
 
 describe('useFlags', () => {
@@ -45,5 +50,10 @@ describe('useFlags', () => {
     T.assert<T.Equivalent<'boolean' | 'string', keyof typeof flags>>(true);
     T.assert<T.Equivalent<BooleanFlag, typeof flags.boolean>>(true);
     T.assert<T.Equivalent<StringFlag, typeof flags.string>>(true);
+  });
+
+  it('rejects unknown flag options', () => {
+    // @ts-expect-error Unknown flag options are not allowed
+    useFlags({ number: { allowMany: true, description, type: 'number' } });
   });
 });
