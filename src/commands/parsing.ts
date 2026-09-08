@@ -198,7 +198,6 @@ function buildCommandRunner(
     args,
     command,
     flags,
-    path,
     providedFlags
   } = parsed;
 
@@ -213,7 +212,6 @@ function buildCommandRunner(
         {
           args,
           commands,
-          commandPath: path,
           context,
           providedFlags: new Set(providedFlags)
         }

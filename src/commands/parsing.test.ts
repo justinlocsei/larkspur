@@ -435,11 +435,6 @@ describe('parseCommand', () => {
               string: { description, type: 'string' }
             },
             handler: async (_, parsing) => {
-              assert.sameOrderedMembers(parsing.commandPath, [
-                'parent',
-                'command'
-              ]);
-
               assert.equal(parsing.context.meta.name, 'test-cli');
 
               assert.equal(
