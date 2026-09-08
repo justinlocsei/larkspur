@@ -50,7 +50,7 @@ export type ValueOf<
   TContext extends FlagContext = 'wide'
 > = TFlag extends ScalarFlag
   ? TContext extends 'wide' ? OneOrMany<SpecificValueOf<TFlag>>
-  : TFlag extends { allowMany: true } ? SpecificValueOf<TFlag>[]
+  : TFlag extends { repeatable: true } ? SpecificValueOf<TFlag>[]
   : SpecificValueOf<TFlag>
   : SpecificValueOf<TFlag>;
 

@@ -317,7 +317,7 @@ Then add this line before loading compinit:
       .map(flagToSetter)
       .map(f =>
         isScalarFlag(flag)
-          ? `${flag.allowMany ? '*' : ''}${f}=${description}${suffix}`
+          ? `${flag.repeatable ? '*' : ''}${f}=${description}${suffix}`
           : `${f}${description}`
       );
   }

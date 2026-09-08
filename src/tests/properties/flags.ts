@@ -25,9 +25,9 @@ const scalarOptions = <T>(
   { required = true }: FlagOptions
 ) =>
   fc.record({
-    allowMany: optionalBoolean,
     default: optional(defaultValue),
     description,
+    repeatable: optionalBoolean,
     required: required
       ? fc.oneof(fc.constant(true), fc.constant(undefined))
       : fc.constant(undefined)
@@ -37,10 +37,10 @@ const scalarOptions = <T>(
  * Apply a repeatable default value as an array
  */
 function repeatableDefault<T>(
-  allowMany: boolean | undefined,
+  repeatable: boolean | undefined,
   defaultValue: T | undefined
 ): T | T[] | undefined {
-  return allowMany && defaultValue !== undefined
+  return repeatable && defaultValue !== undefined
     ? [defaultValue]
     : defaultValue;
 }
@@ -57,44 +57,48 @@ const choiceFlag = (options: FlagOptions) =>
   )
     .map(
       (
-        [{ allowMany, description, required }, choices, useDefault]
+        [{ description, repeatable, required }, choices, useDefault]
       ): ChoiceFlag =>
         C.flag('choice', description, {
-          allowMany,
           choices,
           default: useDefault
-            ? allowMany ? choices : choices[0]
+            ? repeatable ? choices : choices[0]
             : undefined,
+          repeatable,
           required
         })
     );
 
 const numberFlag = (options: FlagOptions) =>
   scalarOptions(fc.integer(), options).map(
-    ({ allowMany, default: defaultValue, description, required }): NumberFlag =>
+    (
+      { default: defaultValue, description, repeatable, required }
+    ): NumberFlag =>
       C.flag('number', description, {
-        allowMany,
-        default: repeatableDefault(allowMany, defaultValue),
+        default: repeatableDefault(repeatable, defaultValue),
+        repeatable,
         required
       })
   );
 
 const pathFlag = (options: FlagOptions) =>
   scalarOptions(fc.string(), options).map(
-    ({ allowMany, default: defaultValue, description, required }): PathFlag =>
+    ({ default: defaultValue, description, repeatable, required }): PathFlag =>
       C.flag('path', description, {
-        allowMany,
-        default: repeatableDefault(allowMany, defaultValue),
+        default: repeatableDefault(repeatable, defaultValue),
+        repeatable,
         required
       })
   );
 
 const stringFlag = (options: FlagOptions) =>
   scalarOptions(fc.string(), options).map(
-    ({ allowMany, default: defaultValue, description, required }): StringFlag =>
+    (
+      { default: defaultValue, description, repeatable, required }
+    ): StringFlag =>
       C.flag('string', description, {
-        allowMany,
-        default: repeatableDefault(allowMany, defaultValue),
+        default: repeatableDefault(repeatable, defaultValue),
+        repeatable,
         required
       })
   );

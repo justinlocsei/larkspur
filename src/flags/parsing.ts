@@ -356,7 +356,7 @@ function forbidScalarDefault(
   flag: ScalarFlag
 ): void {
   if (
-    flag.allowMany
+    flag.repeatable
     && flag.default !== undefined
     && !isMultiValueDefault(flag.default)
   ) {
@@ -496,13 +496,13 @@ function parseScalarInputs<T extends ScalarFlag>(
     values = defaults.map(v => validate(v as Value, JSON.stringify(v)));
   }
 
-  if (values.length > 1 && !flag.allowMany) {
+  if (values.length > 1 && !flag.repeatable) {
     forbidDuplicates(context);
   }
 
   let value: Value[] | Value | undefined;
 
-  if (flag.allowMany) {
+  if (flag.repeatable) {
     if (flagIsRequired(flag) && !values.length) {
       value = undefined;
     } else if (values.length) {

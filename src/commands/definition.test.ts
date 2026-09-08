@@ -135,15 +135,15 @@ describe('defineCommand', () => {
     defineCommandHandler({
       description,
       flags: {
-        numbers: C.flag('number', description, { allowMany: true }),
-        paths: C.flag('path', description, { allowMany: true }),
+        numbers: C.flag('number', description, { repeatable: true }),
+        paths: C.flag('path', description, { repeatable: true }),
         specials: C.flag('choice', description, {
-          allowMany: true,
           choices: ['alfa', 'bravo'],
-          default: ['bravo']
+          default: ['bravo'],
+          repeatable: true
         }),
         strings: C.flag('string', description, {
-          allowMany: true,
+          repeatable: true,
           required: true
         })
       },

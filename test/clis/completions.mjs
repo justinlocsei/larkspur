@@ -14,7 +14,7 @@ await run({
     nested: C(
       '@nested',
       {
-        count: C.flag('number', '@count', { allowMany: true }),
+        count: C.flag('number', '@count', { repeatable: true }),
         custom: C.flag('string', '@custom', {
           completion: async () => ['custom-alfa', 'custom-bravo']
         }),

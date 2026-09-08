@@ -82,7 +82,7 @@ test.prop([flagName, fc.array(fc.string(), { minLength: 2 })])(
   (flag, values) => {
     const parsed = parseFlags(
       new NormalizedArgs(values.flatMap(v => [`--${flag}`, v])),
-      { [flag]: C.flag('string', description, { allowMany: true }) }
+      { [flag]: C.flag('string', description, { repeatable: true }) }
     );
 
     checkScalarParsing(parsed, flag, v => {

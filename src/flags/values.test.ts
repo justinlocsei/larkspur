@@ -94,7 +94,7 @@ describe('ValuesOf', () => {
   it('produces a context-appropriate value type for a set of flags', () => {
     const flags = useFlags({
       boolean: { description, type: 'boolean' },
-      number: { allowMany: true, description, type: 'number' },
+      number: { description, repeatable: true, type: 'number' },
       path: { description, type: 'path' },
       string: { description, type: 'string' }
     });
@@ -166,13 +166,13 @@ describe('ValuesOf', () => {
   it('marks array defaults as guaranteed repeatable values', () => {
     const flags = useFlags({
       numbers: C.flag('number', description, {
-        allowMany: true,
-        default: [1, 2]
+        default: [1, 2],
+        repeatable: true
       }),
       choices: C.flag('choice', description, {
-        allowMany: true,
         choices: ['alfa', 'bravo'],
-        default: ['alfa', 'bravo']
+        default: ['alfa', 'bravo'],
+        repeatable: true
       })
     });
 

@@ -280,13 +280,13 @@ class HelpMessage {
       ? (flag.default ? `[${NEGATE_BOOLEAN}]${id}` : id)
       : id;
 
-    const allowMany = flag.type !== 'boolean' && flag.allowMany;
+    const repeatable = flag.type !== 'boolean' && flag.repeatable;
     const value = flag.type === 'boolean' ? undefined : flag.type;
 
     return compact([
       flagToSetter(name),
       value && `<${value}>`,
-      allowMany && '...'
+      repeatable && '...'
     ]).join(' ');
   }
 

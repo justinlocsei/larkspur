@@ -117,13 +117,13 @@ describe('parseFlags', () => {
   it('treats unset multi-value flags as undefined', () => {
     const flags = useFlags({
       alfa: {
-        allowMany: true,
         description,
+        repeatable: true,
         type: 'string'
       },
       bravo: {
-        allowMany: true,
         description,
+        repeatable: true,
         type: 'string'
       }
     });
@@ -156,7 +156,7 @@ describe('parseFlags', () => {
       ([type, args], value) => {
         const { flags } = useWorkingDir(
           '/',
-          () => checkFlag('test', { allowMany: true, type }, args)
+          () => checkFlag('test', { repeatable: true, type }, args)
         );
 
         assert.deepStrictEqual(
@@ -224,7 +224,7 @@ describe('parseFlags', () => {
 
   it('accepts flag-like strings as scalar values', () => {
     const parsed = parse(['--a', '--a', '--a', ''], {
-      a: C.flag('string', description, { allowMany: true })
+      a: C.flag('string', description, { repeatable: true })
     });
 
     assert.deepEqual(extractValues(parsed.flags), { a: ['--a', ''] });
@@ -255,7 +255,7 @@ describe('parseFlags', () => {
 
   it('supports interleaved multi-value flags', () => {
     const parsed = parse(['--alfa', '1', '--bravo', '2', '--alfa', '3'], {
-      alfa: C.flag('number', description, { allowMany: true }),
+      alfa: C.flag('number', description, { repeatable: true }),
       bravo: C.flag('number', description)
     });
 
@@ -274,7 +274,7 @@ describe('parseFlags', () => {
 
     cases.forEach(([type, args]) => {
       ensure.throws(
-        () => checkFlag('test', { allowMany: true, type }, args),
+        () => checkFlag('test', { repeatable: true, type }, args),
         'Unused argument',
         `Multiple values allowed ${type} flag`
       );
@@ -343,16 +343,16 @@ describe('parseFlags', () => {
   it('can apply array defaults to repeatable flags', () => {
     const { flags } = parse([], {
       choices: {
-        allowMany: true,
         choices: ['alfa', 'bravo'],
         default: ['alfa', 'bravo'],
         description,
+        repeatable: true,
         type: 'choice'
       },
       numbers: {
-        allowMany: true,
         default: [1, 2],
         description,
+        repeatable: true,
         type: 'number'
       }
     });
@@ -366,9 +366,9 @@ describe('parseFlags', () => {
       () =>
         parse([], {
           numbers: {
-            allowMany: true,
             default: 1,
             description,
+            repeatable: true,
             type: 'number'
           }
         }),
@@ -429,7 +429,7 @@ describe('parseFlags', () => {
           checkFlag(
             'test',
             {
-              allowMany: true,
+              repeatable: true,
               required: true,
               type
             },
@@ -701,10 +701,10 @@ describe('parseFlags', () => {
 
   it('validates every value in an array default for a choice flag', () => {
     const flag = useFlag({
-      allowMany: true,
       choices: ['alfa', 'bravo'],
       default: ['alfa', 'charlie'],
       description,
+      repeatable: true,
       type: 'choice'
     });
 

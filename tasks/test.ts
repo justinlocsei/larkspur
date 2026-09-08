@@ -8,9 +8,9 @@ export default C({
   description: 'Run tests',
   flags: {
     suite: C.flag('choice', 'Only run the given test suites', {
-      allowMany: true,
       choices: SUITES,
-      default: SUITES
+      default: SUITES,
+      repeatable: true
     })
   },
   handler: async ({ suite: suites }, { args }) => {

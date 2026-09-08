@@ -319,9 +319,9 @@ describe('buildHelp', () => {
         command: C(
           '@command',
           {
-            alfa: C.flag('string', '@alfa', { allowMany: true }),
-            bravo: C.flag('number', '@bravo', { allowMany: true }),
-            charlie: C.flag('path', '@charlie', { allowMany: true })
+            alfa: C.flag('string', '@alfa', { repeatable: true }),
+            bravo: C.flag('number', '@bravo', { repeatable: true }),
+            charlie: C.flag('path', '@charlie', { repeatable: true })
           },
           handler
         ),

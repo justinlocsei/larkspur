@@ -7,9 +7,9 @@ export default C(
   'Check the codebase',
   {
     only: C.flag('choice', 'Only run the given checks', {
-      allowMany: true,
       choices: CHECKS,
-      default: CHECKS
+      default: CHECKS,
+      repeatable: true
     })
   },
   async ({ only }) => {
