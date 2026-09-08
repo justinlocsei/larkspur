@@ -122,7 +122,7 @@ Then add this line before loading compinit:
     const choices = [
       'choices=("${(@f)$(',
       quote(this.cli.name),
-      quote(this.config.completion.group),
+      quote(this.config.completions.group),
       'provide --flag',
       quote(encodeFlagPath(levels, flagName)),
       '--current "$current" --shell zsh )}")'

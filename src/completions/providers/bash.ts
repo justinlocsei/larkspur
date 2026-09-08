@@ -207,7 +207,7 @@ To use these completions, reload your profile or start a new shell.`.trim();
           'fi'
         ],
         `done < <(${quote(this.cli.name)} ${
-          quote(this.config.completion.group)
+          quote(this.config.completions.group)
         } provide --flag "$flag_path" --current "$complete_on" --shell bash)`
       ]
     );

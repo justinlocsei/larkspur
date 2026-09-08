@@ -124,7 +124,7 @@ describe('withCompletionCommands', () => {
 
     const updated = withCompletionCommands(
       original,
-      createTestContext({}, { completion: { group: 'completions' } })
+      createTestContext({}, { completions: { group: 'completions' } })
     );
 
     assert.isDefined(updated.completions);
@@ -136,7 +136,7 @@ describe('withCompletionCommands', () => {
   it('preserves the entry point if completions are not enabled', () => {
     const entry = withCompletionCommands(
       {},
-      createTestContext({}, { completion: { enabled: false } })
+      createTestContext({}, { completions: { enabled: false } })
     );
 
     assert.isEmpty(entry);
@@ -147,7 +147,7 @@ describe('withCompletionCommands', () => {
       () =>
         withCompletionCommands(
           { testing: defineCompletionCommands() },
-          createTestContext({}, { completion: { group: 'testing' } })
+          createTestContext({}, { completions: { group: 'testing' } })
         ),
       'testing'
     );

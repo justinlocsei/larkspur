@@ -63,11 +63,11 @@ export function defineCompletionCommands(): CommandGroup {
  */
 export function withCompletionCommands(
   entry: EntryPoint,
-  { config: { completion } }: Context
+  { config: { completions } }: Context
 ): EntryPoint {
-  const { group } = completion;
+  const { group } = completions;
 
-  if (!completion.enabled) {
+  if (!completions.enabled) {
     return entry;
   } else if (group in entry) {
     throw new OperationalError(

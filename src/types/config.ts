@@ -27,7 +27,7 @@ export type CompletionConfig = {
  * Fully populated configuration data for a CLI
  */
 export type Config = {
-  completion: CompletionConfig;
+  completions: CompletionConfig;
   help: HelpConfig;
 };
 

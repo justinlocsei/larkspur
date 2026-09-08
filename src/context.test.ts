@@ -8,7 +8,7 @@ describe('createContext', () => {
       createContext({ name: 'alfa' }),
       {
         config: {
-          completion: {
+          completions: {
             enabled: true,
             group: 'completions'
           },
@@ -30,11 +30,11 @@ describe('createContext', () => {
     assert.deepEqual(
       createContext(
         { description: 'alfa', name: 'bravo' },
-        { completion: { enabled: true }, help: { formatting: { indent: 4 } } }
+        { completions: { enabled: true }, help: { formatting: { indent: 4 } } }
       ),
       {
         config: {
-          completion: {
+          completions: {
             enabled: true,
             group: 'completions'
           },

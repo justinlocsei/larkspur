@@ -10,7 +10,7 @@ import type {
  */
 export function resolveConfig(config: UserConfig = {}): Config {
   return {
-    completion: resolveCompletionConfig(config),
+    completions: resolveCompletionConfig(config),
     help: resolveHelpConfig(config)
   };
 }
@@ -38,7 +38,7 @@ function resolveHelpConfig(user: UserConfig): HelpConfig {
  */
 function resolveCompletionConfig(user: UserConfig): CompletionConfig {
   const {
-    completion: {
+    completions: {
       enabled = true,
       group = 'completions'
     } = {}

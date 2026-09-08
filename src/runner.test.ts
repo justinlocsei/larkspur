@@ -178,7 +178,7 @@ describe('runCLI', () => {
       },
       createTestContext(
         {},
-        { completion: { enabled: false } }
+        { completions: { enabled: false } }
       )
     );
 

@@ -100,7 +100,7 @@ export abstract class CompletionProvider {
    * Build the command to generate a completion script
    */
   protected generateCommand(): string {
-    const { group } = this.config.completion;
+    const { group } = this.config.completions;
 
     return `${this.cli.name} ${group} generate --shell ${this.provideShell()}`;
   }
