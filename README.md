@@ -183,6 +183,10 @@ Any CLI built with Larkspur exposes a core set of functionality to a user withou
 
 Larkspur can show help messages for the CLI and each of its commands via a `--help` flag.  Passing this to the CLI's root command or a named command group will show all commands available at that level, and using `--help` with a command handler will show all available flags.
 
+#### Command Discovery
+
+All commands and flags can be recursively listed at any level of a command tree using the `--explore` flag.  This can be used by both humans and agents, as the output closely matches that of the standard help messages.
+
 #### Shell Completions
 
 Any Larkspur CLI can generate completions for bash and zsh using the top-level `completions` command group, which is present by default.  A user of your CLI would install completions by running `my-cli completions install --shell=<bash|zsh>`.  This command shows shell-specific installation instructions that a user can follow to set up completions for your CLI.
@@ -204,7 +208,10 @@ await run(
   { version: C('Show the current version', async () => '1.0.0') },
   {
     completions: { enabled: false },
-    help: { indent: 2 },
+    help: {
+      explore: { flag: 'document' },
+      indent: 2
+    },
     name: 'custom-name'
   }
 )
@@ -213,9 +220,11 @@ await run(
 The available configuration options are as follows:
 
 * `completions.enabled`: Whether completion commands are available (default: `true`)
-* `completions.group`: The name of the group that exposes completion commands (default: `completions`)
+* `completions.group`: The name of the group that exposes completion commands (default: `'completions'`)
 * `description`: A program description shown in help messages
-* `help.indent`: The number of spaces used for indentation in help message (default: 2)
+* `help.explore.enabled`: Whether the explore flag is available (default: `true`)
+* `help.explore.flag`: The name of the explore flag (default: `'explore'`)
+* `help.indent`: The number of spaces used for indentation in help message (default: `2`)
 * `name`: A custom program name shown in help messages, which can be used if the inferred name of the CLI is incorrect
 
 All of the properties above are optional.  If partial configuration data is provided, such as a `completions` object with a `group` but no `enabled` value, user-provided values will be merged on top of the default values.
