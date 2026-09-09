@@ -88,7 +88,7 @@ testProvider(ZshCompletionProvider, {
   ],
   resolvedFlags: [
     '[[ "$words[CURRENT-1]" == (--count|--custom|--file|--mode|--title) ]]',
-    '[[ "$words[CURRENT]" == --* ]] && [[ "$words[CURRENT]" != (--disabled|--no-enabled|--help) ]]'
+    '[[ "$words[CURRENT]" == --* ]] && [[ "$words[CURRENT]" != (--disabled|--no-enabled|--explore|--help) ]]'
   ],
   quoting: [
     "#compdef 'test-cli'",

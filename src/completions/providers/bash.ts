@@ -379,9 +379,9 @@ To use these completions, reload your profile or start a new shell.`.trim();
     commandNames: string[],
     subcommandCases: string[]
   ): CompletionFunction {
-    const setters = Object.entries(useSharedFlags()).flatMap(([n, f]) =>
-      getFlagForms(n, f).map(flagToSetter)
-    );
+    const setters = Object.entries(useSharedFlags(this.config)).flatMap((
+      [n, f]
+    ) => getFlagForms(n, f).map(flagToSetter));
 
     return this.defineFunction('command', levels, [
       'local index=$1',
@@ -413,7 +413,7 @@ To use these completions, reload your profile or start a new shell.`.trim();
   ): Completions {
     const flags: Flags = {
       ...command.flags,
-      ...useSharedFlags()
+      ...useSharedFlags(this.config)
     };
 
     const setters = Object.entries(flags).flatMap(([n, f]) =>
