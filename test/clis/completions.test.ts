@@ -33,6 +33,7 @@ test('completions', {
             '--count',
             '--custom',
             '--disabled',
+            '--file',
             '--help',
             '--mode',
             '--no-enabled',
@@ -68,6 +69,18 @@ test('completions', {
               ['mode-alfa', 'mode-bravo']
             ],
             [
+              ['group', 'nested', '--file', ' '],
+              ['hidden.txt', 'visible.txt']
+            ],
+            [
+              ['group', 'nested', '--file', 'visible'],
+              ['visible.txt']
+            ],
+            [
+              ['group', 'nested', '--title', 'visible'],
+              []
+            ],
+            [
               ['group', 'nested', '--disabled', ' '],
               flags
             ],
@@ -75,7 +88,7 @@ test('completions', {
               ['group', 'nested', '--count', '1', '--c'],
               ['--count', '--custom']
             ]
-          ]);
+          ], { files: ['hidden.txt', 'visible.txt'] });
         }
       ]
     ])
