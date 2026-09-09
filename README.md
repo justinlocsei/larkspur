@@ -195,10 +195,8 @@ import C, { run } from 'larkspur';
 await run(
   { version: C('Show the current version', async () => '1.0.0') },
   {
-    config: {
-      completions: { enabled: false },
-      help: { indent: 2 }
-    },
+    completions: { enabled: false },
+    help: { indent: 2 },
     name: 'custom-name'
   }
 )
@@ -206,13 +204,13 @@ await run(
 
 The available configuration options are as follows:
 
-* `config.completions.enabled`: Whether completion commands are available (default: `true`)
-* `config.completions.group`: The name of the group that exposes completion commands (default: `completions`)
+* `completions.enabled`: Whether completion commands are available (default: `true`)
+* `completions.group`: The name of the group that exposes completion commands (default: `completions`)
 * `description`: A program description shown in help messages
 * `help.indent`: The number of spaces used for indentation in help message (default: 2)
 * `name`: A custom program name shown in help messages, which can be used if the inferred name of the CLI is incorrect
 
-All of the properties above are optional.  If partial configuration data is provided, such as a `config.completions` object with a `group` but no `enabled` value, user-provided values will be merged on top of the default values.
+All of the properties above are optional.  If partial configuration data is provided, such as a `completions` object with a `group` but no `enabled` value, user-provided values will be merged on top of the default values.
 
 ### Defining Commands
 

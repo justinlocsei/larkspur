@@ -1,6 +1,10 @@
 import { assert, describe, it } from 'vitest';
 
-import type { EntryPointProvider, RunOptions } from './cli.ts';
+import type {
+  EntryPointProvider,
+  InternalOptions,
+  UserOptions
+} from './cli.ts';
 import { run } from './cli.ts';
 import type { EntryPoint } from './commands/types.ts';
 import { OperationalError } from './errors.ts';
@@ -12,18 +16,19 @@ const filename = import.meta.filename;
 async function testRun(
   entry: EntryPointProvider,
   args: string[],
-  config: RunOptions = {}
+  options: UserOptions = {},
+  internal: InternalOptions = {}
 ) {
   let error: Error | undefined;
   const { getOutput, logging } = testLogging();
 
-  await run(entry, {
+  await run(entry, options, {
     args: [process.execPath, ...args],
     logging,
     onError: cause => {
       error = cause;
     },
-    ...config
+    ...internal
   });
 
   return { error, output: getOutput() };

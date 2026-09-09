@@ -30,11 +30,15 @@ export type EntryPointProvider =
   | (() => EntryPoint | Promise<EntryPoint>);
 
 /**
- * Options for running a CLI
+ * User-facing options for running a CLI
  */
-export type RunOptions = Partial<Metadata> & {
+export type UserOptions = Partial<Metadata> & UserConfig;
+
+/**
+ * Internal options for running a CLI
+ */
+export type InternalOptions = {
   args?: string[];
-  config?: UserConfig;
   logging?: LoggingHandlers;
   onError?: (error: Error) => void;
 };
@@ -44,25 +48,30 @@ export type RunOptions = Partial<Metadata> & {
  */
 export async function run(
   entry: EntryPointProvider,
-  options: RunOptions = {}
+  options: UserOptions = {},
+  internal: InternalOptions = {}
 ): Promise<void> {
   const resolvedEntry = await resolveEntryPoint(entry);
 
   const {
     args = process.argv,
-    config,
-    description,
     logging: log = {
       error: m => console.error(m || ''),
       info: m => console.info(m || '')
     },
-    onError = () => (process.exitCode = 1),
+    onError = () => (process.exitCode = 1)
+  } = internal;
+
+  const {
+    completions,
+    description,
+    help,
     name = inferName(args)
   } = options;
 
   const context = createContext(
     { description, name },
-    config
+    { completions, help }
   );
 
   const response = await runCLI({
