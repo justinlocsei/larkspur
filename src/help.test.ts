@@ -71,7 +71,7 @@ describe('buildHelp', () => {
     );
   });
 
-  it('can show help for a CLI’s root commands', () => {
+  it('can show help for a CLI’s root command handlers and groups', () => {
     checkHelp(
       {
         commands: {
