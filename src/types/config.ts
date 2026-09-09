@@ -1,18 +1,10 @@
 import type { DeepPartial } from './utils.ts';
 
 /**
- * Formatting options for help messages
- */
-export type HelpFormatting = {
-  gutter: number;
-  indent: number;
-};
-
-/**
  * Configuration for help messages
  */
 export type HelpConfig = {
-  formatting: HelpFormatting;
+  indent: number;
 };
 
 /**

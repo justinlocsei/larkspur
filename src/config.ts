@@ -21,16 +21,11 @@ export function resolveConfig(config: UserConfig = {}): Config {
 function resolveHelpConfig(user: UserConfig): HelpConfig {
   const {
     help: {
-      formatting: {
-        gutter = 2,
-        indent = 2
-      } = {}
+      indent = 2
     } = {}
   } = user;
 
-  return {
-    formatting: { gutter, indent }
-  };
+  return { indent };
 }
 
 /**

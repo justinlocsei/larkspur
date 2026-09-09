@@ -10,10 +10,7 @@ describe('resolveConfig', () => {
         group: 'completions'
       },
       help: {
-        formatting: {
-          gutter: 2,
-          indent: 2
-        }
+        indent: 2
       }
     });
   });
@@ -22,7 +19,7 @@ describe('resolveConfig', () => {
     assert.deepEqual(
       resolveConfig({
         completions: { enabled: false, group: 'completion' },
-        help: { formatting: { gutter: 4 } }
+        help: { indent: 4 }
       }),
       {
         completions: {
@@ -30,10 +27,7 @@ describe('resolveConfig', () => {
           group: 'completion'
         },
         help: {
-          formatting: {
-            gutter: 4,
-            indent: 2
-          }
+          indent: 4
         }
       }
     );

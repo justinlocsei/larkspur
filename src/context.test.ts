@@ -13,10 +13,7 @@ describe('createContext', () => {
             group: 'completions'
           },
           help: {
-            formatting: {
-              gutter: 2,
-              indent: 2
-            }
+            indent: 2
           }
         },
         meta: {
@@ -30,7 +27,7 @@ describe('createContext', () => {
     assert.deepEqual(
       createContext(
         { description: 'alfa', name: 'bravo' },
-        { completions: { enabled: true }, help: { formatting: { indent: 4 } } }
+        { completions: { enabled: true }, help: { indent: 4 } }
       ),
       {
         config: {
@@ -39,10 +36,7 @@ describe('createContext', () => {
             group: 'completions'
           },
           help: {
-            formatting: {
-              gutter: 2,
-              indent: 4
-            }
+            indent: 4
           }
         },
         meta: {

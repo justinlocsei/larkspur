@@ -107,7 +107,6 @@ type HelpMessageConfig = {
 
 class HelpMessage {
   private readonly config: HelpMessageConfig;
-  private readonly gutter: string;
   private readonly indent: string;
 
   /**
@@ -116,10 +115,7 @@ class HelpMessage {
   constructor(config: HelpMessageConfig) {
     this.config = config;
 
-    const { gutter, indent } = config.context.config.help.formatting;
-
-    this.gutter = ' '.repeat(gutter);
-    this.indent = ' '.repeat(indent);
+    this.indent = ' '.repeat(config.context.config.help.indent);
   }
 
   /**
@@ -197,7 +193,7 @@ class HelpMessage {
         [
           this.indent,
           entry.label.padEnd(offset),
-          this.gutter,
+          this.indent,
           entry.description
         ].join('')
       )
@@ -294,12 +290,10 @@ class HelpMessage {
    * Build usage information for a single flag
    */
   private showFlag({ flag, setter }: PrintableFlag, offset: number): string[] {
-    const { gutter, indent } = this.config.context.config.help.formatting;
-
     const usage = [
       this.indent,
       setter.padEnd(offset),
-      this.gutter,
+      this.indent,
       formatDescription(flag.description)
     ].join('');
 
@@ -318,7 +312,7 @@ class HelpMessage {
 
     return [
       usage,
-      ...extra.map(l => `${' '.repeat(offset + gutter + indent)}(${l})`)
+      ...extra.map(l => `${' '.repeat(offset + this.indent.length * 2)}(${l})`)
     ];
   }
 }
