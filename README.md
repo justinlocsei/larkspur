@@ -11,7 +11,7 @@
 ## Installation
 
 ```sh
-npm install larkspur
+git clone https://github.com/justinlocsei/larkspur.git
 ```
 
 ## Quick Start
