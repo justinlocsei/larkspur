@@ -29,13 +29,15 @@ type GroupedFlags = {
  */
 export function buildHelp({
   context,
-  scope
+  scope,
+  sharedFlags = true
 }: {
   context: Context;
   scope: HelpScope;
+  sharedFlags?: boolean;
 }): string {
   const flags: Flags = {
-    ...useSharedFlags(context.config, scope.type),
+    ...(sharedFlags ? useSharedFlags(context.config, scope.type) : {}),
     ...(scope.type === 'command' ? scope.command.flags : {})
   };
 
