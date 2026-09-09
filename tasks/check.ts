@@ -14,16 +14,16 @@ export default C(
   },
   async ({ only }) => {
     if (only.includes('code')) {
-      run('biome', 'lint', '.');
+      run('biome', ['lint', '.']);
     }
 
     if (only.includes('formatting')) {
-      run('biome', 'ci', '--linter-enabled=false', '.');
-      run('dprint', 'check');
+      run('biome', ['ci', '--linter-enabled=false', '.']);
+      run('dprint', ['check']);
     }
 
     if (only.includes('types')) {
-      run('tsc', '--noEmit');
+      run('tsc', ['--noEmit']);
     }
   }
 );

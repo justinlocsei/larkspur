@@ -19,7 +19,7 @@ function localBin(name: string): string {
 /**
  * Run a command
  */
-export function run(npmBin: string, ...args: string[]): void {
+export function run(npmBin: string, args: string[] = []): void {
   const command = localBin(npmBin);
 
   const result = spawnSync(command, args, {

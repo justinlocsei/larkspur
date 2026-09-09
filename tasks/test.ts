@@ -18,15 +18,14 @@ export default C({
   },
   handler: async ({ name = '', suite: suites }) => {
     for (const suite of suites) {
-      run(
-        'vitest',
+      run('vitest', [
         'run',
         '--project',
         suite,
         '--reporter',
         'verbose',
         name
-      );
+      ]);
     }
   }
 });
