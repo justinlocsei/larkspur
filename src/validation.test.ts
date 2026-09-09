@@ -1,6 +1,7 @@
 import { assert, describe, it } from 'vitest';
 
 import type { CommandTree } from './commands/types.ts';
+import { resolveConfig } from './config.ts';
 import { OperationalError } from './errors.ts';
 import C from './factory.ts';
 import { checkConversion, ensure } from './tests.ts';
@@ -10,6 +11,7 @@ import {
   validateCommands
 } from './validation.ts';
 
+const config = resolveConfig();
 const description = 'description';
 const handler = async () => {};
 
@@ -74,7 +76,7 @@ describe('validateCommands', () => {
             handler
           )
         })
-      })
+      }, config)
     );
   });
 
@@ -85,7 +87,58 @@ describe('validateCommands', () => {
       commands = { [`command-${i}`]: C.group(description, commands) };
     }
 
-    assert.doesNotThrow(() => validateCommands(commands));
+    assert.doesNotThrow(() => validateCommands(commands, config));
+  });
+
+  it('rejects flags that conflict with core flags', () => {
+    for (const flag of ['explore', 'help']) {
+      ensure.throws(
+        () =>
+          validateCommands(
+            {
+              command: C(
+                description,
+                { [flag]: C.flag('string', description) },
+                handler
+              )
+            },
+            resolveConfig()
+          ),
+        'internal use'
+      );
+    }
+  });
+
+  it('allows explore flags when the core explore flag is disabled', () => {
+    assert.doesNotThrow(
+      () =>
+        validateCommands(
+          {
+            command: C(
+              description,
+              { explore: C.flag('string', description) },
+              handler
+            )
+          },
+          resolveConfig({ help: { explore: { enabled: false } } })
+        )
+    );
+  });
+
+  it('allows explore flags when the core explore flag uses a custom name', () => {
+    assert.doesNotThrow(
+      () =>
+        validateCommands(
+          {
+            command: C(
+              description,
+              { explore: C.flag('string', description) },
+              handler
+            )
+          },
+          resolveConfig({ help: { explore: { flag: 'other' } } })
+        )
+    );
   });
 
   it('reports invalid root command names', () => {
@@ -93,7 +146,7 @@ describe('validateCommands', () => {
       () =>
         validateCommands({
           Wrong: C(description, handler)
-        }),
+        }, config),
       'Invalid command name: Wrong'
     );
   });
@@ -105,7 +158,7 @@ describe('validateCommands', () => {
           parent: C.group(description, {
             'bad child': C(description, handler)
           })
-        }),
+        }, config),
       'Invalid command name: parent > bad child'
     );
   });
@@ -121,7 +174,7 @@ describe('validateCommands', () => {
               handler
             )
           })
-        }),
+        }, config),
       'Invalid flag --BadFlag on command: parent > leaf'
     );
   });
@@ -135,7 +188,7 @@ describe('validateCommands', () => {
             { 'no-verbose': C.flag('boolean', description) },
             handler
           )
-        }),
+        }, config),
       e => {
         assert.instanceOf(e, OperationalError);
 
