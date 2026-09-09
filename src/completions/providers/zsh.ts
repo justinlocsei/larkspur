@@ -238,7 +238,7 @@ Then add this line before loading compinit:
     levels: string[]
   ): ScriptLines {
     const flags: Flags = {
-      ...useSharedFlags(this.config),
+      ...useSharedFlags(this.config, 'command'),
       ...(command.flags || {})
     };
 
