@@ -369,7 +369,7 @@ describe('parseCommand', () => {
 
   it('exposes parsed and extra args when unused arguments are allowed', () => {
     const command = C({
-      allowUnused: true,
+      allowExtraArgs: true,
       description,
       flags: {
         boolean: { description, type: 'boolean' },
@@ -428,7 +428,7 @@ describe('parseCommand', () => {
       {
         parent: C.group(description, {
           command: C({
-            allowUnused: true,
+            allowExtraArgs: true,
             description,
             flags: {
               absent: { description, type: 'string' },

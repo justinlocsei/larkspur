@@ -4,7 +4,7 @@ import { run } from './helpers.ts';
 const SUITES = ['integration', 'properties', 'unit'] as const;
 
 export default C({
-  allowUnused: true,
+  allowExtraArgs: true,
   description: 'Run tests',
   flags: {
     suite: C.flag('choice', 'Only run the given test suites', {

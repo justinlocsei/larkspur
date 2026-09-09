@@ -63,7 +63,7 @@ await run({
     ),
 
     unit: C({
-      allowUnused: true,
+      allowExtraArgs: true,
       description: 'Run unit tests',
       flags: { reporter: C.flag('string', 'The reporter to use') },
       handler: async ({ reporter }, { args }) => {
@@ -240,14 +240,14 @@ C(
 
 // C(<fields>)
 C({
-  allowUnused: true,
+  allowExtraArgs: true,
   description: 'A command with extended options',
   flags: { version: C.flag('number', 'A version number') },
   handler: async (flags) => `Version: ${flags.version.toString()}`
 });
 ```
 
-The first two forms are the most concise and commonly used.  If you need to set extended options on a command, such as `allowUnused`, use the third form, which accepts an object describing the properties of the command.
+The first two forms are the most concise and commonly used.  If you need to set extended options on a command, such as `allowExtraArgs`, use the third form, which accepts an object describing the properties of the command.
 
 #### Command Groups
 
@@ -309,7 +309,7 @@ These details can be used to customize the behavior of the command, as demonstra
 import C from 'larkspur';
 
 C({
-  allowUnused: true,
+  allowExtraArgs: true,
   description: 'Run tests',
   flags: { cores: C.flag('number', 'The number of cores to use', { default: 4 }) },
   handler: async ({ cores }, details) => {

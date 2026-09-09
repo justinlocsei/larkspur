@@ -22,12 +22,12 @@ describe('buildCommandHandler', () => {
 
   it('can define a command handler that accepts unused arguments', () => {
     const command = buildCommandHandler({
-      allowUnused: true,
+      allowExtraArgs: true,
       description,
       handler
     });
 
-    assert.equal(command.allowUnused, true);
+    assert.equal(command.allowExtraArgs, true);
   });
 
   it('can define a command handler from a description and handler', () => {

@@ -163,7 +163,7 @@ class HelpMessage {
       ...path,
       needsCommand && '<command>',
       (needsCommand || !isEmpty(flags)) && '[flags]',
-      scope.type === 'command' && scope.command.allowUnused === true
+      scope.type === 'command' && scope.command.allowExtraArgs === true
       && '[arguments...]'
     ]);
 

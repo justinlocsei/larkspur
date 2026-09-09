@@ -189,7 +189,7 @@ describe('buildHelp', () => {
     checkHelp(
       {
         command: C({
-          allowUnused: true,
+          allowExtraArgs: true,
           description: '@command',
           handler
         }),

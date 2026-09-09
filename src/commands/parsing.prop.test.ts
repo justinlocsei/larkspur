@@ -23,7 +23,7 @@ test.prop([argv, singleCommand])(
   (args, command) => {
     const result = parseCommand([command.name, ...args], {
       [command.name]: C({
-        allowUnused: true,
+        allowExtraArgs: true,
         description,
         handler
       })

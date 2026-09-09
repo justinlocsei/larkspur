@@ -322,7 +322,7 @@ function extractCommand(
     const commandFlags = tryParseFlags(
       remainingArgs,
       command.flags || {},
-      { allowUnused: command.allowUnused === true },
+      { allowUnused: command.allowExtraArgs === true },
       { command, path, type: 'command' }
     );
 
