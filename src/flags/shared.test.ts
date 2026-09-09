@@ -1,7 +1,11 @@
 import { assert, describe, it } from 'vitest';
 
 import { resolveConfig } from '../config.ts';
-import { getExploreFlagName, useSharedFlags } from './shared.ts';
+import {
+  getExploreFlagName,
+  getReservedFlagNames,
+  useSharedFlags
+} from './shared.ts';
 
 describe('getExploreFlagName', () => {
   it('returns the configured explore flag name', () => {
@@ -19,6 +23,12 @@ describe('getExploreFlagName', () => {
     const config = resolveConfig({ help: { explore: { enabled: false } } });
 
     assert.isUndefined(getExploreFlagName(config));
+  });
+});
+
+describe('getReservedFlagNames', () => {
+  it('returns the names of flags that are reserved for internal use', () => {
+    assert.deepEqual(getReservedFlagNames(), ['help']);
   });
 });
 

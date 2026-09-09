@@ -45,3 +45,10 @@ export function getExploreFlagName(
     ? explore.flag
     : undefined;
 }
+
+/**
+ * Get the names of flags that are reserved for internal use
+ */
+export function getReservedFlagNames(): string[] {
+  return Object.keys(STATIC_FLAGS).sort();
+}
