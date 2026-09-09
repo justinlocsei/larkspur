@@ -427,7 +427,7 @@ my-cli test --always alfa --optional bravo --required charlie
 
 #### Path Flags
 
-Path flags are specialized string flags that normalize user-provided paths as absolute paths.  When shell completions are enabled, they also provide filesystem paths as suggestions.
+Path flags are specialized string flags that normalize user-provided paths as absolute paths.  When shell completions are enabled, they provide filesystem paths as suggestions.
 
 ```js
 import C from 'larkspur';
