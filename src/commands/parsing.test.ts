@@ -635,13 +635,15 @@ describe('parseCommand', () => {
     assert.equal(result.scope.type, 'root');
   });
 
-  it('can request exploration for a command', () => {
+  it('rejects exploration for a command', () => {
     const result = parseCommand(['command', '--explore'], {
       command: C(description, handler)
     });
 
-    assert(result.type === 'explore', 'Exploration not requested');
-    assert.equal(result.scope.type, 'command');
+    assert.equal(result.type, 'error');
+    if (result.type === 'error') {
+      assert.equal(result.message, 'Unknown flag: --explore');
+    }
   });
 
   it('can request exploration for a group', () => {

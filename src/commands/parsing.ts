@@ -15,7 +15,12 @@ import type { Config } from '../types/config.ts';
 import type { Variant } from '../types/utils.ts';
 import type { Context } from '../types.ts';
 import { getCommand } from './data.ts';
-import type { CommandGroup, CommandHandler, CommandTree } from './types.ts';
+import type {
+  CommandGroup,
+  CommandHandler,
+  CommandTree,
+  TreeScope
+} from './types.ts';
 
 /**
  * An executable command extracted from CLI args
@@ -98,7 +103,7 @@ type HelpParsingResult = IsParsingResult<'help', {
  * A request to explore the CLI
  */
 type ExploreParsingResult = IsParsingResult<'explore', {
-  scope: HelpScope;
+  scope: ExploreScope;
 }>;
 
 /**
@@ -122,7 +127,7 @@ type InternalParsingResult =
 /**
  * The fields shared by all help scopes
  */
-type IsHelpScope<T extends string, U> = U & {
+type IsHelpScope<T extends TreeScope, U> = U & {
   type: T;
 };
 
@@ -133,6 +138,20 @@ export type HelpScope =
   | IsHelpScope<'command', { command: CommandHandler; path: string[] }>
   | IsHelpScope<'group', { group: CommandGroup; path: string[] }>
   | IsHelpScope<'root', { commands: CommandTree }>;
+
+/**
+ * The fields shared by all explore scopes
+ */
+type IsExploreScope<T extends TreeScope, U> = U & {
+  type: T;
+};
+
+/**
+ * All scopes that can be explored
+ */
+export type ExploreScope =
+  | IsExploreScope<'group', { group: CommandGroup; path: string[] }>
+  | IsExploreScope<'root', { commands: CommandTree }>;
 
 /**
  * The results of parsing flags
@@ -261,7 +280,10 @@ function extractCommand(
   while (true) {
     const coreFlags = tryParseFlags(
       current.args,
-      useSharedFlags(current.config),
+      useSharedFlags(
+        current.config,
+        current.group ? 'group' : 'root'
+      ),
       { allowUnused: true }
     );
 
@@ -288,10 +310,14 @@ function extractCommand(
       ? { group: current.group, path: current.namespace, type: 'group' }
       : { commands: current.commands, type: 'root' };
 
+    const explore: ExploreScope = current.group
+      ? { group: current.group, path: current.namespace, type: 'group' }
+      : { commands: current.commands, type: 'root' };
+
     if (showHelp && (!name || !command)) {
       return { scope: help, type: 'help' };
     } else if (showExplore && (!name || !command)) {
-      return { scope: help, type: 'explore' };
+      return { scope: explore, type: 'explore' };
     } else if (!name) {
       return {
         code: 'invalid-command',
@@ -324,11 +350,6 @@ function extractCommand(
       };
 
       continue;
-    } else if (showExplore) {
-      return {
-        scope: { command, path, type: 'command' },
-        type: 'explore'
-      };
     } else if (showHelp) {
       return {
         scope: { command, path, type: 'command' },
