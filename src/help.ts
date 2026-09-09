@@ -41,7 +41,7 @@ export function buildHelp({
   scope
 }: HelpDisplayRequest): string {
   const flags: Flags = {
-    ...useSharedFlags(context.config),
+    ...useSharedFlags(context.config, scope.type),
     ...(scope.type === 'command' ? scope.command.flags : {})
   };
 

@@ -237,6 +237,27 @@ describe('buildHelp', () => {
     );
   });
 
+  it('does not show explore for a command', () => {
+    checkHelp(
+      {
+        command: C('@command', handler),
+        path: ['command'],
+        type: 'command'
+      },
+      [
+        'Usage: testing command [flags]',
+        '',
+        '@command',
+        '',
+        'Flags:',
+        '',
+        '  --help  Show help'
+      ],
+      {},
+      { help: { explore: { enabled: true } } }
+    );
+  });
+
   it('can show help for a grouped command', () => {
     checkHelp(
       {
