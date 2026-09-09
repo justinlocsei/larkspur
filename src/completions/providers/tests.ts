@@ -26,6 +26,7 @@ function createCompletionCommands(): CommandTree {
           }),
           disabled: C.flag('boolean', '@disabled'),
           enabled: C.flag('boolean', '@enabled', { default: true }),
+          file: C.flag('path', '@file'),
           mode: C.flag('choice', '@mode', {
             choices: ['mode-alfa', 'mode-bravo']
           }),
