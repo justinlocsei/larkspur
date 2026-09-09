@@ -1,9 +1,9 @@
 import { fc } from '@fast-check/vitest';
 
-const {
-  LARKSPUR_PROP_TEST_RUNS: testRuns,
-  LARKSPUR_PROP_TEST_SEED: testSeed
-} = process.env;
+import { getConfigVariable } from '../../src/tests/properties/config.ts';
+
+const testRuns = getConfigVariable('LARKSPUR_PROP_TEST_RUNS');
+const testSeed = getConfigVariable('LARKSPUR_PROP_TEST_SEED');
 
 fc.configureGlobal({
   numRuns: testRuns ? Number(testRuns) : 100,
