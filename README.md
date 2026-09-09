@@ -139,7 +139,7 @@ Larkspur can show help messages for the CLI and each of its commands via a `--he
 
 Any Larkspur CLI can generate completions for bash and zsh using the top-level `completions` command group, which is present by default.  A user of your CLI would install completions by running `my-cli completions install --shell=<bash|zsh>`.  This command shows shell-specific installation instructions that a user can follow to set up completions for your CLI.
 
-Completions require your CLI to be on the user's `PATH`.  The installation instructions notify the user of this requirement without providing details for how to make this happen.  If your users might not know how to add a command to their `PATH`, you can address this in the documentation for your CLI.
+For completions to work, your CLI must be on the user's `PATH`.  The installation instructions mention this requirement without explaining how to configure `PATH`.  If your users might need guidance on this point, you can provide it in your CLI's documentation.
 
 Installed completions are refreshed every time a user starts a new terminal session.  While this may result in a slight performance hit for very large CLIs, it allows your users to receive updated completions as you release changes to your CLI by opening a new terminal session.
 
