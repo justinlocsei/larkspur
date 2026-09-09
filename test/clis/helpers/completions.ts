@@ -8,6 +8,7 @@ import path from 'node:path';
  */
 export type CompletionsTest = {
   cliName: string;
+  files: string[];
   inputs: string[];
   script: string;
 };
@@ -16,8 +17,9 @@ export type CompletionsTest = {
  * A concrete run of completion tests
  */
 export type CompletionsTestRun = CompletionsTest & {
-  dir: string;
   preamble: string[];
+  rootDir: string;
+  runDir: string;
 };
 
 /**
@@ -32,11 +34,18 @@ export async function testCompletions(
   test: CompletionsTest,
   run: CompletionsTester
 ): Promise<string[]> {
-  return useTempDir(async dir => {
+  return useTempDir(async rootDir => {
+    const runDir = path.join(rootDir, 'run');
+    await fs.mkdir(runDir);
+
     const cliPath = path.join(import.meta.dirname, '..', `${test.cliName}.mjs`);
 
+    for (const file of test.files) {
+      await fs.writeFile(path.join(runDir, file), '');
+    }
+
     await fs.writeFile(
-      path.join(dir, path.basename(cliPath, '.mjs')),
+      path.join(rootDir, path.basename(cliPath, '.mjs')),
       [
         '#!/usr/bin/env sh',
         `exec ${process.execPath} ${JSON.stringify(cliPath)} "$@"`
@@ -46,8 +55,9 @@ export async function testCompletions(
 
     return run({
       ...test,
-      dir,
-      preamble: [`export PATH=${JSON.stringify(dir)}:$PATH`]
+      rootDir,
+      runDir,
+      preamble: [`export PATH=${JSON.stringify(rootDir)}:$PATH`]
     });
   });
 }
