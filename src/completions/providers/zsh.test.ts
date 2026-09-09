@@ -80,7 +80,8 @@ testProvider(ZshCompletionProvider, {
   groups: [
     '_test-cli__command__bare() {',
     '_test-cli__command__flags() {',
-    '_test-cli__command__group() {'
+    '_test-cli__command__group() {',
+    "_describe 'option' flag_names"
   ],
   nested: [
     '_test-cli__command__group__nested() {',

@@ -40,14 +40,24 @@ test('completions', {
             '--title'
           ];
 
+          const sharedFlags = ['--explore', '--help'];
+
           return testCompletions(name, [
             [
               [' '],
               ['bare', 'completions', 'flags', 'group']
             ],
             [
+              ['--'],
+              sharedFlags
+            ],
+            [
               ['group', ' '],
               ['nested']
+            ],
+            [
+              ['group', '--'],
+              sharedFlags
             ],
             [
               ['group', 'nested', ' '],

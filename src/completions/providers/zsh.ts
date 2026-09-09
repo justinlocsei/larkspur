@@ -209,6 +209,16 @@ Then add this line before loading compinit:
       .map(v => quote(v))
       .join(' ');
 
+    const sharedFlags = useSharedFlags(
+      this.config,
+      levels.length === 0 ? 'root' : 'group'
+    );
+
+    const flagNames = sortEntries(sharedFlags)
+      .flatMap(([name, flag]) => getFlagForms(name, flag).map(flagToSetter))
+      .map(name => quote(name))
+      .join(' ');
+
     const cases = entries.map(([name]) =>
       [
         `${quote(name)})`,
@@ -218,15 +228,24 @@ Then add this line before loading compinit:
     );
 
     return [
-      `case "$words[${wordIndex}]" in`,
-      cases,
-      '*)',
+      `if [[ "$words[${wordIndex}]" == --* ]]; then`,
       [
-        `local -a command_names=(${commandNames})`,
-        "_describe 'command' command_names"
+        `local -a flag_names=(${flagNames})`,
+        "_describe 'option' flag_names"
       ],
-      ';;',
-      'esac'
+      'else',
+      [
+        `case "$words[${wordIndex}]" in`,
+        cases,
+        '*)',
+        [
+          `local -a command_names=(${commandNames})`,
+          "_describe 'command' command_names"
+        ],
+        ';;',
+        'esac'
+      ],
+      'fi'
     ];
   }
 
