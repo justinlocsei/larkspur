@@ -1,4 +1,5 @@
 import { OperationalError } from '../src/errors.ts';
+import type { EnvironmentVariables } from '../src/types.ts';
 
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
@@ -19,11 +20,16 @@ function localBin(name: string): string {
 /**
  * Run a command
  */
-export function run(npmBin: string, args: string[] = []): void {
+export function run(
+  npmBin: string,
+  args: string[] = [],
+  { env = {} }: { env?: EnvironmentVariables } = {}
+): void {
   const command = localBin(npmBin);
 
   const result = spawnSync(command, args, {
     cwd: REPO_ROOT,
+    env: { ...process.env, ...env },
     stdio: 'inherit'
   });
 
