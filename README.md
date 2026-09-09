@@ -133,20 +133,6 @@ A command group contains one or more child commands, and groups can recursively 
 
 A command handler is a concrete function that runs an action and has access to any flags that a user provided.  Handler functions are covered in detail later on, but the most basic handler is an empty async function, which will allow the command to run and exit with a 0 status code.
 
-#### Help Messages
-
-Larkspur can show help messages for the CLI and each of its commands via a `--help` flag.  Passing this to the CLI's root command or a named command group will show all commands available at that level, and using `--help` with a command handler will show all available flags.
-
-#### Shell Completions
-
-Any Larkspur CLI can generate completions for bash and zsh using the top-level `completions` command group, which is present by default.  A user of your CLI would install completions by running `my-cli completions install --shell=<bash|zsh>`.  This command shows shell-specific installation instructions that a user can follow to set up completions for your CLI.
-
-For completions to work, your CLI must be on the user's `PATH`.  The installation instructions mention this requirement but do not explain how to configure `PATH`; if your users may need guidance, provide it in your CLI's documentation.
-
-Installed completions are refreshed every time a user starts a new terminal session.  While this may result in a slight performance hit for very large CLIs, it allows your users to receive updated completions as you release changes to your CLI by opening a new terminal session.
-
-If you wish to manage completions for internal users, you can run `my-cli completions generate --shell=<bash|zsh>` to print the completions for the requested shell.  If you save these to a file and configure a user's shell to read that file, you can avoid the cost of refreshing completions for each interactive terminal session.
-
 #### File Properties
 
 A Larkspur CLI is intended to be directly executed, either via `./my-cli` for a local file or `my-cli`, if the command lives on a user's `PATH`.  For this to work, you must ensure that the file is marked as executable via command like `chmod +x my-cli` and that it starts with a shebang that invokes the Node.js interpreter, such as `#!/usr/bin/env node`.
@@ -188,6 +174,24 @@ import test from './test.mjs';
 
 await run({ build, test });
 ```
+
+### CLI Features
+
+Any CLI built with Larkspur exposes a core set of functionality to a user without any further configuration.  If desired, some of the features described below can be disabled or customized, as described in the section on configuring Larkspur.
+
+#### Help Messages
+
+Larkspur can show help messages for the CLI and each of its commands via a `--help` flag.  Passing this to the CLI's root command or a named command group will show all commands available at that level, and using `--help` with a command handler will show all available flags.
+
+#### Shell Completions
+
+Any Larkspur CLI can generate completions for bash and zsh using the top-level `completions` command group, which is present by default.  A user of your CLI would install completions by running `my-cli completions install --shell=<bash|zsh>`.  This command shows shell-specific installation instructions that a user can follow to set up completions for your CLI.
+
+For completions to work, your CLI must be on the user's `PATH`.  The installation instructions mention this requirement but do not explain how to configure `PATH`; if your users may need guidance, provide it in your CLI's documentation.
+
+Installed completions are refreshed every time a user starts a new terminal session.  While this may result in a slight performance hit for very large CLIs, it allows your users to receive updated completions as you release changes to your CLI by opening a new terminal session.
+
+If you wish to manage completions for internal users, you can run `my-cli completions generate --shell=<bash|zsh>` to print the completions for the requested shell.  If you save these to a file and configure a user's shell to read that file, you can avoid the cost of refreshing completions for each interactive terminal session.
 
 ### Configuring Larkspur
 
