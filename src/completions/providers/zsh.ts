@@ -214,11 +214,6 @@ Then add this line before loading compinit:
       levels.length === 0 ? 'root' : 'group'
     );
 
-    const flagNames = sortEntries(sharedFlags)
-      .flatMap(([name, flag]) => getFlagForms(name, flag).map(flagToSetter))
-      .map(name => quote(name))
-      .join(' ');
-
     const cases = entries.map(([name]) =>
       [
         `${quote(name)})`,
@@ -230,7 +225,7 @@ Then add this line before loading compinit:
     return [
       `if [[ "$words[${wordIndex}]" == --* ]]; then`,
       [
-        `local -a flag_names=(${flagNames})`,
+        `local -a flag_names=(${this.listFlags(sharedFlags)})`,
         "_describe 'option' flag_names"
       ],
       'else',
@@ -265,11 +260,7 @@ Then add this line before loading compinit:
       this.renderFlagSpecs(name, flag, levels)
     );
 
-    const flagNames = sortEntries(flags)
-      .flatMap(([name, flag]) => getFlagForms(name, flag).map(flagToSetter))
-      .map(name => quote(name))
-      .join(' ');
-
+    const flagNames = this.listFlags(flags);
     const patterns = this.partitionSetterPatterns(flags);
 
     const flagOrValue = compact([
@@ -295,6 +286,20 @@ Then add this line before loading compinit:
       ],
       'fi'
     ];
+  }
+
+  /**
+   * Format flags as a combination of a setter and description
+   */
+  private listFlags(flags: Flags): string {
+    return sortEntries(flags)
+      .flatMap(([name, flag]) =>
+        getFlagForms(name, flag).map(f =>
+          `${flagToSetter(f)}:${formatDescription(flag.description)}`
+        )
+      )
+      .map(v => quote(v))
+      .join(' ');
   }
 
   /**

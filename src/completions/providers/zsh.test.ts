@@ -81,7 +81,9 @@ testProvider(ZshCompletionProvider, {
     '_test-cli__command__bare() {',
     '_test-cli__command__flags() {',
     '_test-cli__command__group() {',
-    "_describe 'option' flag_names"
+    "_describe 'option' flag_names",
+    "'--explore:Recursively list commands and flags'",
+    "'--help:Show help'"
   ],
   nested: [
     '_test-cli__command__group__nested() {',
