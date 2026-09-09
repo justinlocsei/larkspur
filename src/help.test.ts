@@ -8,7 +8,7 @@ import type { Metadata } from './types.ts';
 
 async function handler() {}
 
-const rootFlags = [
+const helpFlag = [
   '',
   'Flags:',
   '',
@@ -46,7 +46,7 @@ describe('buildHelp', () => {
         '',
         '  alfa   @alfa',
         '  bravo  @bravo',
-        ...rootFlags
+        ...helpFlag
       ]
     );
   });
@@ -66,7 +66,7 @@ describe('buildHelp', () => {
         'Commands:',
         '',
         '  visible  @visible',
-        ...rootFlags
+        ...helpFlag
       ]
     );
   });
@@ -89,7 +89,7 @@ describe('buildHelp', () => {
         '',
         '  alfa             @alfa',
         '  bravo <command>  @bravo',
-        ...rootFlags
+        ...helpFlag
       ]
     );
   });
@@ -110,7 +110,7 @@ describe('buildHelp', () => {
         'Commands:',
         '',
         '  command  @command',
-        ...rootFlags
+        ...helpFlag
       ],
       { description: '@description' }
     );
@@ -135,10 +135,7 @@ describe('buildHelp', () => {
         '',
         '  alfa   @alfa',
         '  bravo  @bravo',
-        '',
-        'Flags:',
-        '',
-        '  --help  Show help'
+        ...helpFlag
       ]
     );
   });
@@ -161,7 +158,7 @@ describe('buildHelp', () => {
         'Commands:',
         '',
         '  visible  @visible',
-        ...rootFlags
+        ...helpFlag
       ]
     );
   });
@@ -177,10 +174,7 @@ describe('buildHelp', () => {
         'Usage: testing command [flags]',
         '',
         '@command',
-        '',
-        'Flags:',
-        '',
-        '  --help  Show help'
+        ...helpFlag
       ]
     );
   });
@@ -196,10 +190,7 @@ describe('buildHelp', () => {
         'Usage: testing parent command [flags]',
         '',
         '@command',
-        '',
-        'Flags:',
-        '',
-        '  --help  Show help'
+        ...helpFlag
       ]
     );
   });
