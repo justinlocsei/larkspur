@@ -114,10 +114,10 @@ function parseZshCompletionReply(output: string): string[] {
  * Request completions for a set of inputs from zsh
  */
 export const runZshCompletions: CompletionsTester = async (run) => {
-  const { cliName, dir, inputs } = run;
+  const { cliName, rootDir, inputs } = run;
 
-  const completionPath = path.join(dir, 'completion.zsh');
-  const harnessPath = path.join(dir, 'harness.zsh');
+  const completionPath = path.join(rootDir, 'completion.zsh');
+  const harnessPath = path.join(rootDir, 'harness.zsh');
 
   await fs.writeFile(
     completionPath,
@@ -132,7 +132,7 @@ export const runZshCompletions: CompletionsTester = async (run) => {
   const { status, stderr, stdout } = spawnSync(
     'zsh',
     [harnessPath],
-    { cwd: dir, encoding: 'utf8' }
+    { cwd: run.runDir, encoding: 'utf8' }
   );
 
   assert.equal(
