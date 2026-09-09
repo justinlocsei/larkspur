@@ -162,7 +162,7 @@ class HelpMessage {
     flags,
     title
   }: HelpSections): string {
-    const lines = [title];
+    const lines = [`Usage: ${title}`];
 
     if (details) {
       lines.push('', details);
@@ -202,14 +202,12 @@ class HelpMessage {
 
     const needsCommand = scope.type !== 'command';
 
-    const usage = compact([
+    return compact([
       cli.name,
       ...path,
       needsCommand && '<command>',
       (needsCommand || !isEmpty(flags)) && '[flags]'
-    ]);
-
-    return `Usage: ${usage.join(' ')}`;
+    ]).join(' ');
   }
 
   /**
