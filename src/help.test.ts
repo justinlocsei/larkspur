@@ -4,6 +4,7 @@ import type { HelpScope } from './commands/parsing.ts';
 import C from './factory.ts';
 import { buildHelp } from './help.ts';
 import { createTestContext } from './tests.ts';
+import type { UserConfig } from './types/config.ts';
 import type { Metadata } from './types.ts';
 
 async function handler() {}
@@ -18,11 +19,15 @@ const helpFlag = [
 function checkHelp(
   scope: HelpScope,
   lines: string[],
-  meta?: Partial<Metadata>
+  meta?: Partial<Metadata>,
+  config: UserConfig = {}
 ) {
   assert.equal(
     buildHelp({
-      context: createTestContext(meta),
+      context: createTestContext(meta, {
+        help: { explore: { enabled: false } },
+        ...config
+      }),
       scope
     }),
     lines.join('\n')
@@ -48,6 +53,29 @@ describe('buildHelp', () => {
         '  bravo  @bravo',
         ...helpFlag
       ]
+    );
+  });
+
+  it('includes the explore flag in root help messages', () => {
+    checkHelp(
+      {
+        commands: { alfa: C('@alfa', handler) },
+        type: 'root'
+      },
+      [
+        'Usage: testing <command> [flags]',
+        '',
+        'Commands:',
+        '',
+        '  alfa  @alfa',
+        '',
+        'Flags:',
+        '',
+        '  --explore  Recursively list commands and flags',
+        '  --help     Show help'
+      ],
+      {},
+      { help: { explore: { enabled: true } } }
     );
   });
 
@@ -137,6 +165,36 @@ describe('buildHelp', () => {
         '  bravo  @bravo',
         ...helpFlag
       ]
+    );
+  });
+
+  it('includes the explore flag in help messages for command groups', () => {
+    checkHelp(
+      {
+        group: C.group('@parent', {
+          alfa: C('@alfa', handler),
+          bravo: C('@bravo', handler)
+        }),
+        path: ['parent'],
+        type: 'group'
+      },
+      [
+        'Usage: testing parent <command> [flags]',
+        '',
+        '@parent',
+        '',
+        'Commands:',
+        '',
+        '  alfa   @alfa',
+        '  bravo  @bravo',
+        '',
+        'Flags:',
+        '',
+        '  --explore  Recursively list commands and flags',
+        '  --help     Show help'
+      ],
+      {},
+      { help: { explore: { enabled: true } } }
     );
   });
 
