@@ -29,7 +29,7 @@ type GroupedFlags = GroupFlags<Flags>;
 /**
  * Sections in a help message
  */
-type HelpSections = {
+export type HelpSections = {
   commands: string[];
   details?: string;
   flags: GroupFlags<string[]>;
@@ -39,13 +39,13 @@ type HelpSections = {
 /**
  * Generated help
  */
-type Help = {
+export type Help = {
+  message: string;
   sections: HelpSections;
-  text: string;
 };
 
 /**
- * Build the text of a CLI's help message
+ * Build a CLI's help message
  */
 export function buildHelp({
   context,
@@ -55,7 +55,7 @@ export function buildHelp({
   context: Context;
   scope: HelpScope;
   sharedFlags?: boolean;
-}): string {
+}): Help {
   const flags: Flags = {
     ...(sharedFlags ? useSharedFlags(context.config, scope.type) : {}),
     ...(scope.type === 'command' ? scope.command.flags : {})
@@ -70,12 +70,10 @@ export function buildHelp({
 
   const sections = message.assemble();
 
-  const help: Help = {
-    sections,
-    text: message.format(sections)
+  return {
+    message: message.format(sections),
+    sections
   };
-
-  return help.text;
 }
 
 /**

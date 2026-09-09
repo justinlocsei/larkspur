@@ -106,7 +106,7 @@ export async function runCLI({
       return failWith(
         new OperationalError(parsing.message),
         parsing.help
-          ? buildHelp({ context, scope: parsing.help })
+          ? buildHelp({ context, scope: parsing.help }).message
           : undefined
       );
 
@@ -118,7 +118,7 @@ export async function runCLI({
 
     case 'help':
       return {
-        message: buildHelp({ context, scope: parsing.scope }),
+        message: buildHelp({ context, scope: parsing.scope }).message,
         type: 'help'
       };
   }

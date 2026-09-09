@@ -29,7 +29,7 @@ function checkHelp(
         ...config
       }),
       scope
-    }),
+    }).message,
     lines.join('\n')
   );
 }
@@ -80,7 +80,7 @@ describe('buildHelp', () => {
   });
 
   it('can opt out of shared flags', () => {
-    const message = buildHelp({
+    const { message } = buildHelp({
       context: createTestContext(),
       scope: {
         commands: { alfa: C('@alfa', handler) },
