@@ -15,9 +15,9 @@ import { SUPPORTED_SHELLS } from './shells.ts';
 export function defineCompletionCommands(): CommandGroup {
   return C.group('manage shell completions', {
     generate: C(
-      'generate a completion script',
+      'Generate a completion script',
       {
-        shell: C.flag('choice', 'a supported shell', {
+        shell: C.flag('choice', 'A supported shell', {
           choices: SUPPORTED_SHELLS,
           required: true
         })
@@ -27,9 +27,9 @@ export function defineCompletionCommands(): CommandGroup {
     ),
 
     install: C(
-      'show installation instructions',
+      'Show installation instructions',
       {
-        shell: C.flag('choice', 'a supported shell', {
+        shell: C.flag('choice', 'A supported shell', {
           choices: SUPPORTED_SHELLS,
           required: true
         })
@@ -39,11 +39,11 @@ export function defineCompletionCommands(): CommandGroup {
     ),
 
     provide: C({
-      description: 'provide values for a custom flag completion',
+      description: 'Provide values for a custom flag completion',
       flags: {
-        current: C.flag('string', 'the current value'),
-        flag: C.flag('string', 'the encoded flag path', { required: true }),
-        shell: C.flag('choice', 'a supported shell', {
+        current: C.flag('string', 'The current value'),
+        flag: C.flag('string', 'The encoded flag path', { required: true }),
+        shell: C.flag('choice', 'A supported shell', {
           choices: SUPPORTED_SHELLS,
           required: true
         })
