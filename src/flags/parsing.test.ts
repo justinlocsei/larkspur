@@ -1,6 +1,7 @@
 import { assert, describe, it } from 'vitest';
 
 import { NormalizedArgs } from '../args.ts';
+import { resolveConfig } from '../config.ts';
 import C from '../factory.ts';
 import { checkConversion, ensure, inspect } from '../tests.ts';
 import type { DistributiveOmit } from '../types/utils.ts';
@@ -52,8 +53,10 @@ describe('extractValues', () => {
 
 describe('getSharedFlagValue', () => {
   it('gets the value of a shared flag', () => {
-    const empty = parse([], useSharedFlags());
-    const full = parse(['--help'], useSharedFlags());
+    const flags = useSharedFlags(resolveConfig());
+
+    const empty = parse([], flags);
+    const full = parse(['--explore', '--help'], flags);
 
     assert.isFalse(getSharedFlagValue(empty.flags, 'help'));
     assert.isTrue(getSharedFlagValue(full.flags, 'help'));
