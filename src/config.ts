@@ -1,9 +1,11 @@
 import type {
   CompletionConfig,
   Config,
+  ExploreConfig,
   HelpConfig,
   UserConfig
 } from './types/config.ts';
+import { isValidFlagName } from './validation.ts';
 
 /**
  * Build a full configuration object from user data
@@ -21,11 +23,36 @@ export function resolveConfig(config: UserConfig = {}): Config {
 function resolveHelpConfig(user: UserConfig): HelpConfig {
   const {
     help: {
+      explore,
       indent = 2
     } = {}
   } = user;
 
-  return { indent };
+  return {
+    explore: resolveExploreConfig(explore),
+    indent
+  };
+}
+
+/**
+ * Resolve the explore configuration
+ */
+function resolveExploreConfig(
+  user: Partial<ExploreConfig> = {}
+): ExploreConfig {
+  const {
+    enabled = true,
+    flag = 'explore'
+  } = user;
+
+  if (!isValidFlagName(flag) || flag === 'help') {
+    throw new Error(`Invalid name for the explore flag: ${flag}`);
+  }
+
+  return {
+    enabled,
+    flag
+  };
 }
 
 /**

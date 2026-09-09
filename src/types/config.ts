@@ -4,7 +4,16 @@ import type { DeepPartial } from './utils.ts';
  * Configuration for help messages
  */
 export type HelpConfig = {
+  explore: ExploreConfig;
   indent: number;
+};
+
+/**
+ * Configuration for exploratory CLI output
+ */
+export type ExploreConfig = {
+  enabled: boolean;
+  flag: string;
 };
 
 /**

@@ -13,6 +13,10 @@ describe('createContext', () => {
             group: 'completions'
           },
           help: {
+            explore: {
+              enabled: true,
+              flag: 'explore'
+            },
             indent: 2
           }
         },
@@ -36,6 +40,10 @@ describe('createContext', () => {
             group: 'completions'
           },
           help: {
+            explore: {
+              enabled: true,
+              flag: 'explore'
+            },
             indent: 4
           }
         },

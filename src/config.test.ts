@@ -10,6 +10,10 @@ describe('resolveConfig', () => {
         group: 'completions'
       },
       help: {
+        explore: {
+          enabled: true,
+          flag: 'explore'
+        },
         indent: 2
       }
     });
@@ -18,18 +22,34 @@ describe('resolveConfig', () => {
   it('merges partial configuration data with defaults', () => {
     assert.deepEqual(
       resolveConfig({
-        completions: { enabled: false, group: 'completion' },
-        help: { indent: 4 }
+        completions: { enabled: false },
+        help: {
+          explore: { flag: 'document' },
+          indent: 4
+        }
       }),
       {
         completions: {
           enabled: false,
-          group: 'completion'
+          group: 'completions'
         },
         help: {
+          explore: {
+            enabled: true,
+            flag: 'document'
+          },
           indent: 4
         }
       }
     );
+  });
+
+  it('rejects invalid explore-flag names', () => {
+    for (const name of ['help', 'Invalid']) {
+      assert.throws(
+        () => resolveConfig({ help: { explore: { flag: name } } }),
+        name
+      );
+    }
   });
 });
