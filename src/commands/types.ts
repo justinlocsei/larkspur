@@ -18,7 +18,6 @@ export type CommandHandler<
   F extends Flags = Flags,
   C extends FlagContext = 'narrow'
 > = IsCommand<'handler', {
-  allowExtraArgs?: true;
   flags?: F;
   handler: CommmandHandlerFn<F, C>;
   hidden?: true;

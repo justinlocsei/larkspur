@@ -158,9 +158,7 @@ class HelpMessage {
       cli.name,
       ...path,
       needsCommand && '<command>',
-      (needsCommand || !isEmpty(flags)) && '[flags]',
-      scope.type === 'command' && scope.command.allowExtraArgs === true
-      && '[arguments...]'
+      (needsCommand || !isEmpty(flags)) && '[flags]'
     ]);
 
     return `Usage: ${usage.join(' ')}`;
