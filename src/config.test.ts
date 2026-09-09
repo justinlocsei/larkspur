@@ -5,7 +5,7 @@ import { resolveConfig } from './config.ts';
 describe('resolveConfig', () => {
   it('returns defaults for an empty configuration', () => {
     assert.deepEqual(resolveConfig(), {
-      completion: {
+      completions: {
         enabled: true,
         group: 'completions'
       },
@@ -25,7 +25,7 @@ describe('resolveConfig', () => {
         help: { formatting: { gutter: 4 } }
       }),
       {
-        completion: {
+        completions: {
           enabled: false,
           group: 'completion'
         },
