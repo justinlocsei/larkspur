@@ -64,6 +64,11 @@ export type CommandTree<T extends string = string> = Partial<
 export type KnownCommandTree<T extends string> = Required<CommandTree<T>>;
 
 /**
+ * A level within a command tree
+ */
+export type TreeScope = 'command' | 'group' | 'root';
+
+/**
  * An entry point for a CLI
  */
 export type EntryPoint = CommandTree;
