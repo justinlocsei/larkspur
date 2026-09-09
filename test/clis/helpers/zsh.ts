@@ -132,7 +132,7 @@ export const runZshCompletions: CompletionsTester = async (run) => {
   const { status, stderr, stdout } = spawnSync(
     'zsh',
     [harnessPath],
-    { encoding: 'utf8' }
+    { cwd: dir, encoding: 'utf8' }
   );
 
   assert.equal(

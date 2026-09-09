@@ -14,7 +14,7 @@ import path from 'node:path';
  * Request completions for a set of inputs from bash
  */
 export const runBashCompletions: CompletionsTester = async (run) => {
-  const { cliName, inputs } = run;
+  const { cliName, dir, inputs } = run;
   const args = [cliName, ...inputs];
 
   const words = args
@@ -37,6 +37,7 @@ export const runBashCompletions: CompletionsTester = async (run) => {
   await fs.writeFile(harnessPath, harness);
 
   const { status, stderr, stdout } = spawnSync('bash', [harnessPath], {
+    cwd: dir,
     encoding: 'utf8'
   });
 
