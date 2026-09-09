@@ -1,6 +1,7 @@
 import C from '../src/factory.ts';
 import { setConfigVariables } from '../src/tests/properties/config.ts';
 import type { EnvironmentVariables } from '../src/types.ts';
+import { build } from './build.ts';
 import { run } from './helpers.ts';
 
 const SUITES = ['integration', 'properties', 'unit'] as const;
@@ -12,7 +13,7 @@ function runSuite(
   suite: typeof SUITES[number],
   name: string = '',
   env: EnvironmentVariables = {}
-) {
+): void {
   run(
     'vitest',
     [
@@ -41,8 +42,19 @@ export default C.group('Run tests', {
 
   integration: C(
     'Run integration tests',
-    { name },
-    async flags => runSuite('integration', flags.name)
+    {
+      build: C.flag('boolean', 'Build the project before running tests', {
+        default: true
+      }),
+      name
+    },
+    async flags => {
+      if (flags.build) {
+        build();
+      }
+
+      runSuite('integration', flags.name);
+    }
   ),
 
   properties: C(

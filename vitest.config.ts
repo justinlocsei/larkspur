@@ -16,7 +16,6 @@ export default defineConfig({
       {
         extends: true,
         test: {
-          globalSetup: ['./test/setup/integration.ts'],
           include: ['test/clis/**/*.test.ts'],
           name: 'integration'
         }
