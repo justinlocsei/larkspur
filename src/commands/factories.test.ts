@@ -114,10 +114,12 @@ describe('buildCommandGroup', () => {
 });
 
 describe('buildCommandTree', () => {
-  it('returns the given command tree', () => {
+  it('builds a command tree with known keys', () => {
     const tree = buildCommandTree({
       child: buildCommandHandler(description, handler)
     });
+
+    T.assert<T.Equivalent<keyof typeof tree, 'child'>>(true);
 
     const { child } = tree;
 

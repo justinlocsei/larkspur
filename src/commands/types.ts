@@ -54,7 +54,14 @@ export type Command = GenericCommandHandler | CommandGroup;
 /**
  * A tree of named commands
  */
-export type CommandTree = Partial<Record<string, Command>>;
+export type CommandTree<T extends string = string> = Partial<
+  Record<T, Command>
+>;
+
+/**
+ * A command tree with known commands
+ */
+export type KnownCommandTree<T extends string> = Required<CommandTree<T>>;
 
 /**
  * An entry point for a CLI
