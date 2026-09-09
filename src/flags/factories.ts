@@ -20,7 +20,7 @@ type ValidOptions<T extends Flag, O> =
   & ValidDefaultOptions<O>;
 
 /**
- * Require value lists for defaults of multi-value flags
+ * Require value lists for defaults of repeatable flags
  */
 type ValidDefaultOptions<O> = O extends { default: readonly unknown[] }
   ? O extends { repeatable: true } ? O : never

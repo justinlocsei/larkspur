@@ -114,7 +114,7 @@ describe('parseFlags', () => {
     );
   });
 
-  it('treats unset multi-value flags as undefined', () => {
+  it('treats unset repeatable flags as empty arrays', () => {
     const flags = useFlags({
       alfa: {
         description,
@@ -253,7 +253,7 @@ describe('parseFlags', () => {
     );
   });
 
-  it('supports interleaved multi-value flags', () => {
+  it('supports interleaved repeatable flags', () => {
     const parsed = parse(['--alfa', '1', '--bravo', '2', '--alfa', '3'], {
       alfa: C.flag('number', description, { repeatable: true }),
       bravo: C.flag('number', description)
@@ -420,7 +420,7 @@ describe('parseFlags', () => {
     });
   });
 
-  it('throws an error if a required multi-value flag lacks a value', () => {
+  it('throws an error if a required repeatable flag lacks a value', () => {
     scalarTypes.forEach((type) => {
       const message = `Missing value allowed for ${type} flag`;
 

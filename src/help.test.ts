@@ -313,7 +313,7 @@ describe('buildHelp', () => {
     );
   });
 
-  it('shows placeholders for multi-value scalar flags', () => {
+  it('shows placeholders for repeatable scalar flags', () => {
     checkHelp(
       {
         command: C(

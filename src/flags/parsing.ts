@@ -349,7 +349,7 @@ function forbidDuplicates({ name }: ParsingContext): never {
 }
 
 /**
- * Throw an error when a multi-value flag uses a scalar default
+ * Throw an error when a repeatable flag uses a scalar default
  */
 function forbidScalarDefault(
   { name }: ParsingContext,
@@ -361,7 +361,7 @@ function forbidScalarDefault(
     && !isMultiValueDefault(flag.default)
   ) {
     throw new ParsingError(
-      `Non-array default for multi-value flag: ${flagToSetter(name)}`
+      `Non-array default for repeatable flag: ${flagToSetter(name)}`
     );
   }
 }

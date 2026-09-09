@@ -66,7 +66,7 @@ export type ValuesOf<
 >;
 
 /**
- * Determine whether a default value is a multi-value one
+ * Determine whether a default value is a repeatable one
  */
 export function isMultiValueDefault<T extends ScalarValue>(
   value: DefaultFor<T>
