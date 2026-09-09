@@ -239,7 +239,6 @@ describe('parseFlags', () => {
     });
 
     assert.deepEqual(extractValues(parsed.flags), { alfa: '--bravo' });
-    assert.deepEqual(parsed.args.extra, ['2']);
   });
 
   it('throws an error for values left after a setter-like value is consumed', () => {
@@ -590,12 +589,6 @@ describe('parseFlags', () => {
         extractValues(parsed.flags),
         values,
         `Unexpected parsed flags for args: ${args.join(' ')}`
-      );
-
-      assert.sameOrderedMembers(
-        parsed.args.all,
-        args,
-        `Incorrect arguments reported for input args: ${args.join(' ')}`
       );
     });
   });

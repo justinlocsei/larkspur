@@ -13,18 +13,12 @@ import type { ValuesOf } from '../flags/values.ts';
 import type { Variant } from '../types/utils.ts';
 import type { Context } from '../types.ts';
 import { getCommand } from './data.ts';
-import type {
-  ArgParsingDetails,
-  CommandGroup,
-  CommandHandler,
-  CommandTree
-} from './types.ts';
+import type { CommandGroup, CommandHandler, CommandTree } from './types.ts';
 
 /**
  * An executable command extracted from CLI args
  */
 export type ParsedCommand = {
-  args: ArgParsingDetails;
   command: CommandHandler<Flags>;
   flags: ParsedFlags;
   path: string[];
@@ -195,7 +189,6 @@ function buildCommandRunner(
   commands: CommandTree
 ): CommandRunner {
   const {
-    args,
     command,
     flags,
     providedFlags
@@ -210,7 +203,6 @@ function buildCommandRunner(
       const result = await command.handler(
         values as ValuesOf<Flags, 'narrow'>,
         {
-          args,
           commands,
           context,
           providedFlags: new Set(providedFlags)
@@ -322,7 +314,7 @@ function extractCommand(
     const commandFlags = tryParseFlags(
       remainingArgs,
       command.flags || {},
-      { allowUnused: command.allowExtraArgs === true },
+      {},
       { command, path, type: 'command' }
     );
 

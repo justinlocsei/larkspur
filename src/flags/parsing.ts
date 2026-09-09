@@ -8,7 +8,6 @@ import type { SharedFlags } from './shared.ts';
 import type {
   BooleanFlag,
   ChoiceFlag,
-  ConsumedArgs,
   Flag,
   FlagContext,
   Flags,
@@ -86,7 +85,6 @@ export type ProvidedFlagNames<T extends Flags> = Set<
  * Information on the results of parsing flags
  */
 export type FlagParsing<T extends string = string> = {
-  args: ConsumedArgs;
   flags: ParsedFlags<T>;
   provided: string[];
 };
@@ -181,11 +179,6 @@ export function parseFlags(
   }
 
   return {
-    args: {
-      all: args,
-      extra: args.filter((_, i) => !consumed.has(i)),
-      parsed: args.filter((_, i) => consumed.has(i))
-    },
     flags: parsedFlags,
     provided: providedFlags
   };

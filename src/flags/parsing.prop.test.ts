@@ -16,14 +16,6 @@ function checkScalarParsing(
 ) {
   assert.deepEqual(parsed.provided, [flag], 'incorrect provided flags');
 
-  assert.deepEqual(
-    parsed.args.all,
-    parsed.args.parsed,
-    'inconsistent parsing results'
-  );
-
-  assert.isEmpty(parsed.args.extra, 'unexpected extra arguments');
-
   assert.deepEqual(Object.keys(parsed.flags), [flag], 'incorrect flags');
 
   const value = parsed.flags[flag]?.value;

@@ -179,12 +179,3 @@ export type FlagContext = 'narrow' | 'wide';
  * Definitions for a set of named CLI flags
  */
 export type Flags<T extends string = string> = Record<T, Flag>;
-
-/**
- * Details on how flags were parsed
- */
-export type ConsumedArgs = {
-  all: string[];
-  extra: string[];
-  parsed: string[];
-};

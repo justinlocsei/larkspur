@@ -259,15 +259,12 @@ describe('parseCommand', () => {
     >(
       async ([flags, args], output, message) => {
         let values: Record<string, SupportedValue> = {};
-        let parsedArgs: string[] = [];
-
         const result = parseCommand(['command', ...args], {
           command: C(
             description,
             transformValues(flags, flag => ({ ...flag, description })),
-            async (parsed, { args }) => {
+            async parsed => {
               values = parsed as Record<string, SupportedValue>;
-              parsedArgs = args.parsed;
             }
           )
         });
@@ -279,12 +276,6 @@ describe('parseCommand', () => {
           values,
           output,
           `Unexpected flags for args: ${args.join(' ')}`
-        );
-
-        assert.sameOrderedMembers(
-          args,
-          parsedArgs,
-          'Reported raw args did not match the input args'
         );
       },
       [
@@ -367,68 +358,25 @@ describe('parseCommand', () => {
     });
   });
 
-  it('exposes parsed and extra args when unused arguments are allowed', () => {
-    const command = C({
-      allowExtraArgs: true,
-      description,
-      flags: {
-        boolean: { description, type: 'boolean' },
-        string: { description, type: 'string' }
-      },
-      handler
-    });
-
-    const cases: Array<[args: string[], extra: string[], parsed: string[]]> = [
-      [['command'], [], []],
-      [['command', '--other', '--flag'], ['--other', '--flag'], []],
-      [
-        ['command', '--other', '--boolean', '--string', 'value', '--flag'],
-        ['--other', '--flag'],
-        ['--boolean', '--string', 'value']
-      ],
-      [
-        ['command', '--boolean', '--other', '--flag', '--string', 'value'],
-        ['--other', '--flag'],
-        ['--boolean', '--string', 'value']
-      ],
-      [
-        ['command', '--boolean', '--string', 'value'],
-        [],
-        ['--boolean', '--string', 'value']
-      ]
-    ];
-
-    cases.forEach(([input, extra, parsed]) => {
-      const result = parseCommand(input, { command });
-
-      assert(
-        result.type === 'command',
-        `Command not parsed: ${input.join(' ')}`
-      );
-
-      const { args } = result.command;
-
-      assert.sameOrderedMembers(
-        args.extra,
-        extra,
-        `Incorrect parsed arguments input args: ${input.join(' ')}`
-      );
-
-      assert.sameOrderedMembers(
-        args.parsed,
-        parsed,
-        `Incorrect parsed arguments input args: ${input.join(' ')}`
-      );
-    });
+  it('returns an error if an unused argument is provided', () => {
+    assert.deepInclude(
+      parseCommand(['command', 'file.txt'], {
+        command: C(description, handler)
+      }),
+      {
+        code: 'invalid-flag',
+        message: 'Unused argument: file.txt',
+        type: 'error'
+      }
+    );
   });
 
   it('provides parsing details to a command’s handler', async () => {
     const result = parseCommand(
-      ['parent', 'command', '--string', 'value', '--other'],
+      ['parent', 'command', '--string', 'value'],
       {
         parent: C.group(description, {
           command: C({
-            allowExtraArgs: true,
             description,
             flags: {
               absent: { description, type: 'string' },
@@ -452,12 +400,6 @@ describe('parseCommand', () => {
 
     assert(run.type === 'success', 'Command not run');
     const details = run.command;
-
-    assert.deepEqual(details.args, {
-      all: ['--string', 'value', '--other'],
-      extra: ['--other'],
-      parsed: ['--string', 'value']
-    });
 
     assert.deepEqual(details.path, ['parent', 'command']);
     assert.deepEqual(details.providedFlags, ['string']);
