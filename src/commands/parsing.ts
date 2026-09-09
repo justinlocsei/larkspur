@@ -1,4 +1,5 @@
 import { NormalizedArgs } from '../args.ts';
+import { resolveConfig } from '../config.ts';
 import { OperationalError } from '../errors.ts';
 import type { FlagParsing, ParsedFlags } from '../flags/parsing.ts';
 import {
@@ -7,9 +8,10 @@ import {
   ParsingError,
   parseFlags
 } from '../flags/parsing.ts';
-import { useSharedFlags } from '../flags/shared.ts';
+import { getExploreFlagName, useSharedFlags } from '../flags/shared.ts';
 import type { Flags } from '../flags/types.ts';
 import type { ValuesOf } from '../flags/values.ts';
+import type { Config } from '../types/config.ts';
 import type { Variant } from '../types/utils.ts';
 import type { Context } from '../types.ts';
 import { getCommand } from './data.ts';
@@ -93,11 +95,19 @@ type HelpParsingResult = IsParsingResult<'help', {
 }>;
 
 /**
+ * A request to explore the CLI
+ */
+type ExploreParsingResult = IsParsingResult<'explore', {
+  scope: HelpScope;
+}>;
+
+/**
  * The results of parsing CLI args
  */
 export type ParsingResult =
   | CommandParsingResult & { run: CommandRunner }
   | ErrorParsingResult
+  | ExploreParsingResult
   | HelpParsingResult;
 
 /**
@@ -106,6 +116,7 @@ export type ParsingResult =
 type InternalParsingResult =
   | CommandParsingResult
   | ErrorParsingResult
+  | ExploreParsingResult
   | HelpParsingResult;
 
 /**
@@ -135,12 +146,14 @@ type FlagParsingResult =
  */
 export function parseCommand(
   args: string[],
-  commands: CommandTree
+  commands: CommandTree,
+  config: Config = resolveConfig()
 ): ParsingResult {
   const result = extractCommand({
     current: {
       args: new NormalizedArgs(args),
       commands,
+      config,
       namespace: []
     }
   });
@@ -234,6 +247,7 @@ function buildCommandRunner(
 type TraversalState = {
   args: NormalizedArgs;
   commands: CommandTree;
+  config: Config;
   group?: CommandGroup;
   namespace: string[];
 };
@@ -247,7 +261,7 @@ function extractCommand(
   while (true) {
     const coreFlags = tryParseFlags(
       current.args,
-      useSharedFlags(),
+      useSharedFlags(current.config),
       { allowUnused: true }
     );
 
@@ -256,7 +270,12 @@ function extractCommand(
     }
 
     const { flags } = coreFlags.parsed;
+    const exploreFlag = getExploreFlagName(current.config);
+
     const showHelp = getSharedFlagValue(flags, 'help') === true;
+
+    const showExplore = exploreFlag !== undefined
+      && flags[exploreFlag]?.value === true;
 
     const { args } = current.args;
     const name = args[0];
@@ -271,9 +290,9 @@ function extractCommand(
 
     if (showHelp && (!name || !command)) {
       return { scope: help, type: 'help' };
-    }
-
-    if (!name) {
+    } else if (showExplore && (!name || !command)) {
+      return { scope: help, type: 'explore' };
+    } else if (!name) {
       return {
         code: 'invalid-command',
         help,
@@ -298,12 +317,18 @@ function extractCommand(
     if (command.type === 'group') {
       current = {
         commands: command.subcommands,
+        config: current.config,
         group: command,
         args: remainingArgs,
         namespace: path
       };
 
       continue;
+    } else if (showExplore) {
+      return {
+        scope: { command, path, type: 'command' },
+        type: 'explore'
+      };
     } else if (showHelp) {
       return {
         scope: { command, path, type: 'command' },

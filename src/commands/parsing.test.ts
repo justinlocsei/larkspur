@@ -1,5 +1,6 @@
 import { assert, describe, it } from 'vitest';
 
+import { resolveConfig } from '../config.ts';
 import { OperationalError } from '../errors.ts';
 import C from '../factory.ts';
 import { extractValues } from '../flags/parsing.ts';
@@ -623,6 +624,67 @@ describe('parseCommand', () => {
     );
 
     assert.deepEqual(scope.path, ['alfa'], 'Incorrect path provided');
+  });
+
+  it('can request exploration at the root', () => {
+    const result = parseCommand(['--explore'], {
+      command: C(description, handler)
+    });
+
+    assert(result.type === 'explore', 'Exploration not requested');
+    assert.equal(result.scope.type, 'root');
+  });
+
+  it('can request exploration for a command', () => {
+    const result = parseCommand(['command', '--explore'], {
+      command: C(description, handler)
+    });
+
+    assert(result.type === 'explore', 'Exploration not requested');
+    assert.equal(result.scope.type, 'command');
+  });
+
+  it('can request exploration for a group', () => {
+    const result = parseCommand(['alfa', '--explore'], {
+      alfa: C.group(description, {
+        bravo: C(description, handler)
+      })
+    });
+
+    assert(result.type === 'explore', 'Exploration not requested');
+    assert.equal(result.scope.type, 'group');
+  });
+
+  it('supports a configured exploration flag', () => {
+    const config = resolveConfig({ help: { explore: { flag: 'document' } } });
+
+    const result = parseCommand(
+      ['--document'],
+      { command: C(description, handler) },
+      config
+    );
+
+    assert(result.type === 'explore', 'Exploration not requested');
+  });
+
+  it('prefers help when help and exploration are requested', () => {
+    const result = parseCommand(['--help', '--explore'], {
+      command: C(description, handler)
+    });
+
+    assert(result.type === 'help', 'Help did not take precedence');
+  });
+
+  it('rejects the default exploration flag when disabled', () => {
+    const config = resolveConfig({ help: { explore: { enabled: false } } });
+
+    const result = parseCommand(
+      ['--explore'],
+      { command: C(description, handler) },
+      config
+    );
+
+    assert.equal(result.type, 'error');
   });
 
   it('respects help requests for otherwise invalid commands', () => {
