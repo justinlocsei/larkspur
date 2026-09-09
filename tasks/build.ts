@@ -1,7 +1,11 @@
 import C from '../src/factory.ts';
 import { run } from './helpers.ts';
 
-export default C(
-  'Build Larkspur',
-  async () => run('tsdown')
-);
+/**
+ * Build the project
+ */
+export function build(): void {
+  run('tsdown');
+}
+
+export default C('Build Larkspur', async () => build());
