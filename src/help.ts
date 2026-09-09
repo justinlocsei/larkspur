@@ -25,20 +25,15 @@ type GroupedFlags = {
 };
 
 /**
- * A request to display a help message
- */
-type HelpDisplayRequest = {
-  context: Context;
-  scope: HelpScope;
-};
-
-/**
  * Build the text of a CLI's help message
  */
 export function buildHelp({
   context,
   scope
-}: HelpDisplayRequest): string {
+}: {
+  context: Context;
+  scope: HelpScope;
+}): string {
   const flags: Flags = {
     ...useSharedFlags(context.config, scope.type),
     ...(scope.type === 'command' ? scope.command.flags : {})
