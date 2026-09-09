@@ -27,7 +27,7 @@ const scalarOptions = <T>(
   fc.record({
     default: optional(defaultValue),
     description,
-    repeatable: optionalBoolean,
+    repeatable: fc.oneof(fc.constant(true), fc.constant(undefined)),
     required: required
       ? fc.oneof(fc.constant(true), fc.constant(undefined))
       : fc.constant(undefined)
@@ -37,10 +37,10 @@ const scalarOptions = <T>(
  * Apply a repeatable default value as an array
  */
 function repeatableDefault<T>(
-  repeatable: boolean | undefined,
+  repeatable: true | undefined,
   defaultValue: T | undefined
 ): T | T[] | undefined {
-  return repeatable && defaultValue !== undefined
+  return repeatable === true && defaultValue !== undefined
     ? [defaultValue]
     : defaultValue;
 }
