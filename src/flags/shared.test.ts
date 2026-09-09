@@ -64,6 +64,20 @@ describe('useSharedFlags', () => {
     );
   });
 
+  it('omits explore for command scopes', () => {
+    assert.deepEqual(
+      Object.keys(useSharedFlags(resolveConfig(), 'command')),
+      ['help']
+    );
+  });
+
+  it('includes explore for group scopes', () => {
+    assert.deepEqual(
+      Object.keys(useSharedFlags(resolveConfig(), 'group')),
+      ['help', 'explore']
+    );
+  });
+
   it('omits the explore flag when disabled', () => {
     const config = resolveConfig({ help: { explore: { enabled: false } } });
 
