@@ -1,31 +1,64 @@
 import C from '../src/factory.ts';
+import { setConfigVariables } from '../src/tests/properties/config.ts';
+import type { EnvironmentVariables } from '../src/types.ts';
 import { run } from './helpers.ts';
 
 const SUITES = ['integration', 'properties', 'unit'] as const;
 
-export default C({
-  description: 'Run tests',
-  flags: {
-    name: C.flag(
-      'string',
-      'Only run tests in files matching the given pattern'
-    ),
-    suite: C.flag('choice', 'Only run the given test suites', {
-      choices: SUITES,
-      default: SUITES,
-      repeatable: true
-    })
-  },
-  handler: async ({ name = '', suite: suites }) => {
-    for (const suite of suites) {
-      run('vitest', [
-        'run',
-        '--project',
-        suite,
-        '--reporter',
-        'verbose',
-        name
-      ]);
+/**
+ * Run a test suite
+ */
+function runSuite(
+  suite: typeof SUITES[number],
+  name: string = '',
+  env: EnvironmentVariables = {}
+) {
+  run(
+    'vitest',
+    [
+      'run',
+      '--project',
+      suite,
+      '--reporter',
+      'verbose',
+      name
+    ],
+    { env }
+  );
+}
+
+const name = C.flag(
+  'string',
+  'Only run tests in files matching the given pattern'
+);
+
+export default C.group('Run tests', {
+  all: C('Run all tests', async () => {
+    for (const suite of SUITES) {
+      runSuite(suite);
     }
-  }
+  }),
+
+  integration: C(
+    'Run integration tests',
+    { name },
+    async flags => runSuite('integration', flags.name)
+  ),
+
+  properties: C(
+    'Run property tests',
+    {
+      name,
+      runs: C.flag('number', 'The number of test runs'),
+      seed: C.flag('number', 'A fixed seed')
+    },
+    async ({ name, runs, seed }) =>
+      runSuite('properties', name, setConfigVariables({ runs, seed }))
+  ),
+
+  unit: C(
+    'Run unit tests',
+    { name },
+    async flags => runSuite('unit', flags.name)
+  )
 });
