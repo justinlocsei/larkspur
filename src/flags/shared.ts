@@ -21,7 +21,6 @@ export type SharedFlags = typeof STATIC_FLAGS;
  */
 export function useSharedFlags(config: Config): Flags {
   const flags: Flags = { ...STATIC_FLAGS };
-
   const explore = getExploreFlagName(config);
 
   if (explore) {
@@ -49,6 +48,6 @@ export function getExploreFlagName(
 /**
  * Get the names of flags that are reserved for internal use
  */
-export function getReservedFlagNames(): string[] {
-  return Object.keys(STATIC_FLAGS).sort();
+export function getReservedFlagNames(config: Config): string[] {
+  return Object.keys(useSharedFlags(config)).sort();
 }

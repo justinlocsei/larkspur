@@ -28,7 +28,31 @@ describe('getExploreFlagName', () => {
 
 describe('getReservedFlagNames', () => {
   it('returns the names of flags that are reserved for internal use', () => {
-    assert.deepEqual(getReservedFlagNames(), ['help']);
+    assert.deepEqual(getReservedFlagNames(resolveConfig()), [
+      'explore',
+      'help'
+    ]);
+  });
+
+  it('respects a custom explore flag', () => {
+    assert.deepEqual(
+      getReservedFlagNames(
+        resolveConfig({ help: { explore: { flag: 'document' } } })
+      ),
+      [
+        'document',
+        'help'
+      ]
+    );
+  });
+
+  it('respects a disabled explore flag', () => {
+    assert.deepEqual(
+      getReservedFlagNames(
+        resolveConfig({ help: { explore: { enabled: false } } })
+      ),
+      ['help']
+    );
   });
 });
 
