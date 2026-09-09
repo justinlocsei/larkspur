@@ -63,12 +63,14 @@ await run({
     ),
 
     unit: C({
-      allowExtraArgs: true,
       description: 'Run unit tests',
-      flags: { reporter: C.flag('string', 'The reporter to use') },
-      handler: async ({ reporter }, { args }) => {
+      flags: {
+        file: C.flag('path', 'A test file to run', { repeatable: true }),
+        reporter: C.flag('string', 'The reporter to use')
+      },
+      handler: async ({ file: files, reporter }) => {
         runUnitTests({
-          onlyFiles: args.extra,
+          onlyFiles: files.filter(f => f.includes('.test')),
           reporter
         });
       }
@@ -240,14 +242,13 @@ C(
 
 // C(<fields>)
 C({
-  allowExtraArgs: true,
   description: 'A command with extended options',
   flags: { version: C.flag('number', 'A version number') },
   handler: async (flags) => `Version: ${flags.version.toString()}`
 });
 ```
 
-The first two forms are the most concise and commonly used.  If you need to set extended options on a command, such as `allowExtraArgs`, use the third form, which accepts an object describing the properties of the command.
+The first two forms are the most concise and commonly used.  The third form allows you to set all object properties directly, which can be useful if you are building dynamic commands.
 
 #### Command Groups
 
@@ -298,9 +299,9 @@ The supported flags and their options are covered in detail further on in this d
 
 A handler has access to details about how the command was parsed before execution.  Parsing details contain the following fields:
 
-* `args.all`: A list of all received arguments
-* `args.extra`: A list of arguments that did not map to flags or commands
-* `args.parsed`: A list of all known arguments that were parsed
+* `commands`: The complete command tree
+* `context.config`: Resolved values for all configurable properties
+* `context.metadata`: The name and description of the current CLI
 * `providedFlags`: A set containing the names of all flags that were provided by the user
 
 These details can be used to customize the behavior of the command, as demonstrated below:
@@ -309,19 +310,18 @@ These details can be used to customize the behavior of the command, as demonstra
 import C from 'larkspur';
 
 C({
-  allowExtraArgs: true,
   description: 'Run tests',
   flags: { cores: C.flag('number', 'The number of cores to use', { default: 4 }) },
   handler: async ({ cores }, details) => {
     runTests({
       cores: details.providedFlags.has('cores') ? cores : cores * 2,
-      files: details.args.extra,
+      label: details.context.metadata.name
     });
   }
 });
 ```
 
-In the above example, unused arguments are treated as specific test files to run, and an explicit `--cores <number>` flag results in the requested number being used as-is, rather than doubled.
+In the above example, an explicit `--cores <number>` flag results in the requested number being used as-is, rather than doubled.  Additionally, tests will run with a label that matches the name of the CLI, such as `my-cli`.
 
 #### Command Output
 
