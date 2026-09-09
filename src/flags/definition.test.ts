@@ -29,6 +29,11 @@ describe('useFlag', () => {
     // @ts-expect-error Unknown flag options are not allowed
     useFlag({ allowMany: true, description, type: 'number' });
   });
+
+  it('rejects false for repeatable', () => {
+    // @ts-expect-error Repeatable flags must be set to true
+    useFlag({ description, repeatable: false, type: 'number' });
+  });
 });
 
 describe('useFlags', () => {
@@ -55,5 +60,10 @@ describe('useFlags', () => {
   it('rejects unknown flag options', () => {
     // @ts-expect-error Unknown flag options are not allowed
     useFlags({ number: { allowMany: true, description, type: 'number' } });
+  });
+
+  it('rejects false for repeatable', () => {
+    // @ts-expect-error Repeatable flags must be set to true
+    useFlags({ number: { description, repeatable: false, type: 'number' } });
   });
 });

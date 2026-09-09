@@ -71,6 +71,9 @@ describe('buildFlag', () => {
     // @ts-expect-error Scalar defaults require an array when repeatable is true
     buildFlag('number', description, { repeatable: true, default: 1 });
 
+    // @ts-expect-error Repeatable flags must be set to true
+    buildFlag('number', description, { repeatable: false });
+
     // @ts-expect-error Extra options are not allowed
     buildFlag('number', description, { other: 'value' });
   });
