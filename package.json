@@ -1,7 +1,7 @@
 {
   "name": "larkspur",
   "version": "0.1.0",
-  "description": "",
+  "description": "A TypeScript-first CLI library optimized for internal tools",
   "keywords": [],
   "author": "Justin Locsei",
   "license": "MIT",
