@@ -15,6 +15,11 @@ import type {
 } from './types.ts';
 
 /**
+ * A trait for repeatable flags
+ */
+type IsRepeatable = { repeatable: true };
+
+/**
  * Flag fields that describe an implicit or explicit default value
  */
 type DefaultFields = BooleanFlag | { default: unknown };
@@ -22,7 +27,10 @@ type DefaultFields = BooleanFlag | { default: unknown };
 /**
  * Flag fields that guarantee the presence of a value after parsing
  */
-type GuaranteedFields = DefaultFields | IsRequired<Flag>;
+type GuaranteedFields =
+  | DefaultFields
+  | IsRequired<Flag>
+  | IsRepeatable;
 
 /**
  * Extract the names of all flags that satisfy a constraint
@@ -50,7 +58,7 @@ export type ValueOf<
   TContext extends FlagContext = 'wide'
 > = TFlag extends ScalarFlag
   ? TContext extends 'wide' ? OneOrMany<SpecificValueOf<TFlag>>
-  : TFlag extends { repeatable: true } ? SpecificValueOf<TFlag>[]
+  : TFlag extends IsRepeatable ? SpecificValueOf<TFlag>[]
   : SpecificValueOf<TFlag>
   : SpecificValueOf<TFlag>;
 

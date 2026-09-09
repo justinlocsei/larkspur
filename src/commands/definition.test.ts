@@ -152,8 +152,8 @@ describe('defineCommand', () => {
           T.Equivalent<
             typeof flags,
             {
-              numbers?: number[];
-              paths?: string[];
+              numbers: number[];
+              paths: string[];
               specials: Array<'alfa' | 'bravo'>;
               strings: string[];
             }

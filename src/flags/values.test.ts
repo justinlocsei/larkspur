@@ -103,7 +103,7 @@ describe('ValuesOf', () => {
       T.Equivalent<
         {
           boolean: boolean;
-          number?: number | number[];
+          number: number | number[];
           path?: string | string[];
           string?: string | string[];
         },
@@ -115,7 +115,7 @@ describe('ValuesOf', () => {
       T.Equivalent<
         {
           boolean: boolean;
-          number?: number[];
+          number: number[];
           path?: string;
           string?: string;
         },
