@@ -17,11 +17,31 @@ type PrintableFlag = {
 };
 
 /**
+ * Group flags by their status
+ */
+type GroupFlags<T> = Record<'optional' | 'required', T>;
+
+/**
  * Grouped collections of flags
  */
-type GroupedFlags = {
-  optional: Flags;
-  required: Flags;
+type GroupedFlags = GroupFlags<Flags>;
+
+/**
+ * Sections in a help message
+ */
+type HelpSections = {
+  commands: string[];
+  details?: string;
+  flags: GroupFlags<string[]>;
+  title: string;
+};
+
+/**
+ * Generated help
+ */
+type Help = {
+  sections: HelpSections;
+  text: string;
 };
 
 /**
@@ -48,7 +68,14 @@ export function buildHelp({
     scope
   });
 
-  return message.format();
+  const sections = message.assemble();
+
+  const help: Help = {
+    sections,
+    text: message.format(sections)
+  };
+
+  return help.text;
 }
 
 /**
@@ -115,26 +142,53 @@ class HelpMessage {
   }
 
   /**
+   * Build the sections of a help message
+   */
+  assemble(): HelpSections {
+    const { display: { title } } = this.config;
+
+    return {
+      commands: this.listCommands(),
+      details: title,
+      flags: transformValues(this.groupFlags(), fs => this.listFlags(fs)),
+      title: this.buildUsage()
+    };
+  }
+
+  /**
    * Format the help message
    */
-  format(): string {
-    const { display: { commands, title }, flags } = this.config;
+  format({
+    commands,
+    details,
+    flags,
+    title
+  }: HelpSections): string {
+    const lines = [title];
 
-    const lines = [this.buildUsage()];
-
-    if (title) {
-      lines.push('', title);
+    if (details) {
+      lines.push('', details);
     }
 
-    if (!isEmpty(commands)) {
-      lines.push('\nCommands:\n', this.listCommands());
+    if (commands.length) {
+      lines.push(
+        '\nCommands:\n',
+        this.applyIndent(this.listCommands()).join('\n')
+      );
     }
 
-    if (!isEmpty(flags)) {
-      lines.push('', this.listGroupedFlags(this.groupFlags()));
+    if (!isEmpty(this.config.flags)) {
+      lines.push('', this.listGroupedFlags(flags));
     }
 
     return lines.join('\n');
+  }
+
+  /**
+   * Apply indentation to a list of lines
+   */
+  private applyIndent(lines: string[]): string[] {
+    return lines.map(l => `${this.indent}${l}`);
   }
 
   /**
@@ -163,7 +217,7 @@ class HelpMessage {
   /**
    * List commands
    */
-  private listCommands(): string {
+  private listCommands(): string[] {
     const { display: { commands } } = this.config;
 
     const entries = transformValues(
@@ -185,14 +239,12 @@ class HelpMessage {
     return sortEntries(entries)
       .map(([_, entry]) =>
         [
-          this.indent,
           entry.label.padEnd(offset),
           this.indent,
           entry.description
         ].join('')
       )
-      .filter(Boolean)
-      .join('\n');
+      .filter(Boolean);
   }
 
   /**
@@ -219,10 +271,12 @@ class HelpMessage {
    *
    * This is only called if there are flags to list.
    */
-  private listGroupedFlags({ optional, required }: GroupedFlags): string {
-    if (isEmpty(optional)) {
+  private listGroupedFlags(
+    { optional, required }: GroupFlags<string[]>
+  ): string {
+    if (!optional.length) {
       return this.listFlagGroup(required, 'Required Flags');
-    } else if (isEmpty(required)) {
+    } else if (!required.length) {
       return this.listFlagGroup(optional, 'Flags');
     } else {
       return [
@@ -235,14 +289,17 @@ class HelpMessage {
   /**
    * List a group of flags
    */
-  private listFlagGroup(flags: Flags, title: string): string {
-    return [`${title}:`, this.listFlags(flags)].join('\n\n');
+  private listFlagGroup(flags: string[], title: string): string {
+    return [
+      `${title}:`,
+      this.applyIndent(flags).join('\n')
+    ].join('\n\n');
   }
 
   /**
    * List flags
    */
-  private listFlags(rawFlags: Flags): string {
+  private listFlags(rawFlags: Flags): string[] {
     const flags = transformValues(
       rawFlags,
       (flag, id): PrintableFlag => ({
@@ -258,8 +315,7 @@ class HelpMessage {
     const offset = Math.max(...setters.map(f => f.length));
 
     return sortEntries(flags)
-      .flatMap(([_, flag]) => this.showFlag(flag, offset))
-      .join('\n');
+      .flatMap(([_, flag]) => this.showFlag(flag, offset));
   }
 
   /**
@@ -285,7 +341,6 @@ class HelpMessage {
    */
   private showFlag({ flag, setter }: PrintableFlag, offset: number): string[] {
     const usage = [
-      this.indent,
       setter.padEnd(offset),
       this.indent,
       formatDescription(flag.description)
@@ -306,7 +361,7 @@ class HelpMessage {
 
     return [
       usage,
-      ...extra.map(l => `${' '.repeat(offset + this.indent.length * 2)}(${l})`)
+      ...extra.map(l => `${' '.repeat(offset + this.indent.length)}(${l})`)
     ];
   }
 }
