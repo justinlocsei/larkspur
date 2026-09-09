@@ -40,7 +40,7 @@ describe('buildInstallationInstructions', () => {
     assert.equal(
       instructions,
       `
-Add the following to your zsh profile (~/.zshrc):
+Ensure that test-cli is available on your PATH, then add the following to your zsh profile (~/.zshrc):
 
   autoload -Uz compinit
   compinit

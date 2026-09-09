@@ -95,7 +95,7 @@ export class BashCompletionProvider extends CompletionProvider {
    */
   buildInstallationInstructions(): string {
     return `
-Add this line to your bash profile (${this.listProfiles()}):
+Ensure that ${this.cli.name} is available on your PATH, then add this line to your bash profile (${this.listProfiles()}):
 
   eval "$(${this.generateCommand()})"
 

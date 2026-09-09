@@ -85,7 +85,7 @@ export class ZshCompletionProvider extends CompletionProvider {
     const fpath = `~/.zsh/completions`;
 
     return `
-Add the following to your zsh profile (${this.listProfiles()}):
+Ensure that ${this.cli.name} is available on your PATH, then add the following to your zsh profile (${this.listProfiles()}):
 
   autoload -Uz compinit
   compinit

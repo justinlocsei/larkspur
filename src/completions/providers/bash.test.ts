@@ -38,7 +38,7 @@ describe('buildInstallationInstructions', () => {
     assert.equal(
       instructions,
       `
-Add this line to your bash profile (~/.bashrc or ~/.bash_profile):
+Ensure that test-cli is available on your PATH, then add this line to your bash profile (~/.bashrc or ~/.bash_profile):
 
   eval "$(test-cli completions generate --shell bash)"
 
