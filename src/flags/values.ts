@@ -1,4 +1,4 @@
-import type { OneOrMany, Require } from '../types/utils.ts';
+import type { OneOrMany, Require, Subset } from '../types/utils.ts';
 import type {
   BooleanFlag,
   ChoiceFlag,
@@ -17,7 +17,7 @@ import type {
 /**
  * A trait for repeatable flags
  */
-type IsRepeatable = { repeatable: true };
+type IsRepeatable = Required<Subset<ScalarFlag, 'repeatable'>>;
 
 /**
  * Flag fields that describe an implicit or explicit default value

@@ -31,7 +31,7 @@ export type UserCompletion = (
  * Shared fields for all scalar flags
  */
 type ScalarFields = {
-  repeatable?: boolean;
+  repeatable?: true;
   required?: true;
 };
 
