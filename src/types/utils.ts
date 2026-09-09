@@ -51,6 +51,11 @@ export type Require<T extends object, K extends keyof T> =
   & Required<Pick<T, K>>;
 
 /**
+ * Produce a narrower type from a subset of an object's properties
+ */
+export type Subset<T extends object, K extends keyof T> = Pick<T, K>;
+
+/**
  * Define a member of a tagged union
  */
 export type Variant<T extends string, V> = { type: T } & V;
