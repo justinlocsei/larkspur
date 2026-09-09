@@ -71,13 +71,15 @@ testProvider(BashCompletionProvider, {
     'group) __test_cli__command__group $next "$2" "$3" "$4" ;;'
   ],
   quoting: [
-    "complete -o default -F __test_cli__entry 'test-cli'",
+    "complete -F __test_cli__entry 'test-cli'",
     "'mode-alfa'",
     "'group:nested:custom'"
   ],
   resolvedFlags: [],
   scalars: [
     '--count=*)',
-    '--title=*)'
+    '--file=*)',
+    '--title=*)',
+    'compgen -f -- "$complete_on"'
   ]
 });

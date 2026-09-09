@@ -2,6 +2,7 @@
 
 import { compact, drain } from '../../utils.ts';
 import { encodeFlagPath } from '../custom.ts';
+import { scalarValueCompletion } from '../data.ts';
 import type { NameGenerator } from '../fns.ts';
 import type {
   Command,
@@ -85,7 +86,7 @@ export class BashCompletionProvider extends CompletionProvider {
       script: [
         ...this.renderCompletions(fn, completions),
         '',
-        `complete -o default -F ${fn.entry.name} ${quote(this.cli.name)}`
+        `complete -F ${fn.entry.name} ${quote(this.cli.name)}`
       ]
     };
   }
@@ -212,9 +213,18 @@ To use these completions, reload your profile or start a new shell.`.trim();
       ]
     );
 
+    const completeFiles = this.defineFunction(
+      'files',
+      [],
+      [
+        'local complete_on=${@: -1}',
+        'COMPREPLY=($(compgen -f -- "$complete_on"))'
+      ]
+    );
+
     return {
       entry,
-      helpers: [completeFn, completeWords]
+      helpers: [completeFn, completeFiles, completeWords]
     };
   }
 
@@ -463,13 +473,20 @@ To use these completions, reload your profile or start a new shell.`.trim();
           .join('|');
 
         const flagPath = customCompletions[name];
+        const completeWith = scalarValueCompletion(flag);
 
-        const completion = flagPath
-          ? this.completeWithFunction(flagPath, completeOn)
-          : this.completeWords(
-            [...(choicesForFlag(flag) || [])].sort().map(String),
-            completeOn
-          );
+        let completion: string;
+
+        if (completeWith === 'custom' && flagPath) {
+          completion = this.completeWithFunction(flagPath, completeOn);
+        } else {
+          completion = completeWith === 'files'
+            ? this.complete('files', [], completeOn)
+            : this.completeWords(
+              [...(choicesForFlag(flag) || [])].sort().map(String),
+              completeOn
+            );
+        }
 
         previous.push(`${forms}) ${completion} ;;`);
 
