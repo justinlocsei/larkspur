@@ -4,6 +4,7 @@
 export type FunctionType =
   | 'command'
   | 'entry'
+  | 'files'
   | 'user_fn'
   | 'words';
 
