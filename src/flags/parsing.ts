@@ -99,6 +99,13 @@ export class ParsingError extends Error {
 }
 
 /**
+ * Report whether a flag is repeatable
+ */
+function flagIsRepeatable(flag: Flag): boolean {
+  return isScalarFlag(flag) ? flag.repeatable === true : false;
+}
+
+/**
  * Report whether a flag is required
  */
 function flagIsRequired(flag: Flag): boolean {
@@ -356,7 +363,7 @@ function forbidScalarDefault(
   flag: ScalarFlag
 ): void {
   if (
-    flag.repeatable
+    flagIsRepeatable(flag)
     && flag.default !== undefined
     && !isMultiValueDefault(flag.default)
   ) {
@@ -496,13 +503,13 @@ function parseScalarInputs<T extends ScalarFlag>(
     values = defaults.map(v => validate(v as Value, JSON.stringify(v)));
   }
 
-  if (values.length > 1 && !flag.repeatable) {
+  if (values.length > 1 && !flagIsRepeatable(flag)) {
     forbidDuplicates(context);
   }
 
   let value: Value[] | Value | undefined;
 
-  if (flag.repeatable) {
+  if (flagIsRepeatable(flag)) {
     if (flagIsRequired(flag) && !values.length) {
       value = undefined;
     } else {
