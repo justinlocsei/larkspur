@@ -24,7 +24,7 @@
     "check": "node tasks/index.ts check",
     "format": "node tasks/index.ts format",
     "prepublishOnly": "npm run build",
-    "test": "node tasks/index.ts test"
+    "test": "node tasks/index.ts test all"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.9",
