@@ -1,9 +1,10 @@
 // biome-ignore-all lint/suspicious/noTemplateCurlyInString: used for completion scripts
 
-import type { Flag, Flags } from '../../flags/types.ts';
+import type { Flag, Flags, ScalarFlag } from '../../flags/types.ts';
 import { formatDescription } from '../../text.ts';
 import { compact, sortEntries, transformValues } from '../../utils.ts';
 import { encodeFlagPath } from '../custom.ts';
+import { scalarValueCompletion } from '../data.ts';
 import type { NameGenerator } from '../fns.ts';
 import type {
   CommandHandler,
@@ -325,18 +326,24 @@ Then add this line before loading compinit:
   /**
    * Define a spec for a flag's value
    */
-  private renderValueSpec(name: string, flag: Flag, levels: string[]): string {
+  private renderValueSpec(
+    name: string,
+    flag: ScalarFlag,
+    levels: string[]
+  ): string {
     const value = `:${flag.type}:`;
+    const completion = scalarValueCompletion(flag);
 
-    if (isSimpleScalarFlag(flag) && flag.completion) {
+    if (completion === 'custom' && isSimpleScalarFlag(flag)) {
       return `${value}${this.fns('user_fn', [...levels, name])}`;
+    } else if (completion === 'choice') {
+      const choices = choicesForFlag(flag) || [];
+      return `${value}(${choices.map(v => quote(String(v))).join(' ')})`;
+    } else if (completion === 'files') {
+      return `${value}_files`;
+    } else {
+      return `${value}_nothing`;
     }
-
-    const choices = choicesForFlag(flag);
-
-    return choices
-      ? `${value}(${choices.map(v => quote(String(v))).join(' ')})`
-      : value;
   }
 
   /**

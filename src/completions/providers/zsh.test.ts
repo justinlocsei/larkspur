@@ -87,7 +87,7 @@ testProvider(ZshCompletionProvider, {
     "'nested') _test-cli__command__group__nested ;;"
   ],
   resolvedFlags: [
-    '[[ "$words[CURRENT-1]" == (--count|--custom|--mode|--title) ]]',
+    '[[ "$words[CURRENT-1]" == (--count|--custom|--file|--mode|--title) ]]',
     '[[ "$words[CURRENT]" == --* ]] && [[ "$words[CURRENT]" != (--disabled|--no-enabled|--help) ]]'
   ],
   quoting: [
@@ -101,7 +101,9 @@ testProvider(ZshCompletionProvider, {
   ],
   scalars: [
     "'*--count=[@count]:number:",
+    "'--file=[@file]:path:_files",
     "'--title=[@title it",
+    ':string:_nothing',
     "'--root=[@root]:string:"
   ]
 });
