@@ -7,6 +7,7 @@ import { parseCommand } from './commands/parsing.ts';
 import type { EntryPoint } from './commands/types.ts';
 import { withCompletionCommands } from './completions/commands.ts';
 import { coerceError, OperationalError } from './errors.ts';
+import { exploreCLI } from './explore.ts';
 import { buildHelp } from './help.ts';
 import type { Context } from './types.ts';
 import { validateCommands } from './validation.ts';
@@ -85,7 +86,7 @@ export async function runCLI({
   }
 
   try {
-    validateCommands(commands);
+    validateCommands(commands, context.config);
   } catch (error) {
     return failWith(
       OperationalError.wrap(error, 'Could not validate CLI commands')
@@ -108,6 +109,12 @@ export async function runCLI({
           ? buildHelp({ context, scope: parsing.help })
           : undefined
       );
+
+    case 'explore':
+      return {
+        message: exploreCLI({ context, scope: parsing.scope }),
+        type: 'help'
+      };
 
     case 'help':
       return {

@@ -59,6 +59,16 @@ describe('runCLI', () => {
     assert.include(response.message, 'Show help');
   });
 
+  it('can explore the CLI', async () => {
+    const response = await testCLI({
+      args: ['--explore'],
+      entry: { command: C(description, handler) }
+    });
+
+    assert(response.type === 'help', 'explore response not returned');
+    assert.equal(response.message, '');
+  });
+
   it('handles parsing errors', async () => {
     const response = await testCLI({
       args: ['invalid-command'],
