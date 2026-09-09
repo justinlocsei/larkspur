@@ -1,22 +1,26 @@
 import type { Config } from '../types/config.ts';
+import { useFlags } from './definition.ts';
 import type { Flags } from './types.ts';
+
+// Fixed flags available to all commands in a tree
+const STATIC_FLAGS = useFlags({
+  help: {
+    default: false,
+    description: 'Show help',
+    type: 'boolean'
+  }
+});
 
 /**
  * All shared flags
  */
-export type SharedFlags = Flags;
+export type SharedFlags = typeof STATIC_FLAGS;
 
 /**
  * Use shared flags based on the given configuration
  */
 export function useSharedFlags(config: Config): Flags {
-  const flags: Flags = {
-    help: {
-      default: false,
-      description: 'Show help',
-      type: 'boolean'
-    }
-  };
+  const flags: Flags = { ...STATIC_FLAGS };
 
   const explore = getExploreFlagName(config);
 
