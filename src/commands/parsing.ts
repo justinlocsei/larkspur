@@ -19,7 +19,8 @@ import type {
   CommandGroup,
   CommandHandler,
   CommandTree,
-  TreeScope
+  ExploreScope,
+  HelpScope
 } from './types.ts';
 
 /**
@@ -123,35 +124,6 @@ type InternalParsingResult =
   | ErrorParsingResult
   | ExploreParsingResult
   | HelpParsingResult;
-
-/**
- * The fields shared by all help scopes
- */
-type IsHelpScope<T extends TreeScope, U> = U & {
-  type: T;
-};
-
-/**
- * All possible scopes for showing help
- */
-export type HelpScope =
-  | IsHelpScope<'command', { command: CommandHandler; path: string[] }>
-  | IsHelpScope<'group', { group: CommandGroup; path: string[] }>
-  | IsHelpScope<'root', { commands: CommandTree }>;
-
-/**
- * The fields shared by all explore scopes
- */
-type IsExploreScope<T extends TreeScope, U> = U & {
-  type: T;
-};
-
-/**
- * All scopes that can be explored
- */
-export type ExploreScope =
-  | IsExploreScope<'group', { group: CommandGroup; path: string[] }>
-  | IsExploreScope<'root', { commands: CommandTree }>;
 
 /**
  * The results of parsing flags
@@ -306,22 +278,18 @@ function extractCommand(
       ? [undefined, current.namespace]
       : [getCommand(current.commands, name), [...current.namespace, name]];
 
-    const help: HelpScope = current.group
-      ? { group: current.group, path: current.namespace, type: 'group' }
-      : { commands: current.commands, type: 'root' };
-
-    const explore: ExploreScope = current.group
+    const scope: ExploreScope = current.group
       ? { group: current.group, path: current.namespace, type: 'group' }
       : { commands: current.commands, type: 'root' };
 
     if (showHelp && (!name || !command)) {
-      return { scope: help, type: 'help' };
+      return { scope, type: 'help' };
     } else if (showExplore && (!name || !command)) {
-      return { scope: explore, type: 'explore' };
+      return { scope, type: 'explore' };
     } else if (!name) {
       return {
         code: 'invalid-command',
-        help,
+        help: scope,
         message: current.namespace.length
           ? `You must provide a subcommand: ${
             current.namespace.join(' ')
@@ -332,7 +300,7 @@ function extractCommand(
     } else if (!command) {
       return {
         code: 'invalid-command',
-        help,
+        help: scope,
         message: `Unknown command: ${path.join(' ')}`,
         type: 'error'
       };

@@ -1,6 +1,5 @@
 import { visibleCommands } from './commands/data.ts';
-import type { HelpScope } from './commands/parsing.ts';
-import type { CommandTree } from './commands/types.ts';
+import type { CommandTree, HelpScope } from './commands/types.ts';
 import { choicesForFlag, flagToSetter } from './flags/data.ts';
 import { NEGATE_BOOLEAN } from './flags/names.ts';
 import { useSharedFlags } from './flags/shared.ts';

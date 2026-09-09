@@ -69,6 +69,51 @@ export type KnownCommandTree<T extends string> = Required<CommandTree<T>>;
 export type TreeScope = 'command' | 'group' | 'root';
 
 /**
+ * Define a query against a level within a command tree
+ */
+type IsTreeQuery<T extends TreeScope, U> = U & {
+  type: T;
+};
+
+/**
+ * A query for a command handler within a command tree
+ */
+export type CommandTreeQuery = IsTreeQuery<'command', {
+  command: CommandHandler;
+  path: string[];
+}>;
+
+/**
+ * A query for a command group within a command tree
+ */
+export type GroupTreeQuery = IsTreeQuery<'group', {
+  group: CommandGroup;
+  path: string[];
+}>;
+
+/**
+ * A query for the root of a command tree
+ */
+export type RootTreeQuery = IsTreeQuery<'root', {
+  commands: CommandTree;
+}>;
+
+/**
+ * All possible scopes for showing help
+ */
+export type HelpScope =
+  | CommandTreeQuery
+  | GroupTreeQuery
+  | RootTreeQuery;
+
+/**
+ * All scopes that can be explored
+ */
+export type ExploreScope =
+  | GroupTreeQuery
+  | RootTreeQuery;
+
+/**
  * An entry point for a CLI
  */
 export type EntryPoint = CommandTree;

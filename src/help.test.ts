@@ -1,6 +1,6 @@
 import { assert, describe, it } from 'vitest';
 
-import type { HelpScope } from './commands/parsing.ts';
+import type { HelpScope } from './commands/types.ts';
 import C from './factory.ts';
 import { buildHelp } from './help.ts';
 import { createTestContext } from './tests.ts';
