@@ -7,7 +7,7 @@ import { parseCommand } from './commands/parsing.ts';
 import type { EntryPoint } from './commands/types.ts';
 import { withCompletionCommands } from './completions/commands.ts';
 import { coerceError, OperationalError } from './errors.ts';
-import { exploreCLI } from './explore.ts';
+import { buildExploreMessage } from './explore.ts';
 import { buildHelp } from './help.ts';
 import type { Context } from './types.ts';
 import { validateCommands } from './validation.ts';
@@ -112,7 +112,7 @@ export async function runCLI({
 
     case 'explore':
       return {
-        message: exploreCLI({ context, scope: parsing.scope }),
+        message: buildExploreMessage({ context, scope: parsing.scope }),
         type: 'help'
       };
 
