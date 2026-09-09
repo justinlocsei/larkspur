@@ -505,10 +505,8 @@ function parseScalarInputs<T extends ScalarFlag>(
   if (flag.repeatable) {
     if (flagIsRequired(flag) && !values.length) {
       value = undefined;
-    } else if (values.length) {
-      value = values;
     } else {
-      value = undefined;
+      value = values;
     }
   } else {
     value = values[0];

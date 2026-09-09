@@ -137,9 +137,9 @@ describe('parseFlags', () => {
         );
       },
       [
-        [[], {}],
-        [['--alfa', 'test'], { alfa: ['test'] }],
-        [['--bravo', 'test'], { bravo: ['test'] }],
+        [[], { alfa: [], bravo: [] }],
+        [['--alfa', 'test'], { alfa: ['test'], bravo: [] }],
+        [['--bravo', 'test'], { alfa: [], bravo: ['test'] }],
         [
           ['--alfa', 'one', '--bravo', 'two'],
           {
