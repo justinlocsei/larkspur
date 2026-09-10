@@ -47,6 +47,13 @@ export function isFlagSetter(text: string): boolean {
 }
 
 /**
+ * Report whether a flag is repeatable
+ */
+export function isRepeatableFlag(flag: Flag): boolean {
+  return flag.type !== 'boolean' && flag.repeatable === true;
+}
+
+/**
  * Report whether a flag is required
  */
 export function isRequiredFlag(flag: Flag): boolean {

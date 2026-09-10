@@ -7,6 +7,7 @@ import {
   flagToSetter,
   getFlagForms,
   isFlagSetter,
+  isRepeatableFlag,
   isRequiredFlag,
   isScalarFlag,
   isSimpleScalarFlag
@@ -86,6 +87,21 @@ describe('isFlagSetter', () => {
         ['test--flag', false],
         ['---alfa', false],
         ['--Alfa', false]
+      ]
+    );
+  });
+});
+
+describe('isRepeatableFlag', () => {
+  it('detects repeatable flags', () => {
+    checkConversion<Flag, boolean>(
+      (i, o, m) => assert.equal(isRepeatableFlag(i), o, m),
+      [
+        [boolean, false],
+        [string, false],
+        [{ repeatable: true, description, type: 'string' }, true],
+        [number, false],
+        [{ repeatable: true, description, type: 'number' }, true]
       ]
     );
   });
