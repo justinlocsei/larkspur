@@ -5,8 +5,8 @@ import type {
   ExploreScope,
   GenericCommandHandler
 } from './commands/types.ts';
-import type { Help } from './help.ts';
-import { buildHelp } from './help.ts';
+import type { Usage } from './help/usage.ts';
+import { buildUsage } from './help/usage.ts';
 import type { Context } from './types.ts';
 import { compact, drain, sortEntries } from './utils.ts';
 
@@ -30,22 +30,12 @@ export function buildExploreMessage({
 }): string {
   return [...collectHandlers(scope)]
     .map(({ command, path }) =>
-      formatCommand(buildHelp({
+      formatCommand(buildUsage({
         context,
         scope: { command, path, type: 'command' },
         sharedFlags: false
       }))
     ).join('\n\n\n');
-}
-
-/**
- * Format a command from its generated help data
- */
-function formatCommand({ sections: c }: Help): string {
-  return compact([
-    c.details && `# ${c.details}`,
-    `> ${c.title}`
-  ]).join('\n');
 }
 
 /**
@@ -79,4 +69,36 @@ function* collectHandlers(
       yield { command, path };
     }
   }
+}
+
+/**
+ * Format a command from its generated help data
+ */
+function formatCommand(usage: Usage): string {
+  const { details, flags } = usage;
+
+  const lines = [
+    `$ ${usage.title}`,
+    ...(details ? [' ', `  ${details}`] : [])
+  ];
+
+  const indent = '  ';
+
+  if (flags.length) {
+    lines.push(
+      '',
+      ...flags
+        .flatMap(flag => {
+          return compact([
+            flag.setter,
+            indent + flag.description,
+            flag.required && `${indent}(Required)`,
+            ...flag.details.map(d => `${indent}(${d})`)
+          ]);
+        })
+        .map(l => indent + l)
+    );
+  }
+
+  return lines.join('\n');
 }
