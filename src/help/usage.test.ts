@@ -301,6 +301,53 @@ describe('buildUsage', () => {
     );
   });
 
+  it('can show required flags in the usage message', () => {
+    const usage = buildUsage({
+      context: createTestContext(),
+      scope: {
+        command: C(
+          '@command',
+          {
+            alfa: C.flag('string', '@alfa', { required: true }),
+            bravo: C.flag('string', '@bravo')
+          },
+          handler
+        ),
+        path: ['command'],
+        type: 'command'
+      },
+      showRequiredFlags: true,
+      sharedFlags: false
+    });
+
+    assert.deepEqual(usage.title, 'testing command --alfa <string> [flags]');
+  });
+
+  it('omits the flags placeholder in titles when all flags are required', () => {
+    const usage = buildUsage({
+      context: createTestContext(),
+      scope: {
+        command: C(
+          '@command',
+          {
+            alfa: C.flag('string', '@alfa', { required: true }),
+            bravo: C.flag('string', '@bravo', { required: true })
+          },
+          handler
+        ),
+        path: ['command'],
+        type: 'command'
+      },
+      showRequiredFlags: true,
+      sharedFlags: false
+    });
+
+    assert.deepEqual(
+      usage.title,
+      'testing command --alfa <string> --bravo <string>'
+    );
+  });
+
   it('combines command and core flags', () => {
     checkUsage(
       {
