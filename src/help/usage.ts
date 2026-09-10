@@ -26,7 +26,7 @@ export type PrintableFlag = {
 /**
  * A command formatted for display
  */
-type PrintableCommand = {
+export type PrintableCommand = {
   description: string;
   label: string;
 };
