@@ -81,7 +81,7 @@ function formatCommand(usage: Usage): string {
 
   const lines = [
     `$ ${usage.title}`,
-    ...(details ? [' ', `  ${details}`] : [])
+    ...(details ? ['', `  ${details}`] : [])
   ];
 
   const indent = '  ';
