@@ -84,12 +84,17 @@ await run({
 Run the CLI:
 
 ```sh
-# Show available commands
+# Show root commands
 ./run-task --help
+
+# Show nested commands
 ./run-task test --help
 
 # Show flags for a command
 ./run-task build --help
+
+# Recursively show all commands in the CLI
+./run-task --explore
 
 # Build an image
 ./run-task build --mode development
@@ -185,7 +190,7 @@ Larkspur can show help messages for the CLI and each of its commands via a `--he
 
 #### Command Discovery
 
-All commands and flags can be recursively listed at any level of a command tree using the `--explore` flag.  This can be used by both humans and agents, as the output closely matches that of the standard help messages.
+All commands and flags can be recursively listed at any level of a command tree using the `--explore` flag.  The output is structured and readable by humans or agents, and can be used to quickly gain an understanding of the full set of features offered by the CLI.
 
 #### Shell Completions
 
