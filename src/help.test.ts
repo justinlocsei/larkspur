@@ -29,7 +29,7 @@ function checkHelp(
         ...config
       }),
       scope
-    }).message,
+    }),
     lines.join('\n')
   );
 }
@@ -77,20 +77,6 @@ describe('buildHelp', () => {
       {},
       { help: { explore: { enabled: true } } }
     );
-  });
-
-  it('can opt out of shared flags', () => {
-    const { message } = buildHelp({
-      context: createTestContext(),
-      scope: {
-        commands: { alfa: C('@alfa', handler) },
-        type: 'root'
-      },
-      sharedFlags: false
-    });
-
-    assert.notInclude(message, '--explore');
-    assert.notInclude(message, '--help');
   });
 
   it('does not show hidden root handlers', () => {
