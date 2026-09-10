@@ -13,7 +13,7 @@ import { SUPPORTED_SHELLS } from './shells.ts';
  * Define a command group to manage completions
  */
 export function defineCompletionCommands(): CommandGroup {
-  return C.group('manage shell completions', {
+  return C.group('Manage shell completions', {
     generate: C(
       'Generate a completion script',
       {
