@@ -7,6 +7,7 @@ import {
   flagToSetter,
   getFlagForms,
   isFlagSetter,
+  isRequiredFlag,
   isScalarFlag,
   isSimpleScalarFlag
 } from './data.ts';
@@ -85,6 +86,21 @@ describe('isFlagSetter', () => {
         ['test--flag', false],
         ['---alfa', false],
         ['--Alfa', false]
+      ]
+    );
+  });
+});
+
+describe('isRequiredFlag', () => {
+  it('detects required flags', () => {
+    checkConversion<Flag, boolean>(
+      (i, o, m) => assert.equal(isRequiredFlag(i), o, m),
+      [
+        [boolean, false],
+        [string, false],
+        [{ required: true, description, type: 'string' }, true],
+        [number, false],
+        [{ required: true, description, type: 'number' }, true]
       ]
     );
   });

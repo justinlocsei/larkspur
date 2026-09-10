@@ -47,6 +47,13 @@ export function isFlagSetter(text: string): boolean {
 }
 
 /**
+ * Report whether a flag is required
+ */
+export function isRequiredFlag(flag: Flag): boolean {
+  return flag.type !== 'boolean' && flag.required === true;
+}
+
+/**
  * Report whether a flag is a scalar flag
  */
 export function isScalarFlag(flag: Flag): flag is ScalarFlag {
