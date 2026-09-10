@@ -1,15 +1,82 @@
-import type { HelpScope } from './commands/parsing.ts';
+import { visibleCommands } from './commands/data.ts';
+import type {
+  Command,
+  CommandTree,
+  ExploreScope,
+  GenericCommandHandler
+} from './commands/types.ts';
+import type { Help } from './help.ts';
+import { buildHelp } from './help.ts';
 import type { Context } from './types.ts';
+import { compact, drain, sortEntries } from './utils.ts';
 
 /**
- * Explore a CLI's commands and flags
+ * A level of a command tree being explored
  */
-export function exploreCLI({
-  context: _context,
-  scope: _scope
+type Frame<T extends Command = Command> = {
+  command: T;
+  path: string[];
+};
+
+/**
+ * Build a message describing a CLI's executable commands and flags
+ */
+export function buildExploreMessage({
+  context,
+  scope
 }: {
   context: Context;
-  scope: HelpScope;
+  scope: ExploreScope;
 }): string {
-  return '';
+  return [...collectHandlers(scope)]
+    .map(({ command, path }) =>
+      formatCommand(buildHelp({
+        context,
+        scope: { command, path, type: 'command' },
+        sharedFlags: false
+      }))
+    ).join('\n\n\n');
+}
+
+/**
+ * Format a command from its generated help data
+ */
+function formatCommand({ sections: c }: Help): string {
+  return compact([
+    c.details && `# ${c.details}`,
+    `> ${c.title}`
+  ]).join('\n');
+}
+
+/**
+ * Collect all command handlers with a tree
+ */
+function* collectHandlers(
+  scope: ExploreScope
+): Generator<Frame<GenericCommandHandler>> {
+  const stack: Frame[] = [];
+
+  const initial = scope.type === 'root'
+    ? { commands: scope.commands, path: [] }
+    : { commands: scope.group.subcommands, path: scope.path };
+
+  const push = (commands: CommandTree, path: string[]): void => {
+    for (
+      const [name, command] of sortEntries(visibleCommands(commands)).reverse()
+    ) {
+      if (command !== undefined) {
+        stack.push({ command, path: [...path, name] });
+      }
+    }
+  };
+
+  push(initial.commands, initial.path);
+
+  for (const { command, path } of drain(stack)) {
+    if (command.type === 'group') {
+      push(command.subcommands, path);
+    } else {
+      yield { command, path };
+    }
+  }
 }
