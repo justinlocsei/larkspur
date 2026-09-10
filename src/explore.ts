@@ -33,7 +33,8 @@ export function buildExploreMessage({
       formatCommand(buildUsage({
         context,
         scope: { command, path, type: 'command' },
-        sharedFlags: false
+        sharedFlags: false,
+        showRequiredFlags: true
       }))
     ).join('\n\n\n');
 }
