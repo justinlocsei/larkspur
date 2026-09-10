@@ -7,7 +7,6 @@ describe('the public API', () => {
     assert.isFunction(C);
     assert.isFunction(C.flag);
     assert.isFunction(C.group);
-    assert.isFunction(C.tree);
   });
 
   it('exposes the CLI runner', () => {

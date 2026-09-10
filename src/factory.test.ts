@@ -40,14 +40,3 @@ describe('C.group', () => {
     assert.isDefined(group.subcommands.child);
   });
 });
-
-describe('C.tree', () => {
-  it('can define a command tree', () => {
-    const tree = C.tree({
-      child: C(description, handler)
-    });
-
-    assert.equal(tree.child?.description, description);
-    assert.equal(tree.child?.type, 'handler');
-  });
-});
