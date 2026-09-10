@@ -220,7 +220,11 @@ class UsageBuilder {
     }
 
     if (defaultValue !== undefined && defaultValue !== false) {
-      details.push(`Default: ${defaultValue.toString()}`);
+      const value = Array.isArray(defaultValue)
+        ? defaultValue.join(', ')
+        : defaultValue.toString();
+
+      details.push(`Default: ${value}`);
     }
 
     return details;
