@@ -11,7 +11,7 @@ import { useSharedFlags } from '../flags/shared.ts';
 import type { Flag, Flags } from '../flags/types.ts';
 import { formatDescription } from '../text.ts';
 import type { Context } from '../types.ts';
-import { compact, isEmpty, sortEntries, transformValues } from '../utils.ts';
+import { compact, sortEntries, transformValues } from '../utils.ts';
 
 /**
  * A flag formatted for display
@@ -47,11 +47,13 @@ export type Usage = {
 export function buildUsage({
   context,
   scope,
-  sharedFlags = true
+  sharedFlags = true,
+  showRequiredFlags = false
 }: {
   context: Context;
   scope: HelpScope;
   sharedFlags?: boolean;
+  showRequiredFlags?: boolean;
 }): Usage {
   return new UsageBuilder({
     context,
@@ -60,7 +62,8 @@ export function buildUsage({
       ...(sharedFlags ? useSharedFlags(context.config, scope.type) : {}),
       ...(scope.type === 'command' ? scope.command.flags : {})
     },
-    scope
+    scope,
+    showRequiredFlags
   }).build();
 }
 
@@ -112,6 +115,7 @@ type UsageBuilderConfig = {
   display: DisplayContext;
   flags: Flags;
   scope: HelpScope;
+  showRequiredFlags: boolean;
 };
 
 class UsageBuilder {
@@ -130,10 +134,12 @@ class UsageBuilder {
   build(): Usage {
     const { details } = this.config.display;
 
+    const flags = this.listFlags();
+
     const usage: Usage = {
       commands: this.listCommands(),
-      flags: this.listFlags(),
-      title: this.buildUsage()
+      flags,
+      title: this.buildUsage(flags)
     };
 
     if (details !== undefined) {
@@ -146,20 +152,33 @@ class UsageBuilder {
   /**
    * Build the usage message
    */
-  private buildUsage(): string {
+  private buildUsage(flags: PrintableFlag[]): string {
     const {
       context: { meta: cli },
       display: { path },
-      flags,
-      scope
+      scope,
+      showRequiredFlags
     } = this.config;
 
-    return compact([
+    const parts = compact([
       cli.name,
       ...path,
-      scope.type !== 'command' && '<command>',
-      !isEmpty(flags) && '[flags]'
-    ]).join(' ');
+      scope.type !== 'command' && '<command>'
+    ]);
+
+    if (flags.length) {
+      const requiredFlags = flags.filter(f => f.required);
+
+      if (showRequiredFlags && requiredFlags.length) {
+        parts.push(...requiredFlags.map(f => f.setter));
+      }
+
+      if (!showRequiredFlags || requiredFlags.length < flags.length) {
+        parts.push('[flags]');
+      }
+    }
+
+    return parts.join(' ');
   }
 
   /**
