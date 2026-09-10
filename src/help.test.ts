@@ -462,7 +462,11 @@ describe('buildHelp', () => {
             bravo: C.flag('boolean', '@bravo', { default: true }),
             charlie: C.flag('number', '@charlie', { default: 1 }),
             delta: C.flag('string', '@delta', { default: 'value' }),
-            echo: C.flag('path', '@echo', { default: '/tmp' })
+            echo: C.flag('path', '@echo', { default: '/tmp' }),
+            foxtrot: C.flag('string', '@foxtrot', {
+              default: ['alfa', 'bravo'],
+              repeatable: true
+            })
           },
           handler
         ),
@@ -476,16 +480,18 @@ describe('buildHelp', () => {
         '',
         'Flags:',
         '',
-        '  --alfa              @alfa',
-        '  --[no-]bravo        @bravo',
-        '                      (Default: true)',
-        '  --charlie <number>  @charlie',
-        '                      (Default: 1)',
-        '  --delta <string>    @delta',
-        '                      (Default: value)',
-        '  --echo <path>       @echo',
-        '                      (Default: /tmp)',
-        '  --help              Show help'
+        '  --alfa                  @alfa',
+        '  --[no-]bravo            @bravo',
+        '                          (Default: true)',
+        '  --charlie <number>      @charlie',
+        '                          (Default: 1)',
+        '  --delta <string>        @delta',
+        '                          (Default: value)',
+        '  --echo <path>           @echo',
+        '                          (Default: /tmp)',
+        '  --foxtrot <string> ...  @foxtrot',
+        '                          (Default: alfa, bravo)',
+        '  --help                  Show help'
       ]
     );
   });

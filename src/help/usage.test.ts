@@ -473,7 +473,11 @@ describe('buildUsage', () => {
             bravo: C.flag('boolean', '@bravo', { default: true }),
             charlie: C.flag('number', '@charlie', { default: 1 }),
             delta: C.flag('string', '@delta', { default: 'value' }),
-            echo: C.flag('path', '@echo', { default: '/tmp' })
+            echo: C.flag('path', '@echo', { default: '/tmp' }),
+            foxtrot: C.flag('string', '@foxtrot', {
+              default: ['alfa', 'bravo'],
+              repeatable: true
+            })
           },
           handler
         ),
@@ -513,6 +517,12 @@ describe('buildUsage', () => {
             details: ['Default: /tmp'],
             required: false,
             setter: '--echo <path>'
+          },
+          {
+            description: '@foxtrot',
+            details: ['Default: alfa, bravo'],
+            required: false,
+            setter: '--foxtrot <string> ...'
           },
           helpFlag
         ],
