@@ -32,7 +32,7 @@ type GroupedFlags = GroupFlags<Flags>;
 export type HelpSections = {
   commands: string[];
   details?: string;
-  groupedFlags: GroupFlags<string[]>;
+  flags: GroupFlags<string[]>;
   title: string;
 };
 
@@ -148,7 +148,7 @@ class HelpMessage {
     return {
       commands: this.listCommands(),
       details: title,
-      groupedFlags: transformValues(
+      flags: transformValues(
         this.groupFlags(),
         fs => this.listFlags(fs)
       ),
@@ -162,7 +162,7 @@ class HelpMessage {
   format({
     commands,
     details,
-    groupedFlags,
+    flags,
     title
   }: HelpSections): string {
     const lines = [`Usage: ${title}`];
@@ -179,7 +179,7 @@ class HelpMessage {
     }
 
     if (!isEmpty(this.config.flags)) {
-      lines.push('', this.listGroupedFlags(groupedFlags));
+      lines.push('', this.listGroupedFlags(flags));
     }
 
     return lines.join('\n');
