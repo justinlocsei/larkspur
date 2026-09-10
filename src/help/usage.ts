@@ -16,7 +16,7 @@ import { compact, isEmpty, sortEntries, transformValues } from '../utils.ts';
 /**
  * A flag formatted for display
  */
-type PrintableFlag = {
+export type PrintableFlag = {
   description: string;
   details: string[];
   required: boolean;
