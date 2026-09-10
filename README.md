@@ -8,7 +8,7 @@
   Larkspur is a zero-dependency Node.js CLI library optimized for internal tools with multiple, nested commands.  It has strong opinions, requiring a description for every command and flag and only allowing long flag names, with no short aliases or positional arguments.  In return, you get a small API surface, detailed help messages, robust shell completions, and excellent type information for flag values when using Larkspur via TypeScript.
 </p>
 
-<br>
+---
 
 ## Installation
 
