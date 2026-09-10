@@ -28,7 +28,7 @@ export function buildExploreMessage({
   context: Context;
   scope: ExploreScope;
 }): string {
-  return [...collectHandlers(scope)]
+  return collectHandlers(scope)
     .map(({ command, path }) =>
       formatCommand(buildUsage({
         context,
@@ -42,10 +42,11 @@ export function buildExploreMessage({
 /**
  * Collect all command handlers with a tree
  */
-function* collectHandlers(
+function collectHandlers(
   scope: ExploreScope
-): Generator<Frame<GenericCommandHandler>> {
+): Frame<GenericCommandHandler>[] {
   const stack: Frame[] = [];
+  const handlers: Frame<GenericCommandHandler>[] = [];
 
   const initial = scope.type === 'root'
     ? { commands: scope.commands, path: [] }
@@ -67,9 +68,11 @@ function* collectHandlers(
     if (command.type === 'group') {
       push(command.subcommands, path);
     } else {
-      yield { command, path };
+      handlers.push({ command, path });
     }
   }
+
+  return handlers;
 }
 
 /**
