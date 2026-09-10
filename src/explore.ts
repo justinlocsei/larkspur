@@ -3,7 +3,7 @@ import type {
   Command,
   CommandTree,
   ExploreScope,
-  GenericCommandHandler
+  HelpScope
 } from './commands/types.ts';
 import type { Usage } from './help/usage.ts';
 import { buildUsage } from './help/usage.ts';
@@ -13,8 +13,8 @@ import { compact, drain, sortEntries } from './utils.ts';
 /**
  * A level of a command tree being explored
  */
-type Frame<T extends Command = Command> = {
-  command: T;
+type Frame = {
+  command: Command;
   path: string[];
 };
 
@@ -28,11 +28,11 @@ export function buildExploreMessage({
   context: Context;
   scope: ExploreScope;
 }): string {
-  return collectHandlers(scope)
-    .map(({ command, path }) =>
+  return buildHandlerScopes(scope)
+    .map(scope =>
       formatCommand(buildUsage({
         context,
-        scope: { command, path, type: 'command' },
+        scope,
         sharedFlags: false,
         showRequiredFlags: true
       }))
@@ -40,13 +40,11 @@ export function buildExploreMessage({
 }
 
 /**
- * Collect all command handlers with a tree
+ * Build help scopes for all command handlers in a tree
  */
-function collectHandlers(
-  scope: ExploreScope
-): Frame<GenericCommandHandler>[] {
+function buildHandlerScopes(scope: ExploreScope): HelpScope[] {
   const stack: Frame[] = [];
-  const handlers: Frame<GenericCommandHandler>[] = [];
+  const scopes: HelpScope[] = [];
 
   const initial = scope.type === 'root'
     ? { commands: scope.commands, path: [] }
@@ -68,11 +66,11 @@ function collectHandlers(
     if (command.type === 'group') {
       push(command.subcommands, path);
     } else {
-      handlers.push({ command, path });
+      scopes.push({ command, path, type: 'command' });
     }
   }
 
-  return handlers;
+  return scopes;
 }
 
 /**
