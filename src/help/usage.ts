@@ -128,12 +128,19 @@ class UsageBuilder {
    * Build usage information
    */
   build(): Usage {
-    return {
+    const { details } = this.config.display;
+
+    const usage: Usage = {
       commands: this.listCommands(),
-      details: this.config.display.details,
       flags: this.listFlags(),
       title: this.buildUsage()
     };
+
+    if (details !== undefined) {
+      usage.details = details;
+    }
+
+    return usage;
   }
 
   /**
