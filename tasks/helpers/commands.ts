@@ -1,5 +1,6 @@
 import { OperationalError } from '../../src/errors.ts';
 import type { EnvironmentVariables } from '../../src/types.ts';
+import { REPO_ROOT } from './paths.ts';
 
 import type { SpawnSyncOptions, SpawnSyncReturns } from 'node:child_process';
 import { spawnSync } from 'node:child_process';
@@ -22,7 +23,9 @@ export function captureOutput(
 ): SpawnSyncReturns<string> {
   const result = spawnSync(command, args, {
     ...options,
-    encoding: 'utf8'
+    cwd: options.cwd ?? REPO_ROOT,
+    encoding: 'utf8',
+    env: { ...process.env, ...options.env }
   });
 
   const label = [command, ...args].join(' ');
@@ -48,7 +51,7 @@ export function captureOutput(
 export function showOutput(
   command: string,
   args: string[],
-  options: CommandOptions
+  options?: CommandOptions
 ): void {
   captureOutput(
     command,
