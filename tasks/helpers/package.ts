@@ -48,7 +48,7 @@ function testConsumer(consumerDir: string): void {
 /**
  * Verify that Larkspur can be packed and consumed from a tarball
  */
-export function checkPackage(): Promise<void> {
+export function verifyPackage(): Promise<void> {
   const showSection = (label: string) => {
     console.log(`${label}\n`);
   };
@@ -86,6 +86,6 @@ export function checkPackage(): Promise<void> {
 
     testConsumer(consumerDir);
 
-    console.log('Build verified');
+    console.log('Package verified');
   });
 }
