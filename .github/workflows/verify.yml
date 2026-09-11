@@ -39,7 +39,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Install zsh
-        run: sudo apt-get install -y zsh
+        run: sudo apt-get install -y ncurses-term zsh
 
       - uses: ./.github/actions/larkspur
         name: Run unit tests
