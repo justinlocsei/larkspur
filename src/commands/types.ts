@@ -32,7 +32,7 @@ export type CommmandHandlerFn<
 > = (
   flags: ValuesOf<F, C>,
   details: CommandParsingDetails<F>
-) => Promise<string> | Promise<void>;
+) => string | void | Promise<string> | Promise<void>;
 
 /**
  * A group of subcommands
