@@ -18,6 +18,13 @@ function localBin(name: string): string {
 }
 
 /**
+ * Produce the path to a file relative to the repository root
+ */
+export function localFile(name: string): string {
+  return path.join(REPO_ROOT, name);
+}
+
+/**
  * Run a command
  */
 export function run(
