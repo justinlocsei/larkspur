@@ -627,7 +627,7 @@ my-cli test --number 2 --string a
 
 ### Custom Completions
 
-String, number, and path flags can define custom lists of suggestions to support the default shell completions.  Suggestions are provided by async JS functions that return lists of strings that will be shown to a user hitting tab after entering the name of the flag that provides custom completions.  A completion function has access to the current flag value typed by the user via an object parameter with a `current` property.
+String, number, and path flags can define custom lists of suggestions to support the default shell completions.  Suggestions are provided by sync or async JS functions that return lists of strings that will be shown to a user hitting tab after entering the name of the flag that provides custom completions.  A completion function has access to the current flag value typed by the user via an object parameter with a `current` property.
 
 ```js
 import C from 'larkspur';
@@ -637,8 +637,11 @@ const values = ['alfa', 'bravo'];
 C(
   'Demonstrate custom completions',
   {
+    server: C.flag('string', 'A server name', {
+      completions: async ({ current }) => queryServers({ prefix: current })
+    }),
     value: C.flag('string', 'A value', {
-      completions: async ({ current }) => current ? values.map(v => `${current}-${v}`) : values
+      completions: ({ current }) => current ? values.map(v => `${current}-${v}`) : values
     })
   },
   async () => {}
@@ -646,6 +649,12 @@ C(
 ```
 
 ```sh
+my-cli test --server <TAB>
+# => dev-01 prod-01 prod-02
+
+my-cli test --server de<TAB>
+# => dev-01
+
 my-cli test --value <TAB>
 # => alfa bravo
 
