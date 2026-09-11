@@ -39,14 +39,24 @@ export function refreshTableOfContents(readme: string): boolean {
  * List Markdown headings in the README
  */
 function listHeadings(lines: string[]): Heading[] {
+  const slugs = new Set<string>();
+
   return lines.reduce<Heading[]>((headings, line) => {
     const match = HEADING.exec(line);
     const [, hashes, title] = match ?? [];
 
     if (hashes && title) {
+      const slug = slugFor(title);
+
+      if (slugs.has(slug)) {
+        throw new Error(`Duplicate slug: ${slug}`);
+      } else {
+        slugs.add(slug);
+      }
+
       headings.push({
         level: hashes.length,
-        slug: slugFor(title),
+        slug,
         title
       });
     }
