@@ -13,13 +13,13 @@ jobs:
       node-version: 24
       task: check
 
-  build:
-    name: Build
+  package:
+    name: Package
     needs: check
     uses: ./.github/workflows/run-task.yml
     with:
       node-version: 24
-      task: build
+      task: package verify
 
   test:
     name: Test (v${{ matrix.node-version }})
