@@ -30,8 +30,10 @@ jobs:
       matrix:
         node-version: [22, 24]
     steps:
-      - uses: ./.github/actions/install
-        name: Install Larkspur
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/install-node
+        name: Install Node.js ${{ matrix.node-version }}
         with:
           node-version: ${{ matrix.node-version }}
 
