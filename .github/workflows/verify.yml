@@ -1,0 +1,52 @@
+name: Verify
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    name: Check code
+    uses: ./.github/workflows/run-task.yml
+    with:
+      node-version: 24
+      task: check
+
+  build:
+    name: Build
+    needs: check
+    uses: ./.github/workflows/run-task.yml
+    with:
+      node-version: 24
+      task: build
+
+  test:
+    name: Run tests (Node.js v${{ matrix.node-version }})
+    needs: check
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [22, 24]
+    steps:
+      - uses: ./.github/actions/install
+        name: Install Larkspur
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - uses: ./.github/actions/larkspur
+        name: Run unit tests
+        with:
+          task: test unit
+
+      - uses: ./.github/actions/larkspur
+        name: Run integration tests
+        with:
+          task: test integration
+
+      - uses: ./.github/actions/larkspur
+        name: Run property tests
+        with:
+          flags: --runs 5000
+          task: test property

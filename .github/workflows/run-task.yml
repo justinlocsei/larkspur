@@ -1,0 +1,31 @@
+name: Run a Larkspur task
+
+on:
+  workflow_call:
+    inputs:
+      flags:
+        description: Flags to pass to the Larkspur task
+        type: string
+      node-version:
+        description: The Node.js version to use
+        required: true
+        type: number
+      task:
+        description: The Larkspur task to run
+        required: true
+        type: string
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./.github/actions/install
+        name: Install Larkspur
+        with:
+          node-version: ${{ inputs.node-version }}
+
+      - uses: ./.github/actions/larkspur
+        name: Run the ${{ inputs.task }} Larkspur task
+        with:
+          flags: ${{ inputs.flags }}
+          task: ${{ inputs.task }}

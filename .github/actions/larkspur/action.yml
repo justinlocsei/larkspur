@@ -1,0 +1,16 @@
+name: Run a Larkspur task
+
+description: Use the Larkspur CLI to run a task
+
+inputs:
+  flags:
+    description: Flags to pass to the task
+  task:
+    description: The task name
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - run: ./bin/larkspur ${{ inputs.task }} ${{ inputs.flags }}
+      shell: bash

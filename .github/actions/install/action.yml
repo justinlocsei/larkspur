@@ -1,0 +1,21 @@
+name: Install Larkspur
+
+description: Install Larkspur and its dependencies
+
+inputs:
+  node-version:
+    description: The Node.js version to use
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-node@v4
+      with:
+        cache: npm
+        node-version: ${{ inputs.node-version }}
+
+    - run: npm ci
+      shell: bash
