@@ -57,7 +57,7 @@ export default C.group('Run tests', {
     }
   ),
 
-  properties: C(
+  property: C(
     'Run property tests',
     {
       name,
