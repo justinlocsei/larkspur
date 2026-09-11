@@ -41,18 +41,11 @@ jobs:
       - name: Install zsh
         run: sudo apt-get install -y ncurses-term zsh
 
-      - uses: ./.github/actions/larkspur
-        name: Run unit tests
-        with:
-          task: test unit
+      - name: Run unit tests
+        run: ./bin/larkspur test unit
 
-      - uses: ./.github/actions/larkspur
-        name: Run integration tests
-        with:
-          task: test integration
+      - name: Run integration tests
+        run: ./bin/larkspur test integration
 
-      - uses: ./.github/actions/larkspur
-        name: Run property tests
-        with:
-          flags: --runs 1000
-          task: test property
+      - name: Run property tests
+        run: ./bin/larkspur test property --runs 1000
