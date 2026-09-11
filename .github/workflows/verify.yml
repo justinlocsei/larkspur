@@ -7,7 +7,7 @@ on:
 
 jobs:
   check:
-    name: Check code
+    name: Check Code
     uses: ./.github/workflows/run-task.yml
     with:
       node-version: 24
@@ -22,7 +22,7 @@ jobs:
       task: build
 
   test:
-    name: Run tests (Node.js v${{ matrix.node-version }})
+    name: Run Tests (Node.js v${{ matrix.node-version }})
     needs: check
     runs-on: ubuntu-latest
     strategy:
