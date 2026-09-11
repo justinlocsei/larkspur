@@ -1,8 +1,7 @@
-import { OperationalError } from '../src/errors.ts';
-import type { EnvironmentVariables } from '../src/types.ts';
+import type { Subset } from '../src/types/utils.ts';
+import type { CommandOptions } from './helpers/commands.ts';
+import { showOutput } from './helpers/commands.ts';
 import { localBin, REPO_ROOT } from './helpers/paths.ts';
-
-import { spawnSync } from 'node:child_process';
 
 /**
  * Run a command
@@ -10,26 +9,10 @@ import { spawnSync } from 'node:child_process';
 export function run(
   npmBin: string,
   args: string[] = [],
-  { env = {} }: { env?: EnvironmentVariables } = {}
+  { env = {} }: Subset<CommandOptions, 'env'> = {}
 ): void {
-  const command = localBin(npmBin);
-
-  const result = spawnSync(command, args, {
+  showOutput(localBin(npmBin), args, {
     cwd: REPO_ROOT,
-    env: { ...process.env, ...env },
-    stdio: 'inherit'
+    env: { ...process.env, ...env }
   });
-
-  const exec = [command, ...args].join(' ');
-
-  if (result.error) {
-    throw new OperationalError(
-      `Failed to run command: ${exec}`,
-      result.error
-    );
-  } else if (result.status !== 0) {
-    throw new OperationalError(
-      `${exec} exited with code ${result.status ?? 'unknown'}`
-    );
-  }
 }
