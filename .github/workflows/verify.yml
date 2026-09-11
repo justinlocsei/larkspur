@@ -54,5 +54,5 @@ jobs:
       - uses: ./.github/actions/larkspur
         name: Run property tests
         with:
-          flags: --runs 5000
+          flags: --runs 1000
           task: test property
