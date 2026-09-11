@@ -16,7 +16,8 @@ on:
         type: string
 
 jobs:
-  run:
+  run-task:
+    name: larkspur ${{ inputs.task }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
