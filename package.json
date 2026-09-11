@@ -2,7 +2,20 @@
   "name": "larkspur",
   "version": "0.1.0",
   "description": "A TypeScript-first CLI library optimized for internal tools",
-  "keywords": [],
+  "keywords": [
+    "cli",
+    "commands",
+    "completions",
+    "shell"
+  ],
+  "homepage": "https://github.com/justinlocsei/larkspur#readme",
+  "bugs": {
+    "url": "https://github.com/justinlocsei/larkspur/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/justinlocsei/larkspur.git"
+  },
   "author": "Justin Locsei",
   "license": "MIT",
   "type": "module",
