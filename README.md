@@ -41,6 +41,7 @@
   - [Repeatable Flags](#repeatable-flags)
   - [Flag Validation](#flag-validation)
   - [Custom Completions](#custom-completions)
+- [Why the Name?](#why-the-name)
 <!-- </toc> -->
 
 ## Installation
@@ -664,3 +665,7 @@ my-cli test --value <TAB>
 my-cli test --value test<TAB>
 # => test-alfa test-bravo
 ```
+
+## Why the Name?
+
+In [floristry](https://www.instagram.com/justinlocsei/), larkspur is used as a *line* flower.  I find it to be particularly beautiful, so you could even say that it *commands* one's attention.
