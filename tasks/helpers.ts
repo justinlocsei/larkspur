@@ -1,28 +1,8 @@
 import { OperationalError } from '../src/errors.ts';
 import type { EnvironmentVariables } from '../src/types.ts';
+import { localBin, REPO_ROOT } from './helpers/paths.ts';
 
 import { spawnSync } from 'node:child_process';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-const REPO_ROOT = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  '..'
-);
-
-/**
- * Produce the path to a node_modules executable
- */
-function localBin(name: string): string {
-  return path.join(REPO_ROOT, 'node_modules', '.bin', name);
-}
-
-/**
- * Produce the path to a file relative to the repository root
- */
-export function localFile(name: string): string {
-  return path.join(REPO_ROOT, name);
-}
 
 /**
  * Run a command
