@@ -20,7 +20,8 @@ jobs:
     name: Run
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - name: Clone Larkspur
+        uses: actions/checkout@v7
 
       - uses: ./.github/actions/install-node
         name: Install Node.js ${{ inputs.node-version }}
