@@ -56,7 +56,7 @@ describe('getSharedFlagValue', () => {
     const flags = useSharedFlags(resolveConfig());
 
     const empty = parse([], flags);
-    const full = parse(['--explore', '--help'], flags);
+    const full = parse(['--help'], flags);
 
     assert.isFalse(getSharedFlagValue(empty.flags, 'help'));
     assert.isTrue(getSharedFlagValue(full.flags, 'help'));
