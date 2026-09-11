@@ -1,4 +1,3 @@
-import type { TreeScope } from '../commands/types.ts';
 import type { Config } from '../types/config.ts';
 import { useFlags } from './definition.ts';
 import type { Flags } from './types.ts';
@@ -20,36 +19,8 @@ export type SharedFlags = typeof STATIC_FLAGS;
 /**
  * Use shared flags based on the given configuration
  */
-export function useSharedFlags(
-  config: Config,
-  scope: TreeScope = 'root'
-): Flags {
-  const flags: Flags = { ...STATIC_FLAGS };
-
-  const explore = scope === 'command'
-    ? undefined
-    : getExploreFlagName(config);
-
-  if (explore) {
-    flags[explore] = {
-      default: false,
-      description: 'Recursively list commands and flags',
-      type: 'boolean'
-    };
-  }
-
-  return flags;
-}
-
-/**
- * Get the configured name of the explore flag
- */
-export function getExploreFlagName(
-  { help: { explore } }: Config
-): string | undefined {
-  return explore.enabled
-    ? explore.flag
-    : undefined;
+export function useSharedFlags(_config: Config): Flags {
+  return { ...STATIC_FLAGS };
 }
 
 /**
