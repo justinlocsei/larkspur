@@ -419,6 +419,32 @@ describe('parseCommand', () => {
     assert.equal(run.output, 'output');
   });
 
+  it('supports sync handlers that return output', async () => {
+    const result = parseCommand(
+      ['command'],
+      { command: C(description, () => 'output') }
+    );
+
+    assert(result.type === 'command', 'Command not parsed');
+    const run = await result.run(createTestContext({ name: 'test-cli' }));
+
+    assert(run.type === 'success', 'Command not run');
+    assert.equal(run.output, 'output');
+  });
+
+  it('supports sync handlers with no return value', async () => {
+    const result = parseCommand(
+      ['command'],
+      { command: C(description, () => {}) }
+    );
+
+    assert(result.type === 'command', 'Command not parsed');
+    const run = await result.run(createTestContext({ name: 'test-cli' }));
+
+    assert(run.type === 'success', 'Command not run');
+    assert.isUndefined(run.output);
+  });
+
   it('reports whether all supported flags were provided', async () => {
     const command = C(description, {
       boolean: { default: false, description, type: 'boolean' },

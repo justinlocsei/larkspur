@@ -64,6 +64,15 @@ describe('provideCompletions', () => {
     assert.equal(result, 'alfa-one\nalfa-two\n');
   });
 
+  it('supports sync completion functions', async () => {
+    const result = await provideCompletions(
+      withCompletion(() => ['alfa', 'bravo']),
+      { current: '', flag: 'command:valid' }
+    );
+
+    assert.equal(result, 'alfa\nbravo\n');
+  });
+
   it('returns an empty string for invalid providers', async () => {
     const result = await provideCompletions(
       withCompletion(() => {
