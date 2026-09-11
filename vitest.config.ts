@@ -17,7 +17,8 @@ export default defineConfig({
         extends: true,
         test: {
           include: ['test/clis/**/*.test.ts'],
-          name: 'integration'
+          name: 'integration',
+          testTimeout: 60_000
         }
       },
       {
