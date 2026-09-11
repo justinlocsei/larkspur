@@ -37,7 +37,7 @@ await run({
       verbose: C.flag('boolean', 'Show verbose output')
     },
     async (flags) => {
-      console.log(`Running ${flags.mode} build`);
+      console.log(`Running build: ${flags.mode}`);
 
       buildImage({
         mode: flags.mode,
@@ -106,13 +106,15 @@ Run the CLI:
 ./run-task test unit --reporter=dot test/unit/parsing.test.ts test/unit/validation.test.ts
 ```
 
+Larkspur CLIs only support long flag names like `--reporter`, rather than short flags like `-r`.  Values can be passed to flags using either `--reporter dot` or `--reporter=dot` syntax, and the two can be used interchangeably in the same command invocation.  While restrictive, the use of long flag names is a design choice that optimizes for discoverability and readability.
+
 ## TypeScript
 
-Larkspur is written in TypeScript and is at its best when consumed in a `.ts` file, which gives you access to constraints around command and flag definitions and narrowly typed flag values in handlers.  As long as you're using a recent version of Node.js 22 or later, a standard `node` shebang in your CLI will allow it to execute directly, giving you rich types from Larkspur without the need for a build process.
+Larkspur is written in TypeScript and is at its best when consumed via a `.ts` file, which gives you access to constraints around command and flag definitions and narrowly typed flag values in handlers.  As long as you're using a recent version of Node.js 22 or later, a standard `node` shebang in your CLI will allow it to execute directly, giving you rich types from Larkspur without the need for a build process.
 
 ## Usage
 
-Larkspur has a focused public API that makes defining simple tools easy and complex ones possible.  The following sections provide details about how to build a CLI using Larkspur.  All examples assume that the CLI code resides in a file named `my-cli` that has been marked as executable and starts with a shebang of `#!/usr/bin/env node`.  The shebang will be omitted from most example code for clarity, but must be present in any CLI tools that you write with Larkspur.
+Larkspur has a minimal public API that makes defining simple tools easy and complex ones possible, both of which will be explored in the following sections.  All examples assume that the CLI code resides in a file named `my-cli` that has been marked as executable and starts with a shebang of `#!/usr/bin/env node`.  The shebang will be omitted from most example code for clarity, but must be present in any CLI tools that you write with Larkspur.
 
 ### Defining a CLI
 
@@ -128,25 +130,25 @@ await run({
 });
 ```
 
-If you store this code in a file named `my-cli`, you could invoke its one and only command by running `my-cli root-command`.  Keys in command definitions map exactly to command names, and support a limited set of characters that is enforced at runtime.
+If you were to store this code in a file named `my-cli`, you would invoke its one and only command by running `my-cli root-command`.  Keys in command definitions map exactly to command names, and support a limited set of characters that is enforced at runtime.
 
-### CLI Structure
+#### CLI Structure
 
 The tree of commands passed to `run` can define either command groups or command handlers.
 
 A command group contains one or more child commands, and groups can recursively contain other groups.  Each group acts as a namespace for its commands, so a group named `test` with a child command named `unit` would be invoked by running `my-cli test unit`.
 
-A command handler is a concrete function that runs an action and has access to any flags that a user provided.  Handler functions are covered in detail later on, but the most basic handler is an empty async function, which will allow the command to run and exit with a 0 status code.
+A command handler is a concrete function that runs an action and has access to the values of all flags associated with the command.  Handler functions are covered in detail later on, but the most basic handler is an empty async function, which will allow the command to run and exit with a 0 status code.
 
 #### File Properties
 
-A Larkspur CLI is intended to be directly executed, either via `./my-cli` for a local file or `my-cli`, if the command lives on a user's `PATH`.  For this to work, you must ensure that the file is marked as executable via command like `chmod +x my-cli` and that it starts with a shebang that invokes the Node.js interpreter, such as `#!/usr/bin/env node`.
+A Larkspur CLI is intended to be directly executed, either via `./my-cli` for a local file or `my-cli` for a command that is available on a user's `PATH`.  For this to work, you must ensure that the file is marked as executable via a command like `chmod +x my-cli` and that it starts with a shebang that invokes the Node.js interpreter, such as `#!/usr/bin/env node`.
 
 Files without an extension can be troublesome to integrate with tooling, so one option is to define your CLI in a file with an extension that is covered by your build tooling and create a symlink to it without an extension.  Larkspur's own task runner does this, with a `bin/larkspur` file that is a symlink to `tasks/index.ts`.
 
 #### Modular Definitions
 
-To avoid a single CLI definition with thousands of lines, you can split command definitions into separate files that get loaded by the entry point.  As long as you define command handlers or groups defined via the `C` factory, you can pass them around to build up the larger command tree.
+To avoid a single CLI definition with thousands of lines, you can split command definitions into separate files that get loaded by the entry point.  As long as you define command handlers or groups using the `C` factory, you can pass them around to build up the larger command tree.
 
 ```js
 // build.mjs
@@ -182,11 +184,11 @@ await run({ build, test });
 
 ### CLI Features
 
-Any CLI built with Larkspur exposes a core set of functionality to a user without any further configuration.  If desired, some of the features described below can be disabled or customized, as described in the section on configuring Larkspur.
+Any CLI built with Larkspur exposes a core set of functionality to a user without any further configuration.  If desired, some of the features covered below can be disabled or customized, as described in the section on configuring Larkspur.
 
 #### Help Messages
 
-Larkspur can show help messages for the CLI and each of its commands via a `--help` flag.  Passing this to the CLI's root command or a named command group will show all commands available at that level, and using `--help` with a command handler will show all available flags.
+Larkspur can show help messages for a CLI and each of its commands via a `--help` flag.  Passing this flag to the CLI's root command or a named command group will show all commands available at that level, and using `--help` with a command handler will show all available flags.
 
 #### Command Discovery
 
@@ -196,11 +198,11 @@ All commands and flags can be recursively listed at any level of a command tree 
 
 Any Larkspur CLI can generate completions for bash and zsh using the top-level `completions` command group, which is present by default.  A user of your CLI would install completions by running `my-cli completions install --shell=<bash|zsh>`.  This command shows shell-specific installation instructions that a user can follow to set up completions for your CLI.
 
-For completions to work, your CLI must be on the user's `PATH`.  The installation instructions mention this requirement but do not explain how to configure `PATH`; if your users may need guidance, provide it in your CLI's documentation.
+For completions to work, your CLI must be on the user's `PATH`.  The installation instructions mention this requirement but do not explain how to configure `PATH`; if your users may need guidance, you can provide it in your CLI's documentation.
 
-Installed completions are refreshed every time a user starts a new terminal session.  While this may result in a slight performance hit for very large CLIs, it allows your users to receive updated completions as you release changes to your CLI by opening a new terminal session.
+Installed completions are refreshed every time a user starts a new terminal session.  While this may result in a slight startup delay for very large CLIs, it allows your users to automatically receive updated completions as you release changes to your CLI.
 
-If you wish to manage completions for internal users, you can run `my-cli completions generate --shell=<bash|zsh>` to print the completions for the requested shell.  If you save these to a file and configure a user's shell to read that file, you can avoid the cost of refreshing completions for each interactive terminal session.
+If you wish to manage completions for internal users, you can run `my-cli completions generate --shell=<bash|zsh>` to print the completions for the requested shell.  If you save this output to a file and configure a user's shell to read that file, you can avoid the startup cost of refreshing completions when opening a new terminal session.
 
 ### Configuring Larkspur
 
@@ -260,7 +262,7 @@ C(
 
 // C(<fields>)
 C({
-  description: 'A command with extended options',
+  description: 'A command with named properties',
   flags: { version: C.flag('number', 'A version number') },
   handler: async (flags) => `Version: ${flags.version.toString()}`
 });
@@ -286,7 +288,7 @@ C.group('Outer group', {
 
 #### Handler Logic
 
-When a command handler is invoked via a CLI call, its handler function is called.  This is an async function that receives parsed flag values as its first parameter and parsing details as its second.  Handlers have very few constraints, and can freely call any synchronous or asynchronous code.
+When a command is invoked via a CLI call, its handler function is called.  This is an async function that receives parsed flag values as its first parameter and parsing details as its second.  Handlers have very few constraints, and can freely call any synchronous or asynchronous code.
 
 #### Command Flags
 
@@ -311,7 +313,7 @@ C(
 );
 ```
 
-The supported flags and their options are covered in detail further on in this document.
+The supported flags and their options are covered in detail later in this document.
 
 #### Parsing Details
 
@@ -322,7 +324,7 @@ A handler has access to details about how the command was parsed before executio
 * `context.metadata`: The name and description of the current CLI
 * `providedFlags`: A set containing the names of all flags that were provided by the user
 
-These details can be used to customize the behavior of the command, as demonstrated below:
+These details can be used to customize the behavior of a command:
 
 ```js
 import C from 'larkspur';
@@ -339,7 +341,7 @@ C({
 });
 ```
 
-In the above example, an explicit `--cores <number>` flag results in the requested number being used as-is, rather than doubled.  Additionally, tests will run with a label that matches the name of the CLI, such as `my-cli`.
+In the above example, an explicit `--cores <number>` flag results in the requested number being used as is, rather than doubled.  Additionally, tests will run with a label that matches the name of the CLI, such as `my-cli`.
 
 #### Command Output
 
@@ -356,7 +358,7 @@ await run({
 
 #### Error Handling
 
-Any errors thrown by a command handler will show a full stacktrace by default.  If you wish to abort execution and show an error message to the user, you can use the `OperationalError` class that is part of Larkspur's public API.  This requires a message and accepts an optional second parameter that will be shown as error details below the message.
+Any errors thrown by a command handler will show a full stacktrace by default.  If you wish to abort execution and show an error message to the user without a stacktrace, you can use the `OperationalError` class that is part of Larkspur's public API.  This requires a message and accepts an optional second parameter that will be shown as error details below the message.
 
 ```js
 import C, { OperationalError } from 'larkspur';
@@ -388,7 +390,7 @@ C(
 
 Larkspur has a rich system for defining flags and exposing their values to command handlers.  All flags are defined via the `C.flag` factory function, which requires a flag type and description, followed by flag-specific options.
 
-Flags can be either boolean or scalar flags, the latter of which require a value.  Boolean flags are guaranteed to be either `true` or `false`, but scalar flags default to `undefined`.  A scalar flag can specify a default value via the `default` value, and can be marked as required using `required: true`.  If a required flag is not provided, the CLI will exit early with a validation error.
+Flags can be either boolean or scalar, the latter of which require a value.  Boolean flags are guaranteed to be either `true` or `false`, but scalar flags default to `undefined`.  A scalar flag can specify a default value via the `default` property and can be marked as required using `required: true`.  If a required flag is not provided, the CLI will exit early with a validation error.
 
 All flag examples below involve a single command with multiple flags that show the range of options available.  It will be invoked as `my-cli test` in the examples.
 
@@ -524,7 +526,7 @@ my-cli test --number 2 --string bravo
 
 #### Repeatable Flags
 
-All non-boolean flags can be marked as repeatable, which allows a user to assign multiple values to the flag and exposes the parsed value as an array.
+All non-boolean flags can be marked as repeatable, which allows a user to assign multiple values to the flag and exposes the parsed value as an array.  If a repeatable flag is not provided, it will have a value of `[]`, rather than `undefined`.
 
 ```js
 import C from 'larkspur';
@@ -536,7 +538,10 @@ C(
       choices: ['alfa', 'bravo'],
       repeatable: true
     }),
-    numbers: C.flag('number', 'Multiple numbers', { repeatable: true }),
+    numbers: C.flag('number', 'Multiple numbers', {
+      default: [1, 2],
+      repeatable: true
+    }),
     paths: C.flag('path', 'Multiple paths', { repeatable: true }),
     strings: C.flag('string', 'Multiple strings', { repeatable: true })
   },
@@ -546,7 +551,7 @@ C(
 
 ```sh
 my-cli test
-# => choices=0:numbers=0:paths=0:strings=0
+# => choices=0:numbers=2:paths=0:strings=0
 
 my-cli test --choices alfa --numbers 1 --numbers 2 --paths bravo.txt --strings charlie --strings delta
 # => choices=1:numbers=2:paths=1:strings=2
@@ -554,7 +559,7 @@ my-cli test --choices alfa --numbers 1 --numbers 2 --paths bravo.txt --strings c
 
 #### Flag Validation
 
-Non-choice scalar flags can define validators that act on the parsed value of the flag.  A validator should return `true` when the value is valid.  Returning `false` will cause a generic validation error to be shown.  To show a custom error message, a validator function can return a string, which will be shown directly to the user.
+String, number, and path flags can define validators that act on the parsed value of the flag.  A validator should return `true` when the value is valid.  Returning `false` will cause a generic validation error to be shown.  To show a custom error message, a validator function can return a string, which will be shown directly to the user.
 
 ```js
 import C from 'larkspur';
@@ -589,7 +594,7 @@ my-cli test --number 2 --string a
 
 #### Custom Completions
 
-Non-choice scalar flags can define custom lists of suggestions to support the default shell completions.  Suggestions are provided by async JS functions that return lists of strings that will be shown to a user hitting tab after entering the name of the flag that provides custom completions.  A completion function has access to the current flag value typed by the user via an object parameter with a `current` property.
+String, number, and path flags can define custom lists of suggestions to support the default shell completions.  Suggestions are provided by async JS functions that return lists of strings that will be shown to a user hitting tab after entering the name of the flag that provides custom completions.  A completion function has access to the current flag value typed by the user via an object parameter with a `current` property.
 
 ```js
 import C from 'larkspur';
