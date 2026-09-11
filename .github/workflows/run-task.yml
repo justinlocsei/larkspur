@@ -29,7 +29,7 @@ jobs:
           node-version: ${{ inputs.node-version }}
 
       - uses: ./.github/actions/larkspur
-        name: Run the ${{ inputs.task }} Larkspur task
+        name: Run larkspur ${{ inputs.task }}
         with:
           flags: ${{ inputs.flags }}
           task: ${{ inputs.task }}
