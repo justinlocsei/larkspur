@@ -39,7 +39,9 @@ function renderHarness(
 
   return `
 # Establish a pseudo-terminal for test execution
+set -e
 emulate -L zsh
+export TERM=xterm
 zmodload zsh/zpty
 ${preamble.join('\n')}
 
@@ -48,6 +50,7 @@ session=$(mktemp)
 cat > "$session" <<'SESSION'
 
 # Load the completion system and the completion script under test
+export TERM=xterm
 emulate -L zsh
 autoload -Uz compinit
 compinit -C -D
@@ -82,7 +85,7 @@ SESSION
 # Start zsh with a pty, wait for boot, type the partial command, hit tab,
 # then read output until the widget prints the closing delimiter
 zpty -d pty 2>/dev/null
-zpty -b pty zsh -f "$session"
+zpty -b pty zsh -fi "$session"
 zpty -r pty boot '*${booted}*' || exit 1
 zpty -w pty ${quote(input)}$'\\t'
 zpty -r pty output $'*${ETX}*' || exit 1
