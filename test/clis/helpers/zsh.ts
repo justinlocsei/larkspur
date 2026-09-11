@@ -5,7 +5,6 @@ import { assert } from 'vitest';
 import { quote } from '../../../src/completions/scripts.ts';
 import type { CompletionsTester } from './completions.ts';
 
-import type { SpawnSyncReturns } from 'node:child_process';
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -97,25 +96,6 @@ print -r -- "$output"
 }
 
 /**
- * Run a zsh harness script in an environment suitable for zpty
- */
-function runHarness(
-  harnessPath: string,
-  cwd: string
-): SpawnSyncReturns<string> {
-  const args = process.platform === 'darwin'
-    ? ['-q', '/dev/null', 'zsh', harnessPath]
-    : ['-q', '-c', `exec zsh ${quote(harnessPath)}`, '/dev/null'];
-
-  return spawnSync('script', args, {
-    cwd,
-    encoding: 'utf8',
-    env: { ...process.env, TERM: 'xterm' },
-    stdio: ['ignore', 'pipe', 'pipe']
-  });
-}
-
-/**
  * Extract completions from the harness's output
  */
 function parseZshCompletionReply(output: string): string[] {
@@ -152,7 +132,11 @@ export const runZshCompletions: CompletionsTester = async (run) => {
     renderHarness(completionPath, cliName, inputs, run.preamble)
   );
 
-  const { status, stderr, stdout } = runHarness(harnessPath, run.runDir);
+  const { status, stderr, stdout } = spawnSync('zsh', [harnessPath], {
+    cwd: run.runDir,
+    encoding: 'utf8',
+    env: { ...process.env, TERM: 'xterm' }
+  });
 
   assert.equal(
     status,
