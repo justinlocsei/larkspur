@@ -72,7 +72,8 @@ await run({
     async (flags) => {
       console.log(`Running build: ${flags.mode}`);
 
-      buildImage({
+      await buildImage({
+        commit: await getLatestCommitSHA(),
         mode: flags.mode,
         tags: flags.tag,
         verbose: flags.verbose
@@ -88,7 +89,7 @@ await run({
         file: C.flag('path', 'A single file to run'),
         verbose: C.flag('boolean', 'Show test details', { default: true })
       },
-      async ({ cores, file, verbose }) => runIntegrationTests({
+      ({ cores, file, verbose }) => runIntegrationTests({
         cores,
         file,
         verbose
@@ -101,16 +102,14 @@ await run({
         file: C.flag('path', 'A test file to run', { repeatable: true }),
         reporter: C.flag('string', 'The reporter to use')
       },
-      handler: async ({ file: files, reporter }) => {
-        runUnitTests({
-          onlyFiles: files.filter(f => f.includes('.test')),
-          reporter
-        });
-      }
+      handler: ({ file: files, reporter }) => runUnitTests({
+        onlyFiles: files.filter(f => f.includes('.test')),
+        reporter
+      })
     })
   }),
 
-  version: C('Show the current version', async () => '1.0.0')
+  version: C('Show the current version', () => '1.0.0')
 });
 ```
 
@@ -159,7 +158,7 @@ All Larkspur CLIs are exposed using the `run` function, which takes a tree of na
 import C, { run } from 'larkspur';
 
 await run({
-  'root-command': C('The root command', async () => {})
+  'root-command': C('The root command', () => {})
 });
 ```
 
@@ -171,7 +170,7 @@ The tree of commands passed to `run` can define either command groups or command
 
 A command group contains one or more child commands, and groups can recursively contain other groups.  Each group acts as a namespace for its commands, so a group named `test` with a child command named `unit` would be invoked by running `my-cli test unit`.
 
-A command handler is a concrete function that runs an action and has access to the values of all flags associated with the command.  Handler functions are covered in detail later on, but the most basic handler is an empty async function, which will allow the command to run and exit with a 0 status code.
+A command handler is a concrete function that runs an action and has access to the values of all flags associated with the command.  Handler functions are covered in detail later on, but the most basic handler is an empty function, which will allow the command to run and exit with a 0 status code.
 
 ### File Properties
 
@@ -187,7 +186,7 @@ To avoid a single CLI definition with thousands of lines, you can split command 
 // build.mjs
 import C from 'larkspur';
 
-export default C('Build the application', async () => {});
+export default C('Build the application', () => {});
 ```
 
 ```js
@@ -202,7 +201,7 @@ export default C.group('Run tests', { unit });
 // test/unit.mjs
 import C from 'larkspur';
 
-export default C('Run unit tests', async () => {});
+export default C('Run unit tests', () => {});
 ```
 
 ```js
@@ -245,7 +244,7 @@ While Larkspur has strong opinions, it allows for some configuration via the opt
 import C, { run } from 'larkspur';
 
 await run(
-  { version: C('Show the current version', async () => '1.0.0') },
+  { version: C('Show the current version', () => '1.0.0') },
   {
     completions: { enabled: false },
     help: {
@@ -283,21 +282,21 @@ import C from 'larkspur';
 // C(<description>, <handler>)
 C(
   'A basic command',
-  async () => 'Handler logic'
+  () => 'Handler logic'
 );
 
 // C(<description>, <flags>, <handler>)
 C(
   'A command with flags',
   { message: C.flag('string', 'A message to show') },
-  async (flags) => `Message: ${flags.message}`
+  flags => `Message: ${flags.message}`
 );
 
 // C(<fields>)
 C({
   description: 'A command with named properties',
   flags: { version: C.flag('number', 'A version number') },
-  handler: async (flags) => `Version: ${flags.version.toString()}`
+  handler: flags => `Version: ${flags.version.toString()}`
 });
 ```
 
@@ -312,16 +311,16 @@ import C from 'larkspur';
 
 // C.group(<description>, <commands>)
 C.group('Outer group', {
-  command: C('Command handler', async () => {}),
+  command: C('Command handler', () => {}),
   inner: C.group('Inner group', {
-    child: C('Child command', async () => {})
+    child: C('Child command', () => {})
   })
 });
 ```
 
 ### Handler Logic
 
-When a command is invoked via a CLI call, its handler function is called.  This is an async function that receives parsed flag values as its first parameter and parsing details as its second.  Handlers have very few constraints, and can freely call any synchronous or asynchronous code.
+When a command is invoked via a CLI call, its handler function is called.  This is a synchronous or asynchronous function that receives parsed flag values as its first parameter and parsing details as its second.  Handlers have very few constraints, and can freely call any synchronous or asynchronous code.
 
 ### Command Flags
 
@@ -337,7 +336,7 @@ C(
     'message-text': C.flag('string', 'The message', { required: true }),
     suffix: C.flag('string', 'Text to show after the message', { repeatable: true }),
   },
-  async (flags) => {
+  flags => {
     const message = `${flags['message-text']}${flags.suffix.join('')}`;
     const { chars = message.length } = flags;
 
@@ -365,7 +364,7 @@ import C from 'larkspur';
 C({
   description: 'Run tests',
   flags: { cores: C.flag('number', 'The number of cores to use', { default: 4 }) },
-  handler: async ({ cores }, details) => {
+  handler: ({ cores }, details) => {
     runTests({
       cores: details.providedFlags.has('cores') ? cores : cores * 2,
       label: details.context.metadata.name
@@ -384,8 +383,8 @@ Command handlers can freely use the `console` methods to show output, as Larkspu
 import C, { run } from 'larkspur';
 
 await run({
-  console: C('Show output via console', async () => { console.log('output'); }),
-  return: C('Show output via a return value', async () => 'output')
+  console: C('Show output via console', () => { console.log('output'); }),
+  return: C('Show output via a return value', () => 'output')
 });
 ```
 
@@ -440,7 +439,7 @@ C(
     profile: C.flag('boolean', 'Enable profiling', { default: true }),
     verbose: C.flag('boolean', 'Show verbose output')
   },
-  async (flags) => `profile=${flags.profile}:verbose=${flags.verbose}`
+  flags => `profile=${flags.profile}:verbose=${flags.verbose}`
 );
 ```
 
@@ -466,7 +465,7 @@ C(
     optional: C.flag('string', 'An optional value'),
     required: C.flag('string', 'A required value', { required: true })
   },
-  async (flags) => `always=${flags.always}:optional=${flags.optional}:required=${flags.required}`
+  flags => `always=${flags.always}:optional=${flags.optional}:required=${flags.required}`
 );
 ```
 
@@ -489,7 +488,7 @@ import path from 'node:path';
 C(
   'Demonstrate path flags',
   { file: C.flag('path', 'A file path'), },
-  async ({ file }) => `${path.basename(file)}:${path.isAbsolute(file)}`
+  ({ file }) => `${path.basename(file)}:${path.isAbsolute(file)}`
 );
 ```
 
@@ -515,7 +514,7 @@ C(
     optional: C.flag('number', 'An optional value'),
     required: C.flag('number', 'A required value', { required: true })
   },
-  async (flags) => `always=${flags.always}:optional=${flags.optional}:required=${Math.round(flags.required)}`
+  flags => `always=${flags.always}:optional=${flags.optional}:required=${Math.round(flags.required)}`
 );
 ```
 
@@ -545,7 +544,7 @@ C(
       choices: ['alfa', 'bravo']
     })
   },
-  async (flags) => `number=${flags.number}:string=${flags.string}`
+  flags => `number=${flags.number}:string=${flags.string}`
 );
 ```
 
@@ -578,7 +577,7 @@ C(
     paths: C.flag('path', 'Multiple paths', { repeatable: true }),
     strings: C.flag('string', 'Multiple strings', { repeatable: true })
   },
-  async (flags) => Object.entries(flags).map(([k, v]) => `${k}=${v.length}`).join(':')
+  flags => Object.entries(flags).map(([k, v]) => `${k}=${v.length}`).join(':')
 );
 ```
 
@@ -607,7 +606,7 @@ C(
       isValid: v => v.startsWith('a')
     })
   },
-  async (flags) => `number=${flags.number}:string=${flags.string}`
+  flags => `number=${flags.number}:string=${flags.string}`
 );
 ```
 
@@ -627,7 +626,7 @@ my-cli test --number 2 --string a
 
 ### Custom Completions
 
-String, number, and path flags can define custom lists of suggestions to support the default shell completions.  Suggestions are provided by sync or async JS functions that return lists of strings that will be shown to a user hitting tab after entering the name of the flag that provides custom completions.  A completion function has access to the current flag value typed by the user via an object parameter with a `current` property.
+String, number, and path flags can define custom lists of suggestions to support the default shell completions.  Suggestions are provided by synchronous or asynchronous JS functions that return lists of strings that will be shown to a user hitting tab after entering the name of the flag that provides custom completions.  A completion function has access to the current flag value typed by the user via an object parameter with a `current` property.
 
 ```js
 import C from 'larkspur';
@@ -638,13 +637,17 @@ C(
   'Demonstrate custom completions',
   {
     server: C.flag('string', 'A server name', {
-      completions: async ({ current }) => queryServers({ prefix: current })
+      completion: async ({ current: prefix }) => {
+        const servers = await listServers();
+
+        return prefix ? servers.filter(s => s.startsWith(prefix)) : servers;
+      }
     }),
     value: C.flag('string', 'A value', {
-      completions: ({ current }) => current ? values.map(v => `${current}-${v}`) : values
+      completion: ({ current }) => current ? values.map(v => `${current}-${v}`) : values
     })
   },
-  async () => {}
+  () => {}
 );
 ```
 
