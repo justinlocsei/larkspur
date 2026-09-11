@@ -34,7 +34,7 @@ const name = C.flag(
 );
 
 export default C.group('Run tests', {
-  all: C('Run all tests', async () => {
+  all: C('Run all tests', () => {
     for (const suite of SUITES) {
       runSuite(suite);
     }
@@ -48,7 +48,7 @@ export default C.group('Run tests', {
       }),
       name
     },
-    async flags => {
+    flags => {
       if (flags.build) {
         build();
       }
@@ -64,13 +64,13 @@ export default C.group('Run tests', {
       runs: C.flag('number', 'The number of test runs'),
       seed: C.flag('number', 'A fixed seed')
     },
-    async ({ name, runs, seed }) =>
+    ({ name, runs, seed }) =>
       runSuite('properties', name, setConfigVariables({ runs, seed }))
   ),
 
   unit: C(
     'Run unit tests',
     { name },
-    async flags => runSuite('unit', flags.name)
+    flags => runSuite('unit', flags.name)
   )
 });

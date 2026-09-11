@@ -12,7 +12,7 @@ export default C(
       repeatable: true
     })
   },
-  async ({ only }) => {
+  ({ only }) => {
     if (only.includes('code')) {
       run('biome', ['lint', '.']);
     }

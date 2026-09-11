@@ -8,4 +8,4 @@ export function build(): void {
   run('tsdown');
 }
 
-export default C('Build Larkspur', async () => build());
+export default C('Build Larkspur', build);
