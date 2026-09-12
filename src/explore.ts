@@ -1,9 +1,5 @@
 import { visibleCommands } from './commands/data.ts';
-import type {
-  Command,
-  CommandTree,
-  CommandTreeQuery
-} from './commands/types.ts';
+import type { Command, CommandTree, HelpScope } from './commands/types.ts';
 import type { Usage } from './help/usage.ts';
 import { buildUsage } from './help/usage.ts';
 import type { Context } from './types.ts';
@@ -41,9 +37,9 @@ export function buildExploreMessage({
 /**
  * Build help scopes for all command handlers in a tree
  */
-function buildHandlerScopes(commands: CommandTree): CommandTreeQuery[] {
+function buildHandlerScopes(commands: CommandTree): HelpScope[] {
   const stack: Frame[] = [];
-  const scopes: CommandTreeQuery[] = [];
+  const scopes: HelpScope[] = [];
 
   const push = (commands: CommandTree, path: string[]): void => {
     for (
