@@ -8,7 +8,7 @@ import {
   ParsingError,
   parseFlags
 } from '../flags/parsing.ts';
-import { getExploreFlagName, useSharedFlags } from '../flags/shared.ts';
+import { useSharedFlags } from '../flags/shared.ts';
 import type { Flags } from '../flags/types.ts';
 import type { ValuesOf } from '../flags/values.ts';
 import type { Config } from '../types/config.ts';
@@ -19,7 +19,6 @@ import type {
   CommandGroup,
   CommandHandler,
   CommandTree,
-  ExploreScope,
   HelpScope
 } from './types.ts';
 
@@ -101,19 +100,11 @@ type HelpParsingResult = IsParsingResult<'help', {
 }>;
 
 /**
- * A request to explore the CLI
- */
-type ExploreParsingResult = IsParsingResult<'explore', {
-  scope: ExploreScope;
-}>;
-
-/**
  * The results of parsing CLI args
  */
 export type ParsingResult =
   | CommandParsingResult & { run: CommandRunner }
   | ErrorParsingResult
-  | ExploreParsingResult
   | HelpParsingResult;
 
 /**
@@ -122,7 +113,6 @@ export type ParsingResult =
 type InternalParsingResult =
   | CommandParsingResult
   | ErrorParsingResult
-  | ExploreParsingResult
   | HelpParsingResult;
 
 /**
@@ -252,10 +242,7 @@ function extractCommand(
   while (true) {
     const coreFlags = tryParseFlags(
       current.args,
-      useSharedFlags(
-        current.config,
-        current.group ? 'group' : 'root'
-      ),
+      useSharedFlags(current.config),
       { allowUnused: true }
     );
 
@@ -264,12 +251,7 @@ function extractCommand(
     }
 
     const { flags } = coreFlags.parsed;
-    const exploreFlag = getExploreFlagName(current.config);
-
     const showHelp = getSharedFlagValue(flags, 'help') === true;
-
-    const showExplore = exploreFlag !== undefined
-      && flags[exploreFlag]?.value === true;
 
     const { args } = current.args;
     const name = args[0];
@@ -278,14 +260,12 @@ function extractCommand(
       ? [undefined, current.namespace]
       : [getCommand(current.commands, name), [...current.namespace, name]];
 
-    const scope: ExploreScope = current.group
+    const scope: HelpScope = current.group
       ? { group: current.group, path: current.namespace, type: 'group' }
       : { commands: current.commands, type: 'root' };
 
     if (showHelp && (!name || !command)) {
       return { scope, type: 'help' };
-    } else if (showExplore && (!name || !command)) {
-      return { scope, type: 'explore' };
     } else if (!name) {
       return {
         code: 'invalid-command',

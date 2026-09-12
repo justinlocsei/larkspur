@@ -107,13 +107,6 @@ export type HelpScope =
   | RootTreeQuery;
 
 /**
- * All scopes that can be explored
- */
-export type ExploreScope =
-  | GroupTreeQuery
-  | RootTreeQuery;
-
-/**
  * An entry point for a CLI
  */
 export type EntryPoint = CommandTree;
