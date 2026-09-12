@@ -25,7 +25,7 @@ function runSuite(
       'verbose',
       name
     ],
-    { env }
+    { env: { ...env, NODE_OPTIONS: '--throw-deprecation' } }
   );
 }
 
