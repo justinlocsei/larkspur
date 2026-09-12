@@ -24,10 +24,7 @@ function checkHelp(
 ) {
   assert.equal(
     buildHelp({
-      context: createTestContext(meta, {
-        help: { explore: { enabled: false } },
-        ...config
-      }),
+      context: createTestContext(meta, config),
       scope
     }),
     lines.join('\n')
@@ -53,29 +50,6 @@ describe('buildHelp', () => {
         '  bravo  @bravo',
         ...helpFlag
       ]
-    );
-  });
-
-  it('includes the explore flag in root help messages', () => {
-    checkHelp(
-      {
-        commands: { alfa: C('@alfa', handler) },
-        type: 'root'
-      },
-      [
-        'Usage: testing <command> [flags]',
-        '',
-        'Commands:',
-        '',
-        '  alfa  @alfa',
-        '',
-        'Flags:',
-        '',
-        '  --explore  Recursively list commands and flags',
-        '  --help     Show help'
-      ],
-      {},
-      { help: { explore: { enabled: true } } }
     );
   });
 
@@ -168,36 +142,6 @@ describe('buildHelp', () => {
     );
   });
 
-  it('includes the explore flag in help messages for command groups', () => {
-    checkHelp(
-      {
-        group: C.group('@parent', {
-          alfa: C('@alfa', handler),
-          bravo: C('@bravo', handler)
-        }),
-        path: ['parent'],
-        type: 'group'
-      },
-      [
-        'Usage: testing parent <command> [flags]',
-        '',
-        '@parent',
-        '',
-        'Commands:',
-        '',
-        '  alfa   @alfa',
-        '  bravo  @bravo',
-        '',
-        'Flags:',
-        '',
-        '  --explore  Recursively list commands and flags',
-        '  --help     Show help'
-      ],
-      {},
-      { help: { explore: { enabled: true } } }
-    );
-  });
-
   it('does not show hidden handlers in a command group', () => {
     checkHelp(
       {
@@ -234,27 +178,6 @@ describe('buildHelp', () => {
         '@command',
         ...helpFlag
       ]
-    );
-  });
-
-  it('does not show explore for a command', () => {
-    checkHelp(
-      {
-        command: C('@command', handler),
-        path: ['command'],
-        type: 'command'
-      },
-      [
-        'Usage: testing command [flags]',
-        '',
-        '@command',
-        '',
-        'Flags:',
-        '',
-        '  --help  Show help'
-      ],
-      {},
-      { help: { explore: { enabled: true } } }
     );
   });
 
