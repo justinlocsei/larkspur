@@ -4,7 +4,8 @@ import type { EnvironmentVariables } from '../src/types.ts';
 import { build } from './build.ts';
 import { run } from './helpers.ts';
 
-const SUITES = ['integration', 'properties', 'unit'] as const;
+// The available test suites, in order of execution
+const SUITES = ['unit', 'integration', 'properties'] as const;
 
 /**
  * Run a test suite
