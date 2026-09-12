@@ -30,17 +30,15 @@ describe('buildExploreMessage', () => {
       [
         '$ test-cli alfa',
         '',
-        '  @alfa',
-        '',
+        '    @alfa',
         '',
         '$ test-cli bravo charlie',
         '',
-        '  @charlie',
-        '',
+        '    @charlie',
         '',
         '$ test-cli bravo delta',
         '',
-        '  @delta'
+        '    @delta'
       ]
     );
   });
@@ -60,13 +58,13 @@ describe('buildExploreMessage', () => {
       [
         '$ test-cli run --alfa <string> [flags]',
         '',
-        '  @run',
+        '    @run',
         '',
-        '  --alfa <string>',
-        '    @alfa',
-        '    (Required)',
-        '  --bravo <string>',
-        '    @bravo'
+        '    --alfa <string>',
+        '        @alfa',
+        '        (Required)',
+        '    --bravo <string>',
+        '        @bravo'
       ]
     );
   });
@@ -88,12 +86,12 @@ describe('buildExploreMessage', () => {
       [
         '$ test-cli run --shell <choice>',
         '',
-        '  @run',
+        '    @run',
         '',
-        '  --shell <choice>',
-        '    @shell',
-        '    (Required)',
-        '    (Choices: bash, zsh)'
+        '    --shell <choice>',
+        '        @shell',
+        '        (Required)',
+        '        (Choices: bash, zsh)'
       ]
     );
   });
@@ -115,12 +113,12 @@ describe('buildExploreMessage', () => {
       [
         '$ test-cli run [flags]',
         '',
-        '  @run',
+        '    @run',
         '',
-        '  --bravo <choice>',
-        '    @bravo',
-        '    (Choices: one, two)',
-        '    (Default: one)'
+        '    --bravo <choice>',
+        '        @bravo',
+        '        (Choices: one, two)',
+        '        (Default: one)'
       ]
     );
   });

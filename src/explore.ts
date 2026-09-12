@@ -35,7 +35,7 @@ export function buildExploreMessage({
         sharedFlags: false,
         showRequiredFlags: true
       }))
-    ).join('\n\n\n');
+    ).join('\n\n');
 }
 
 /**
@@ -76,10 +76,10 @@ function formatCommand(usage: Usage): string {
 
   const lines = [
     `$ ${usage.title}`,
-    ...(details ? ['', `  ${details}`] : [])
+    ...(details ? ['', `    ${details}`] : [])
   ];
 
-  const indent = '  ';
+  const indent = '    ';
 
   if (flags.length) {
     lines.push(
