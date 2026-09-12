@@ -1,9 +1,9 @@
 import { visibleCommands } from './commands/data.ts';
 import type { Command, CommandTree, HelpScope } from './commands/types.ts';
-import type { Usage } from './help/usage.ts';
+import { formatCommand } from './explore/display.ts';
 import { buildUsage } from './help/usage.ts';
 import type { Context } from './types.ts';
-import { compact, drain, sortEntries } from './utils.ts';
+import { drain, sortEntries } from './utils.ts';
 
 /**
  * A level of a command tree being explored
@@ -62,36 +62,4 @@ function buildHandlerScopes(commands: CommandTree): HelpScope[] {
   }
 
   return scopes;
-}
-
-/**
- * Format a command from its generated help data
- */
-function formatCommand(usage: Usage): string {
-  const { details, flags } = usage;
-
-  const lines = [
-    `$ ${usage.title}`,
-    ...(details ? ['', `    ${details}`] : [])
-  ];
-
-  const indent = '    ';
-
-  if (flags.length) {
-    lines.push(
-      '',
-      ...flags
-        .flatMap(flag => {
-          return compact([
-            flag.setter,
-            indent + flag.description,
-            flag.required && `${indent}(Required)`,
-            ...flag.details.map(d => `${indent}(${d})`)
-          ]);
-        })
-        .map(l => indent + l)
-    );
-  }
-
-  return lines.join('\n');
 }
