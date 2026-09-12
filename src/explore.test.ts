@@ -61,10 +61,10 @@ describe('buildExploreMessage', () => {
         '    @run',
         '',
         '    --alfa <string>',
-        '        @alfa',
-        '        (Required)',
+        '      @alfa',
+        '      (Required)',
         '    --bravo <string>',
-        '        @bravo'
+        '      @bravo'
       ]
     );
   });
@@ -89,9 +89,9 @@ describe('buildExploreMessage', () => {
         '    @run',
         '',
         '    --shell <choice>',
-        '        @shell',
-        '        (Required)',
-        '        (Choices: bash, zsh)'
+        '      @shell',
+        '      (Required)',
+        '      (Choices: bash, zsh)'
       ]
     );
   });
@@ -116,9 +116,9 @@ describe('buildExploreMessage', () => {
         '    @run',
         '',
         '    --bravo <choice>',
-        '        @bravo',
-        '        (Choices: one, two)',
-        '        (Default: one)'
+        '      @bravo',
+        '      (Choices: one, two)',
+        '      (Default: one)'
       ]
     );
   });

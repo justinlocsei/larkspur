@@ -53,12 +53,12 @@ describe('formatCommand', () => {
         '    @run',
         '',
         '    --alfa <string>',
-        '        @alfa',
-        '        (Required)',
+        '      @alfa',
+        '      (Required)',
         '    --bravo <choice>',
-        '        @bravo',
-        '        (Choices: one, two)',
-        '        (Default: one)'
+        '      @bravo',
+        '      (Choices: one, two)',
+        '      (Default: one)'
       ]
     );
   });
@@ -82,9 +82,9 @@ describe('formatCommand', () => {
         '    @run',
         '',
         '    --shell <choice>',
-        '        @shell',
-        '        (Required)',
-        '        (Choices: bash, zsh)'
+        '      @shell',
+        '      (Required)',
+        '      (Choices: bash, zsh)'
       ]
     );
   });

@@ -3,6 +3,7 @@ import { OperationalError } from '../errors.ts';
 import { buildExploreMessage } from '../explore.ts';
 import C from '../factory.ts';
 import type { Context } from '../types.ts';
+import { FORMATS } from './display.ts';
 
 /**
  * Define the explore command
@@ -10,7 +11,14 @@ import type { Context } from '../types.ts';
 export function defineExploreCommand() {
   return C(
     'Explore the CLI',
-    (_, { commands, context }) => buildExploreMessage({ commands, context })
+    {
+      format: C.flag('choice', 'The display format', {
+        choices: FORMATS,
+        default: 'full'
+      })
+    },
+    ({ format }, { commands, context }) =>
+      buildExploreMessage({ commands, context, format })
   );
 }
 

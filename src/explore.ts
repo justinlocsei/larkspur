@@ -1,5 +1,6 @@
 import { visibleCommands } from './commands/data.ts';
 import type { Command, CommandTree, HelpScope } from './commands/types.ts';
+import type { Format } from './explore/display.ts';
 import { formatCommand } from './explore/display.ts';
 import { buildUsage } from './help/usage.ts';
 import type { Context } from './types.ts';
@@ -18,19 +19,24 @@ type Frame = {
  */
 export function buildExploreMessage({
   commands,
-  context
+  context,
+  format
 }: {
   commands: CommandTree;
   context: Context;
+  format?: Format;
 }): string {
   return buildHandlerScopes(commands)
     .map(scope =>
-      formatCommand(buildUsage({
-        context,
-        scope,
-        sharedFlags: false,
-        showRequiredFlags: true
-      }))
+      formatCommand(
+        buildUsage({
+          context,
+          scope,
+          sharedFlags: false,
+          showRequiredFlags: true
+        }),
+        format
+      )
     ).join('\n\n');
 }
 
