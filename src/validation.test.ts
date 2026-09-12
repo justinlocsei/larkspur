@@ -91,7 +91,7 @@ describe('validateCommands', () => {
   });
 
   it('rejects flags that conflict with core flags', () => {
-    for (const flag of ['explore', 'help']) {
+    for (const flag of ['help']) {
       ensure.throws(
         () =>
           validateCommands(
@@ -107,38 +107,6 @@ describe('validateCommands', () => {
         'internal use'
       );
     }
-  });
-
-  it('allows explore flags when the core explore flag is disabled', () => {
-    assert.doesNotThrow(
-      () =>
-        validateCommands(
-          {
-            command: C(
-              description,
-              { explore: C.flag('string', description) },
-              handler
-            )
-          },
-          resolveConfig({ help: { explore: { enabled: false } } })
-        )
-    );
-  });
-
-  it('allows explore flags when the core explore flag uses a custom name', () => {
-    assert.doesNotThrow(
-      () =>
-        validateCommands(
-          {
-            command: C(
-              description,
-              { explore: C.flag('string', description) },
-              handler
-            )
-          },
-          resolveConfig({ help: { explore: { flag: 'other' } } })
-        )
-    );
   });
 
   it('reports invalid root command names', () => {

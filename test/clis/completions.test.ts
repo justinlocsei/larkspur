@@ -40,7 +40,7 @@ test('completions', {
             '--title'
           ];
 
-          const sharedFlags = ['--explore', '--help'];
+          const sharedFlags = ['--help'];
 
           return testCompletions(name, [
             [
