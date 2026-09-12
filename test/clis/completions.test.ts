@@ -45,7 +45,7 @@ test('completions', {
           return testCompletions(name, [
             [
               [' '],
-              ['bare', 'completions', 'flags', 'group']
+              ['bare', 'completions', 'explore', 'flags', 'group']
             ],
             [
               ['--'],
