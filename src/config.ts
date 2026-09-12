@@ -61,6 +61,10 @@ function resolveCompletionConfig(user: UserConfig): CompletionConfig {
     } = {}
   } = user;
 
+  if (!isValidCommandName(group)) {
+    throw new Error(`Invalid name for the completions group: ${group}`);
+  }
+
   return {
     enabled,
     group

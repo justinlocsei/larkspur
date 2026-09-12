@@ -52,4 +52,13 @@ describe('resolveConfig', () => {
       );
     }
   });
+
+  it('rejects invalid names for the completions group', () => {
+    for (const name of ['Invalid', 'invalid_group']) {
+      assert.throws(
+        () => resolveConfig({ completions: { group: name } }),
+        name
+      );
+    }
+  });
 });
