@@ -209,10 +209,7 @@ Then add this line before loading compinit:
       .map(v => quote(v))
       .join(' ');
 
-    const sharedFlags = useSharedFlags(
-      this.config,
-      levels.length === 0 ? 'root' : 'group'
-    );
+    const sharedFlags = useSharedFlags(this.config);
 
     const cases = entries.map(([name]) =>
       [
@@ -252,7 +249,7 @@ Then add this line before loading compinit:
     levels: string[]
   ): ScriptLines {
     const flags: Flags = {
-      ...useSharedFlags(this.config, 'command'),
+      ...useSharedFlags(this.config),
       ...(command.flags || {})
     };
 
