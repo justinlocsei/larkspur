@@ -61,7 +61,7 @@ describe('runCLI', () => {
 
   it('can explore the CLI', async () => {
     const response = await testCLI({
-      args: ['--explore'],
+      args: ['explore'],
       entry: {
         alfa: C(description, handler),
         bravo: C(
@@ -72,14 +72,14 @@ describe('runCLI', () => {
       }
     });
 
-    assert(response.type === 'help', 'explore response not returned');
+    assert(response.type === 'success', 'explore response not returned');
 
-    assert.include(response.message, 'alfa');
-    assert.include(response.message, 'bravo');
-    assert.include(response.message, '--flag');
+    assert.include(response.output, 'alfa');
+    assert.include(response.output, 'bravo');
+    assert.include(response.output, '--flag');
 
-    assert.notInclude(response.message, 'Commands:');
-    assert.notInclude(response.message, '--help');
+    assert.notInclude(response.output, 'Commands:');
+    assert.notInclude(response.output, '--help');
   });
 
   it('handles parsing errors', async () => {

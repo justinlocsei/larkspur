@@ -7,7 +7,7 @@ import { parseCommand } from './commands/parsing.ts';
 import type { EntryPoint } from './commands/types.ts';
 import { withCompletionCommands } from './completions/commands.ts';
 import { coerceError, OperationalError } from './errors.ts';
-import { buildExploreMessage } from './explore.ts';
+import { withExploreCommand } from './explore/commands.ts';
 import { buildHelp } from './help.ts';
 import type { Context } from './types.ts';
 import { validateCommands } from './validation.ts';
@@ -78,10 +78,13 @@ export async function runCLI({
   let commands: EntryPoint;
 
   try {
-    commands = withCompletionCommands(entry, context);
+    commands = withExploreCommand(
+      withCompletionCommands(entry, context),
+      context
+    );
   } catch (error) {
     return failWith(
-      OperationalError.wrap(error, 'Could not apply completion commands')
+      OperationalError.wrap(error, 'Could not apply built-in commands')
     );
   }
 
@@ -109,12 +112,6 @@ export async function runCLI({
           ? buildHelp({ context, scope: parsing.help })
           : undefined
       );
-
-    case 'explore':
-      return {
-        message: buildExploreMessage({ context, scope: parsing.scope }),
-        type: 'help'
-      };
 
     case 'help':
       return {
