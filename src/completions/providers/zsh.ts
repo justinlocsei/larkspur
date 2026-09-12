@@ -73,7 +73,9 @@ export class ZshCompletionProvider extends CompletionProvider {
         '',
         ...entry.lines,
         '',
-        `(( $# )) && ${entry.name} "$@"`
+        'if (( $# )); then',
+        [`${entry.name} "$@"`],
+        'fi'
       ]
     };
   }

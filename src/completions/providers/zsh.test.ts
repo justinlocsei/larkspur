@@ -99,7 +99,9 @@ testProvider(ZshCompletionProvider, {
     '\\[value\\]',
     "it'\\''s a:",
     'mode-bravo',
-    '(( $# )) && _test-cli "$@"'
+    'if (( $# )); then',
+    '_test-cli "$@"',
+    'fi'
   ],
   scalars: [
     "'*--count=[@count]:number:",
