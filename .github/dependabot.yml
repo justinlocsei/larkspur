@@ -10,16 +10,3 @@ updates:
           - "*"
     schedule:
       interval: weekly
-
-  - package-ecosystem: npm
-    cooldown:
-      default-days: 7
-    directory: /
-    groups:
-      dev-dependencies:
-        dependency-type: development
-        patterns:
-          - "*"
-    schedule:
-      interval: monthly
-    versioning-strategy: lockfile-only
