@@ -127,7 +127,7 @@ Run the CLI:
 ./run-task build --help
 
 # Recursively show all commands in the CLI
-./run-task --explore
+./run-task explore
 
 # Build an image
 ./run-task build --mode development
@@ -225,7 +225,7 @@ Larkspur can show help messages for a CLI and each of its commands via a `--help
 
 ### Command Discovery
 
-All commands and flags can be recursively listed at any level of a command tree using the `--explore` flag.  The output is structured and readable by humans or agents, and can be used to quickly gain an understanding of the full set of features offered by the CLI.
+All commands and flags can be recursively listed using the `explore` command. The output is structured and readable by humans or agents, and can be used to quickly gain an understanding of the full set of features offered by the CLI.
 
 ### Shell Completions
 
@@ -248,10 +248,8 @@ await run(
   { version: C('Show the current version', () => '1.0.0') },
   {
     completions: { enabled: false },
-    help: {
-      explore: { flag: 'document' },
-      indent: 2
-    },
+    explore: { command: 'document' },
+    help: { indent: 2 },
     name: 'custom-name'
   }
 )
@@ -262,8 +260,8 @@ The available configuration options are as follows:
 * `completions.enabled`: Whether completion commands are available (default: `true`)
 * `completions.group`: The name of the group that exposes completion commands (default: `'completions'`)
 * `description`: A program description shown in help messages
-* `help.explore.enabled`: Whether the explore flag is available (default: `true`)
-* `help.explore.flag`: The name of the explore flag (default: `'explore'`)
+* `explore.command`: The name of the explore command (default: `'explore'`)
+* `explore.enabled`: Whether the explore command is available (default: `true`)
 * `help.indent`: The number of spaces used for indentation in help message (default: `2`)
 * `name`: A custom program name shown in help messages, which can be used if the inferred name of the CLI is incorrect
 
