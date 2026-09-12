@@ -9,11 +9,11 @@ describe('resolveConfig', () => {
         enabled: true,
         group: 'completions'
       },
+      explore: {
+        command: 'explore',
+        enabled: true
+      },
       help: {
-        explore: {
-          enabled: true,
-          flag: 'explore'
-        },
         indent: 2
       }
     });
@@ -23,8 +23,8 @@ describe('resolveConfig', () => {
     assert.deepEqual(
       resolveConfig({
         completions: { enabled: false },
+        explore: { command: 'document' },
         help: {
-          explore: { flag: 'document' },
           indent: 4
         }
       }),
@@ -33,21 +33,21 @@ describe('resolveConfig', () => {
           enabled: false,
           group: 'completions'
         },
+        explore: {
+          command: 'document',
+          enabled: true
+        },
         help: {
-          explore: {
-            enabled: true,
-            flag: 'document'
-          },
           indent: 4
         }
       }
     );
   });
 
-  it('rejects invalid explore-flag names', () => {
-    for (const name of ['help', 'Invalid']) {
+  it('rejects invalid names for the explore command', () => {
+    for (const name of ['Invalid', 'invalid_command']) {
       assert.throws(
-        () => resolveConfig({ help: { explore: { flag: name } } }),
+        () => resolveConfig({ explore: { command: name } }),
         name
       );
     }

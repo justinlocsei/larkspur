@@ -4,7 +4,6 @@ import type { DeepPartial } from './utils.ts';
  * Configuration for help messages
  */
 export type HelpConfig = {
-  explore: ExploreConfig;
   indent: number;
 };
 
@@ -12,8 +11,8 @@ export type HelpConfig = {
  * Configuration for exploratory CLI output
  */
 export type ExploreConfig = {
+  command: string;
   enabled: boolean;
-  flag: string;
 };
 
 /**
@@ -29,6 +28,7 @@ export type CompletionConfig = {
  */
 export type Config = {
   completions: CompletionConfig;
+  explore: ExploreConfig;
   help: HelpConfig;
 };
 

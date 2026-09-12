@@ -12,11 +12,11 @@ describe('createContext', () => {
             enabled: true,
             group: 'completions'
           },
+          explore: {
+            command: 'explore',
+            enabled: true
+          },
           help: {
-            explore: {
-              enabled: true,
-              flag: 'explore'
-            },
             indent: 2
           }
         },
@@ -39,11 +39,11 @@ describe('createContext', () => {
             enabled: true,
             group: 'completions'
           },
+          explore: {
+            command: 'explore',
+            enabled: true
+          },
           help: {
-            explore: {
-              enabled: true,
-              flag: 'explore'
-            },
             indent: 4
           }
         },
