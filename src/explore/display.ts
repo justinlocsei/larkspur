@@ -11,11 +11,15 @@ export type Format = (typeof FORMATS)[number];
 /**
  * Format a command from its generated usage data
  */
-export function formatCommand(usage: Usage, _format: Format = 'full'): string {
-  const { details, flags } = usage;
+export function formatCommand(usage: Usage, format: Format = 'full'): string {
+  const { details, flags, title } = usage;
+
+  if (format === 'names') {
+    return title;
+  }
 
   const lines = [
-    `$ ${usage.title}`,
+    `$ ${title}`,
     ...(details ? ['', `    ${details}`] : [])
   ];
 
