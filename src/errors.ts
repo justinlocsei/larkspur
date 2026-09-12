@@ -39,7 +39,7 @@ export class OperationalError extends Error {
   /**
    * Include the error name in the printed form
    */
-  toString(): string {
+  override toString(): string {
     return `OperationalError: ${this.message}`;
   }
 }
