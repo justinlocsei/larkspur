@@ -15,23 +15,26 @@ export function formatCommands(
   usages: Usage[],
   format: Format = 'full'
 ): string {
-  return usages
-    .map(usage => formatUsage(usage, format))
-    .join(format === 'full' ? '\n\n' : '\n');
+  switch (format) {
+    case 'full':
+      return usages.map(formatFullCommand).join('\n\n');
+
+    case 'names':
+      return usages.map(u => u.title).join('\n');
+
+    case 'summary':
+      return formatSummary(usages).join('\n');
+  }
 }
 
 /**
- * Format a single command from its generated usage data
+ * Format a command's usage for verbose display
  */
-function formatUsage(usage: Usage, format: Format): string {
-  const { details, flags, title } = usage;
-
-  if (format === 'names') {
-    return title;
-  }
+function formatFullCommand(command: Usage): string {
+  const { details, flags } = command;
 
   const lines = [
-    `$ ${title}`,
+    `$ ${command.title}`,
     ...(details ? ['', `    ${details}`] : [])
   ];
 
@@ -55,5 +58,16 @@ function formatFlags(flags: PrintableFlag[]): string[] {
       flag.required && `${indent}(Required)`,
       ...flag.details.map(d => `${indent}(${d})`)
     ]);
+  });
+}
+
+/**
+ * Format a summary for a set of commands
+ */
+function formatSummary(commands: Usage[]): string[] {
+  const longestName = Math.max(...commands.map(c => c.title.length));
+
+  return commands.map(command => {
+    return `${command.title.padEnd(longestName)}  # ${command.details}`;
   });
 }

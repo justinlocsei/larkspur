@@ -113,15 +113,86 @@ describe('formatCommands', () => {
     );
   });
 
-  it('lists command names on separate lines', () => {
-    const usages = [
-      buildUsageFor(C('@alfa', handler), ['alfa']),
-      buildUsageFor(C('@bravo', handler), ['bravo'])
-    ];
+  describe('names format', () => {
+    it('lists usage titles on separate lines', () => {
+      const usages = [
+        buildUsageFor(C('@alfa', handler), ['alfa']),
+        buildUsageFor(C('@bravo', handler), ['bravo'])
+      ];
 
-    assert.equal(
-      formatCommands(usages, 'names'),
-      'test-cli alfa\ntest-cli bravo'
-    );
+      assert.equal(
+        formatCommands(usages, 'names'),
+        'test-cli alfa\ntest-cli bravo'
+      );
+    });
+
+    it('includes required flags in usage titles', () => {
+      const usage = buildUsageFor(
+        C(
+          '@run',
+          { alfa: C.flag('string', '@alfa', { required: true }) },
+          handler
+        ),
+        ['run']
+      );
+
+      assert.equal(
+        formatCommands([usage], 'names'),
+        'test-cli run --alfa <string>'
+      );
+    });
+  });
+
+  describe('summary format', () => {
+    it('shows the command description after a hash', () => {
+      const usage = buildUsageFor(C('@alfa', handler), ['alfa']);
+
+      assert.equal(
+        formatCommands([usage], 'summary'),
+        'test-cli alfa  # @alfa'
+      );
+    });
+
+    it('aligns command names for multiple commands', () => {
+      const usages = [
+        buildUsageFor(C('@alfa', handler), ['alfa']),
+        buildUsageFor(C('@bravo', handler), ['bravo']),
+        buildUsageFor(
+          C('@charlie', handler),
+          ['group', 'charlie']
+        )
+      ];
+
+      assert.equal(
+        formatCommands(usages, 'summary'),
+        [
+          'test-cli alfa           # @alfa',
+          'test-cli bravo          # @bravo',
+          'test-cli group charlie  # @charlie'
+        ].join('\n')
+      );
+    });
+
+    it('includes required flags in aligned usage titles', () => {
+      const usages = [
+        buildUsageFor(C('@alfa', handler), ['alfa']),
+        buildUsageFor(
+          C(
+            '@run',
+            { alfa: C.flag('string', '@alfa', { required: true }) },
+            handler
+          ),
+          ['run']
+        )
+      ];
+
+      assert.equal(
+        formatCommands(usages, 'summary'),
+        [
+          'test-cli alfa                 # @alfa',
+          'test-cli run --alfa <string>  # @run'
+        ].join('\n')
+      );
+    });
   });
 });

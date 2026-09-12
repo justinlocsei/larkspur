@@ -1,17 +1,31 @@
 import { assert, describe, it } from 'vitest';
 
 import type { CommandTree } from './commands/types.ts';
+import type { Format } from './explore/display.ts';
 import { buildExploreMessage } from './explore.ts';
 import C from './factory.ts';
 import { createTestContext } from './tests.ts';
 
 async function handler() {}
 
-function checkExplore(commands: CommandTree, lines: string[]) {
+const nestedCommands = {
+  alfa: C('@alfa', handler),
+  bravo: C.group('@bravo', {
+    charlie: C('@charlie', handler),
+    delta: C('@delta', handler)
+  })
+};
+
+function checkExplore(
+  commands: CommandTree,
+  lines: string[],
+  format?: Format
+) {
   assert.equal(
     buildExploreMessage({
       context: createTestContext({ name: 'test-cli' }),
-      commands
+      commands,
+      format
     }),
     lines.join('\n')
   );
@@ -20,13 +34,7 @@ function checkExplore(commands: CommandTree, lines: string[]) {
 describe('buildExploreMessage', () => {
   it('explores nested handlers from the root', () => {
     checkExplore(
-      {
-        alfa: C('@alfa', handler),
-        bravo: C.group('@bravo', {
-          charlie: C('@charlie', handler),
-          delta: C('@delta', handler)
-        })
-      },
+      nestedCommands,
       [
         '$ test-cli alfa',
         '',
@@ -137,5 +145,29 @@ describe('buildExploreMessage', () => {
     });
 
     assert.notInclude(message, '--help');
+  });
+
+  it('supports a name-only format', () => {
+    checkExplore(
+      nestedCommands,
+      [
+        'test-cli alfa',
+        'test-cli bravo charlie',
+        'test-cli bravo delta'
+      ],
+      'names'
+    );
+  });
+
+  it('supports a summary format', () => {
+    checkExplore(
+      nestedCommands,
+      [
+        'test-cli alfa           # @alfa',
+        'test-cli bravo charlie  # @charlie',
+        'test-cli bravo delta    # @delta'
+      ],
+      'summary'
+    );
   });
 });
