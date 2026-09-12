@@ -8,7 +8,7 @@ import type { CompletionProviderClass } from '../provider.ts';
 /**
  * Create commands that cover the essential parts of the completion system
  */
-function createCompletionCommands(): CommandTree {
+export function createCompletionCommands(): CommandTree {
   return {
     bare: C('@bare-handler', async () => {}),
     flags: C(
