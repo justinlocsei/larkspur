@@ -17,13 +17,6 @@ const helpFlag: PrintableFlag = {
   setter: '--help'
 };
 
-const exploreFlag: PrintableFlag = {
-  description: 'Recursively list commands and flags',
-  details: [],
-  required: false,
-  setter: '--explore'
-};
-
 function checkUsage(
   scope: HelpScope,
   expected: Usage,
@@ -32,10 +25,7 @@ function checkUsage(
 ) {
   assert.deepEqual(
     buildUsage({
-      context: createTestContext(meta, {
-        help: { explore: { enabled: false } },
-        ...config
-      }),
+      context: createTestContext(meta, config),
       scope
     }),
     expected
@@ -60,22 +50,6 @@ describe('buildUsage', () => {
         flags: [helpFlag],
         title: 'testing <command> [flags]'
       }
-    );
-  });
-
-  it('includes the explore flag in root usage', () => {
-    checkUsage(
-      {
-        commands: { alfa: C('@alfa', handler) },
-        type: 'root'
-      },
-      {
-        commands: [{ description: '@alfa', label: 'alfa' }],
-        flags: [exploreFlag, helpFlag],
-        title: 'testing <command> [flags]'
-      },
-      {},
-      { help: { explore: { enabled: true } } }
     );
   });
 
@@ -171,30 +145,6 @@ describe('buildUsage', () => {
     );
   });
 
-  it('includes the explore flag in usage messages for command groups', () => {
-    checkUsage(
-      {
-        group: C.group('@parent', {
-          alfa: C('@alfa', handler),
-          bravo: C('@bravo', handler)
-        }),
-        path: ['parent'],
-        type: 'group'
-      },
-      {
-        commands: [
-          { description: '@alfa', label: 'alfa' },
-          { description: '@bravo', label: 'bravo' }
-        ],
-        details: '@parent',
-        flags: [exploreFlag, helpFlag],
-        title: 'testing parent <command> [flags]'
-      },
-      {},
-      { help: { explore: { enabled: true } } }
-    );
-  });
-
   it('does not show hidden handlers in a command group', () => {
     checkUsage(
       {
@@ -227,24 +177,6 @@ describe('buildUsage', () => {
         flags: [helpFlag],
         title: 'testing command [flags]'
       }
-    );
-  });
-
-  it('does not show the explore flag for a command', () => {
-    checkUsage(
-      {
-        command: C('@command', handler),
-        path: ['command'],
-        type: 'command'
-      },
-      {
-        commands: [],
-        details: '@command',
-        flags: [helpFlag],
-        title: 'testing command [flags]'
-      },
-      {},
-      { help: { explore: { enabled: true } } }
     );
   });
 
