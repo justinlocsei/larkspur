@@ -1,17 +1,17 @@
 import { assert, describe, it } from 'vitest';
 
-import type { ExploreScope } from './commands/types.ts';
+import type { CommandTree } from './commands/types.ts';
 import { buildExploreMessage } from './explore.ts';
 import C from './factory.ts';
 import { createTestContext } from './tests.ts';
 
 async function handler() {}
 
-function checkExplore(scope: ExploreScope, lines: string[]) {
+function checkExplore(commands: CommandTree, lines: string[]) {
   assert.equal(
     buildExploreMessage({
       context: createTestContext({ name: 'test-cli' }),
-      scope
+      commands
     }),
     lines.join('\n')
   );
@@ -21,14 +21,11 @@ describe('buildExploreMessage', () => {
   it('explores nested handlers from the root', () => {
     checkExplore(
       {
-        commands: {
-          alfa: C('@alfa', handler),
-          bravo: C.group('@bravo', {
-            charlie: C('@charlie', handler),
-            delta: C('@delta', handler)
-          })
-        },
-        type: 'root'
+        alfa: C('@alfa', handler),
+        bravo: C.group('@bravo', {
+          charlie: C('@charlie', handler),
+          delta: C('@delta', handler)
+        })
       },
       [
         '$ test-cli alfa',
@@ -48,43 +45,17 @@ describe('buildExploreMessage', () => {
     );
   });
 
-  it('explores handlers from a command group', () => {
-    checkExplore(
-      {
-        group: C.group('@bravo', {
-          charlie: C('@charlie', handler),
-          delta: C('@delta', handler)
-        }),
-        path: ['bravo'],
-        type: 'group'
-      },
-      [
-        '$ test-cli bravo charlie',
-        '',
-        '  @charlie',
-        '',
-        '',
-        '$ test-cli bravo delta',
-        '',
-        '  @delta'
-      ]
-    );
-  });
-
   it('includes required flags in the usage line', () => {
     checkExplore(
       {
-        commands: {
-          run: C(
-            '@run',
-            {
-              alfa: C.flag('string', '@alfa', { required: true }),
-              bravo: C.flag('string', '@bravo')
-            },
-            handler
-          )
-        },
-        type: 'root'
+        run: C(
+          '@run',
+          {
+            alfa: C.flag('string', '@alfa', { required: true }),
+            bravo: C.flag('string', '@bravo')
+          },
+          handler
+        )
       },
       [
         '$ test-cli run --alfa <string> [flags]',
@@ -103,19 +74,16 @@ describe('buildExploreMessage', () => {
   it('omits the flags placeholder when all flags are required', () => {
     checkExplore(
       {
-        commands: {
-          run: C(
-            '@run',
-            {
-              shell: C.flag('choice', '@shell', {
-                choices: ['bash', 'zsh'],
-                required: true
-              })
-            },
-            handler
-          )
-        },
-        type: 'root'
+        run: C(
+          '@run',
+          {
+            shell: C.flag('choice', '@shell', {
+              choices: ['bash', 'zsh'],
+              required: true
+            })
+          },
+          handler
+        )
       },
       [
         '$ test-cli run --shell <choice>',
@@ -133,19 +101,16 @@ describe('buildExploreMessage', () => {
   it('shows flag details', () => {
     checkExplore(
       {
-        commands: {
-          run: C(
-            '@run',
-            {
-              bravo: C.flag('choice', '@bravo', {
-                choices: ['one', 'two'],
-                default: 'one'
-              })
-            },
-            handler
-          )
-        },
-        type: 'root'
+        run: C(
+          '@run',
+          {
+            bravo: C.flag('choice', '@bravo', {
+              choices: ['one', 'two'],
+              default: 'one'
+            })
+          },
+          handler
+        )
       },
       [
         '$ test-cli run [flags]',
@@ -163,20 +128,16 @@ describe('buildExploreMessage', () => {
   it('omits shared flags', () => {
     const message = buildExploreMessage({
       context: createTestContext(),
-      scope: {
-        commands: {
-          alfa: C('@alfa', handler),
-          bravo: C(
-            '@bravo',
-            { flag: C.flag('string', '@flag') },
-            handler
-          )
-        },
-        type: 'root'
+      commands: {
+        alfa: C('@alfa', handler),
+        bravo: C(
+          '@bravo',
+          { flag: C.flag('string', '@flag') },
+          handler
+        )
       }
     });
 
     assert.notInclude(message, '--help');
-    assert.notInclude(message, '--explore');
   });
 });

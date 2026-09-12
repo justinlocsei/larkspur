@@ -2,8 +2,7 @@ import { visibleCommands } from './commands/data.ts';
 import type {
   Command,
   CommandTree,
-  ExploreScope,
-  HelpScope
+  CommandTreeQuery
 } from './commands/types.ts';
 import type { Usage } from './help/usage.ts';
 import { buildUsage } from './help/usage.ts';
@@ -22,13 +21,13 @@ type Frame = {
  * Build a message describing a CLI's executable commands and flags
  */
 export function buildExploreMessage({
-  context,
-  scope
+  commands,
+  context
 }: {
+  commands: CommandTree;
   context: Context;
-  scope: ExploreScope;
 }): string {
-  return buildHandlerScopes(scope)
+  return buildHandlerScopes(commands)
     .map(scope =>
       formatCommand(buildUsage({
         context,
@@ -42,13 +41,9 @@ export function buildExploreMessage({
 /**
  * Build help scopes for all command handlers in a tree
  */
-function buildHandlerScopes(scope: ExploreScope): HelpScope[] {
+function buildHandlerScopes(commands: CommandTree): CommandTreeQuery[] {
   const stack: Frame[] = [];
-  const scopes: HelpScope[] = [];
-
-  const initial = scope.type === 'root'
-    ? { commands: scope.commands, path: [] }
-    : { commands: scope.group.subcommands, path: scope.path };
+  const scopes: CommandTreeQuery[] = [];
 
   const push = (commands: CommandTree, path: string[]): void => {
     for (
@@ -60,7 +55,7 @@ function buildHandlerScopes(scope: ExploreScope): HelpScope[] {
     }
   };
 
-  push(initial.commands, initial.path);
+  push(commands, []);
 
   for (const { command, path } of drain(stack)) {
     if (command.type === 'group') {
