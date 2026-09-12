@@ -9,9 +9,21 @@ export const FORMATS = ['full', 'names', 'summary'] as const;
 export type Format = (typeof FORMATS)[number];
 
 /**
- * Format a command from its generated usage data
+ * Format explored commands from their generated usage data
  */
-export function formatCommand(usage: Usage, format: Format = 'full'): string {
+export function formatCommands(
+  usages: Usage[],
+  format: Format = 'full'
+): string {
+  return usages
+    .map(usage => formatUsage(usage, format))
+    .join(format === 'full' ? '\n\n' : '\n');
+}
+
+/**
+ * Format a single command from its generated usage data
+ */
+function formatUsage(usage: Usage, format: Format): string {
   const { details, flags, title } = usage;
 
   if (format === 'names') {

@@ -1,7 +1,7 @@
 import { visibleCommands } from './commands/data.ts';
 import type { Command, CommandTree, HelpScope } from './commands/types.ts';
 import type { Format } from './explore/display.ts';
-import { formatCommand } from './explore/display.ts';
+import { formatCommands } from './explore/display.ts';
 import { buildUsage } from './help/usage.ts';
 import type { Context } from './types.ts';
 import { drain, sortEntries } from './utils.ts';
@@ -26,18 +26,16 @@ export function buildExploreMessage({
   context: Context;
   format?: Format;
 }): string {
-  return buildHandlerScopes(commands)
-    .map(scope =>
-      formatCommand(
-        buildUsage({
-          context,
-          scope,
-          sharedFlags: false,
-          showRequiredFlags: true
-        }),
-        format
-      )
-    ).join('\n\n');
+  const usages = buildHandlerScopes(commands).map(scope =>
+    buildUsage({
+      context,
+      scope,
+      sharedFlags: false,
+      showRequiredFlags: true
+    })
+  );
+
+  return formatCommands(usages, format);
 }
 
 /**

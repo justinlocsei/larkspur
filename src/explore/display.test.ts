@@ -4,9 +4,18 @@ import type { CommandHandler } from '../commands/types.ts';
 import C from '../factory.ts';
 import { buildUsage } from '../help/usage.ts';
 import { createTestContext } from '../tests.ts';
-import { formatCommand } from './display.ts';
+import { formatCommands } from './display.ts';
 
 async function handler() {}
+
+function buildUsageFor(command: CommandHandler, path: string[]) {
+  return buildUsage({
+    context: createTestContext({ name: 'test-cli' }),
+    scope: { command, path, type: 'command' },
+    sharedFlags: false,
+    showRequiredFlags: true
+  });
+}
 
 function checkFormat(
   command: CommandHandler,
@@ -14,17 +23,12 @@ function checkFormat(
   lines: string[]
 ) {
   assert.equal(
-    formatCommand(buildUsage({
-      context: createTestContext({ name: 'test-cli' }),
-      scope: { command, path, type: 'command' },
-      sharedFlags: false,
-      showRequiredFlags: true
-    })),
+    formatCommands([buildUsageFor(command, path)]),
     lines.join('\n')
   );
 }
 
-describe('formatCommand', () => {
+describe('formatCommands', () => {
   it('formats a command with a description', () => {
     checkFormat(C('@alfa', handler), ['alfa'], [
       '$ test-cli alfa',
@@ -86,6 +90,38 @@ describe('formatCommand', () => {
         '      (Required)',
         '      (Choices: bash, zsh)'
       ]
+    );
+  });
+
+  it('separates full-format commands with a blank line', () => {
+    const usages = [
+      buildUsageFor(C('@alfa', handler), ['alfa']),
+      buildUsageFor(C('@bravo', handler), ['bravo'])
+    ];
+
+    assert.equal(
+      formatCommands(usages),
+      [
+        '$ test-cli alfa',
+        '',
+        '    @alfa',
+        '',
+        '$ test-cli bravo',
+        '',
+        '    @bravo'
+      ].join('\n')
+    );
+  });
+
+  it('lists command names on separate lines', () => {
+    const usages = [
+      buildUsageFor(C('@alfa', handler), ['alfa']),
+      buildUsageFor(C('@bravo', handler), ['bravo'])
+    ];
+
+    assert.equal(
+      formatCommands(usages, 'names'),
+      'test-cli alfa\ntest-cli bravo'
     );
   });
 });
