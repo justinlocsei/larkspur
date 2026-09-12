@@ -14,7 +14,7 @@ export default C(
   },
   ({ only }) => {
     if (only.includes('code')) {
-      run('biome', ['lint', '.']);
+      run('biome', ['lint', '.', '--error-on-warnings']);
     }
 
     if (only.includes('formatting')) {
