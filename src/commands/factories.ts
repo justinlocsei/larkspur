@@ -7,8 +7,7 @@ import { defineCommandGroup, defineCommandHandler } from './definition.ts';
 import type {
   CommandHandler,
   CommandTree,
-  CommmandHandlerFn,
-  KnownCommandTree
+  CommmandHandlerFn
 } from './types.ts';
 
 /**
@@ -68,10 +67,8 @@ export function buildCommandGroup(
 }
 
 /**
- * Build a command tree with known keys
+ * Build a command tree
  */
-export function buildCommandTree<T extends string>(
-  tree: KnownCommandTree<T>
-): KnownCommandTree<T> {
+export function buildCommandTree(tree: CommandTree): CommandTree {
   return tree;
 }
