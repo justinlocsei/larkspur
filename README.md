@@ -13,7 +13,6 @@
 <!-- <toc> -->
 - [Installation](#installation)
 - [Quick Start](#quick-start)
-- [TypeScript](#typescript)
 - [Usage](#usage)
 - [Defining a CLI](#defining-a-cli)
   - [CLI Structure](#cli-structure)
@@ -41,6 +40,8 @@
   - [Repeatable Flags](#repeatable-flags)
   - [Flag Validation](#flag-validation)
   - [Custom Completions](#custom-completions)
+- [TypeScript](#typescript)
+  - [Public Types](#public-types)
 - [Why the Name?](#why-the-name)
 <!-- </toc> -->
 
@@ -140,10 +141,6 @@ Run the CLI:
 ```
 
 Larkspur CLIs only support long flag names like `--reporter`, rather than short flags like `-r`.  Values can be passed to flags using either `--reporter dot` or `--reporter=dot` syntax, and the two can be used interchangeably in the same command invocation.  While restrictive, the use of long flag names is a design choice that optimizes for discoverability and readability.
-
-## TypeScript
-
-Larkspur is written in TypeScript and is at its best when consumed via a `.ts` file, which gives you access to constraints around command and flag definitions and narrowly typed flag values in handlers.  As long as you're using a recent version of Node.js 22 or later, a standard `node` shebang in your CLI will allow it to execute directly, giving you rich types from Larkspur without the need for a build process.
 
 ## Usage
 
@@ -669,6 +666,22 @@ my-cli test --value <TAB>
 my-cli test --value test<TAB>
 # => test-alfa test-bravo
 ```
+
+## TypeScript
+
+Larkspur is written in TypeScript and is at its best when consumed via a `.ts` file, which gives you access to constraints around command and flag definitions and narrowly typed flag values in handlers.  As long as you're using a recent version of Node.js 22 or later, a standard `node` shebang in your CLI will allow it to execute directly, giving you rich types from Larkspur without the need for a build process.
+
+### Public Types
+
+Most Larkspur CLIs can rely exclusively on type inference for the command and flag definitions produced by the `C` factory functions.  However, if you're dynamically building commands or using helper functions to reduce duplication, the following types may be useful:
+
+* `Command`: A command handler or group within a tree
+* `CommandGroup`: A group of subcommands
+* `CommandHandler`: A command with a handler function and flags
+* `CommandTree`: A tree of named commands passed to `run`
+* `Flag`: A single flag definition
+* `Flags`: A set of named flags
+* `ValuesOf`: Calculate the parsed values for a `Flags` type
 
 ## Why the Name?
 
