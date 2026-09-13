@@ -43,6 +43,7 @@
 - [TypeScript](#typescript)
   - [Public Types](#public-types)
   - [Typed Helpers](#typed-helpers)
+  - [Dynamic CLIs](#dynamic-clis)
 - [Why the Name?](#why-the-name)
 <!-- </toc> -->
 
@@ -689,9 +690,96 @@ Most Larkspur CLIs can rely exclusively on type inference for the command and fl
 In addition to the types above, there are two factories on the `C` object that are useful to TS code building up a CLI in pieces:
 
 * `C.flags`: Define a set of named flags whose exact keys and individual flag types are preserved
-* `C.tree`: Define a command tree, ensuring that each key is a valid group or handler
+* `C.tree`: Require an input object to be a command tree
 
 These are lightweight functions that return the input data without transformations but provide you with improved type information and constraints.
+
+### Dynamic CLIs
+
+Here's a somewhat contrived example that shows how to combine Larkspur's public types and API functions to safely define a dynamic CLI:
+
+```ts
+import C, { type CommandTree, run, type ValuesOf } from 'larkspur';
+
+// A list of environments that will become command groups
+const envs = ['development', 'staging', 'production'];
+
+// Flags shared across commands
+//
+// The use of C.flags preserves the specific shape of these flags, allowing the
+// rest of this example to know about the host and verbose flags and their
+// values at compile time.
+const sharedFlags = C.flags({
+  host: C.flag('string', 'A remote host', { required: true }),
+  verbose: C.flag('boolean', 'Show verbose output')
+});
+
+// Build shared options for a theoretical host-management library
+//
+// This takes parsed flags provided to command handlers and resolves them to
+// options. Since sharedFlags is a narrow type, ValuesOf gives flags the
+// following shape:
+//
+//   { host: string; verbose: boolean; }
+//
+// If { required: true } were omitted from the definition of the host flag, the
+// host property would instead be an optional string.
+function buildOptions(flags: ValuesOf<typeof sharedFlags>) {
+  return {
+    host: flags.host,
+    quiet: !flags.verbose
+  };
+}
+
+// Build commands to manage hosts in an environment
+//
+// The use of C.tree ensures that the returned object is a tree of command
+// groups and handlers.  Each command uses the shared flags declared earlier,
+// and transforms them into shared options.  Since the flags provided to command
+// handlers are narrowly typed, these flags satisfy the parameter annotation of
+// flags in buildOptions.
+function buildHostCommands(env: string) {
+  return C.tree({
+    deploy: C(
+      'Deploy to a host',
+      {
+        ...sharedFlags,
+        branch: C.flag('string', 'The branch to deploy')
+      },
+      flags => deployToHost({
+        ...buildOptions(flags),
+        branch: flags.branch, // Typed as an optional string
+        env
+      })
+    ),
+
+    restart: C(
+      'Restart a host',
+      sharedFlags,
+      flags => restartHost({ ...buildOptions(flags), env })
+    )
+  });
+}
+
+// Build commands for each environment
+//
+// This uses the CommandTree type to constrain the returned tree, adding a
+// command group for each environment whose child commands are themselves
+// correctly formed command trees.
+function buildEnvironmentCommands(): CommandTree {
+  return envs.reduce<CommandTree>(function(tree, env) {
+    tree[env] = C.group(
+      `Manage the ${env} environment`,
+      buildHostCommands(env)
+    );
+
+    return tree;
+  }, {});
+}
+
+// Run the valid command tree
+await run(buildEnvironmentCommands());
+```
 
 ## Why the Name?
 
