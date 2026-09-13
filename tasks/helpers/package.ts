@@ -49,21 +49,25 @@ function testConsumer(consumerDir: string): void {
  * Verify that Larkspur can be packed and consumed from a tarball
  */
 export function verifyPackage(): Promise<void> {
-  const showSection = (label: string) => {
-    console.log(`${label}\n`);
+  const showSection = (
+    label: string,
+    { first = false, trailing = true } = {}
+  ) => {
+    console.log(`${first ? '' : '\n'}${label}${trailing ? '\n' : ''}`);
   };
 
   return useTempDir(async packDir => {
-    showSection('# Build');
+    showSection('# Build', { first: true });
 
     build();
 
-    showSection('\n# Package');
+    showSection('# Package');
 
     showOutput('npm', [
       'pack',
       '--pack-destination',
-      packDir
+      packDir,
+      '--quiet'
     ]);
 
     const consumerDir = path.join(
@@ -74,15 +78,15 @@ export function verifyPackage(): Promise<void> {
     await fs.mkdir(consumerDir);
     await fs.cp(CONSUMER_PROJECT, consumerDir, { recursive: true });
 
-    showSection('\n# Install');
+    showSection('# Install', { trailing: false });
 
     showOutput(
       'npm',
-      ['install', await findPackedTarball(packDir)],
+      ['install', '--quiet', await findPackedTarball(packDir)],
       { cwd: consumerDir, env: process.env }
     );
 
-    showSection('\n# Verify');
+    showSection('# Verify');
 
     testConsumer(consumerDir);
 
