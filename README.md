@@ -42,6 +42,7 @@
   - [Custom Completions](#custom-completions)
 - [TypeScript](#typescript)
   - [Public Types](#public-types)
+  - [Typed Helpers](#typed-helpers)
 - [Why the Name?](#why-the-name)
 <!-- </toc> -->
 
@@ -682,6 +683,15 @@ Most Larkspur CLIs can rely exclusively on type inference for the command and fl
 * `Flag`: A single flag definition
 * `Flags`: A set of named flags
 * `ValuesOf`: Calculate the parsed values for a `Flags` type
+
+### Typed Helpers
+
+In addition to the types above, there are two factories on the `C` object that are useful to TS code building up a CLI in pieces:
+
+* `C.flags`: Define a set of named flags whose exact keys and individual flag types are preserved
+* `C.tree`: Define a command tree, ensuring that each key is a valid group or handler
+
+These are lightweight functions that return the input data without transformations but provide you with improved type information and constraints.
 
 ## Why the Name?
 
