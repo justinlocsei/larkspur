@@ -33,11 +33,11 @@
     "node": ">=22.0.0"
   },
   "scripts": {
-    "build": "node tasks/index.ts build",
-    "check": "node tasks/index.ts check",
-    "format": "node tasks/index.ts format code",
+    "build": "node bin/larkspur build",
+    "check": "node bin/larkspur check",
+    "format": "node bin/larkspur format code",
     "prepublishOnly": "npm run build",
-    "test": "node tasks/index.ts test all"
+    "test": "node bin/larkspur test all"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.9",
