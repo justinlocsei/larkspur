@@ -1,0 +1,28 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Larkspur
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - uses: ./.github/actions/install-node
+        name: Install Node.js 24
+        with:
+          node-version: 24
+
+      - name: Check code
+        run: ./bin/larkspur check
+
+      - name: Publish to npm
+        run: npm publish --provenance --access public
