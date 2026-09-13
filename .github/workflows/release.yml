@@ -22,8 +22,14 @@ jobs:
         with:
           node-version: 24
 
+      - name: Install zsh
+        run: sudo apt-get install -y ncurses-term zsh
+
       - name: Check code
         run: ./bin/larkspur check
+
+      - name: Test
+        run: ./bin/larkspur test all
 
       - name: Publish to npm
         run: npm stage publish --provenance --access public
