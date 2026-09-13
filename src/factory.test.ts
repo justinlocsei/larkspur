@@ -40,3 +40,17 @@ describe('C.group', () => {
     assert.isDefined(group.subcommands.child);
   });
 });
+
+describe('C.tree', () => {
+  it('returns a command tree', () => {
+    const tree = C.tree({
+      alfa: C.group(description, {
+        bravo: C(description, handler)
+      })
+    });
+
+    assert.isDefined(tree.alfa);
+    assert(tree.alfa.type === 'group');
+    assert.isNotEmpty(tree.alfa.subcommands);
+  });
+});
