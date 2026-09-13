@@ -1,6 +1,6 @@
 {
   "name": "larkspur",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A TypeScript-first CLI library for self-describing internal tools",
   "keywords": [
     "cli",
