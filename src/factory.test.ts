@@ -1,6 +1,7 @@
 import { assert, describe, it } from 'vitest';
 
 import C from './factory.ts';
+import { T } from './tests.ts';
 
 const description = 'description';
 const handler = async () => {};
@@ -26,6 +27,23 @@ describe('C.flag', () => {
       description,
       type: 'boolean'
     });
+  });
+});
+
+describe('C.flags', () => {
+  it('can define a set of flags', () => {
+    const flags = C.flags({
+      alfa: C.flag('boolean', 'alfa'),
+      bravo: C.flag('boolean', 'bravo')
+    });
+
+    T.assert<T.Equivalent<keyof typeof flags, 'alfa' | 'bravo'>>(true);
+
+    assert.equal(flags.alfa.type, 'boolean');
+    assert.equal(flags.bravo.type, 'boolean');
+
+    assert.equal(flags.alfa.description, 'alfa');
+    assert.equal(flags.bravo.description, 'bravo');
   });
 });
 
