@@ -332,6 +332,19 @@ describe('parseCommand', () => {
       ]
     ));
 
+  it('returns an error when shared flags fail to parse', () => {
+    assert.deepInclude(
+      parseCommand(['--help', '--no-help'], {
+        command: C(description, handler)
+      }),
+      {
+        code: 'invalid-flag',
+        message: 'Multiple values provided for flag: help',
+        type: 'error'
+      }
+    );
+  });
+
   it('returns an error if an unknown flag is provided', () => {
     const cases: Array<string[]> = [
       ['command', '--invalid'],
