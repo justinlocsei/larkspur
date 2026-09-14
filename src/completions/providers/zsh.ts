@@ -260,8 +260,7 @@ Then add this line before loading compinit:
       '[[ "$words[CURRENT]" == --*=* ]]',
       patterns.scalar && `[[ "$words[CURRENT-1]" == ${patterns.scalar} ]]`,
       patterns.boolean
-        ? `{ [[ "$words[CURRENT]" == --* ]] && [[ "$words[CURRENT]" != ${patterns.boolean} ]]; }`
-        : '[[ "$words[CURRENT]" == --* ]]'
+      && `{ [[ "$words[CURRENT]" == --* ]] && [[ "$words[CURRENT]" != ${patterns.boolean} ]]; }`
     ]);
 
     return [
