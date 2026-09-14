@@ -32,7 +32,9 @@ describe('NormalizeArgs', () => {
       [
         ['--alfa=1', '--bravo=2'],
         ['--alfa', '1', '--bravo', '2']
-      ]
+      ],
+      [['--alfa='], ['--alfa', '']],
+      [['--alfa=""'], ['--alfa', '']]
     ]);
   });
 
