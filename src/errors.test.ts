@@ -42,6 +42,24 @@ describe('OperationalError', () => {
     );
   });
 
+  it('supports errors as details', () => {
+    checkConversion<Error, string[]>(
+      (error, checks, message) => {
+        const { message: text } = new OperationalError('@original', error);
+        assert.include(text, '@original', message);
+
+        for (const check of checks) {
+          assert.include(text, check, message);
+        }
+      },
+      [
+        [new Error('@message'), ['@message']],
+        [new OperationalError('@message'), ['@message']],
+        [new OperationalError('@message', '@details'), ['@message', '@details']]
+      ]
+    );
+  });
+
   describe('.wrap', () => {
     it('returns operational errors unchanged', () => {
       const original = new OperationalError('original');
