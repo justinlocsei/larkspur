@@ -12,6 +12,8 @@ const CONSUMER_PROJECT = path.join(
   'consumer-test'
 );
 
+const SOURCEMAP_REFERENCE = /sourceMappingURL=/;
+
 /**
  * Find the tarball produced by npm pack
  */
@@ -25,6 +27,35 @@ async function findPackedTarball(packDir: string): Promise<string> {
   }
 
   return path.join(packDir, tarball);
+}
+
+/**
+ * Verify that the installed package excludes source maps
+ */
+async function checkForSourceMaps(consumerDir: string): Promise<void> {
+  const packageDir = path.join(consumerDir, 'node_modules', 'larkspur');
+
+  const files = await fs.readdir(packageDir, {
+    encoding: 'utf8',
+    recursive: true
+  });
+
+  const maps = files.filter(f => f.endsWith('.map'));
+
+  if (maps.length > 0) {
+    throw new OperationalError(
+      'Installed package includes source maps:',
+      maps.join('\n')
+    );
+  }
+
+  for (const file of files.filter(f => f.endsWith('.mjs'))) {
+    const content = await fs.readFile(path.join(packageDir, file), 'utf8');
+
+    if (SOURCEMAP_REFERENCE.test(content)) {
+      throw new OperationalError('File references a source map:', file);
+    }
+  }
 }
 
 /**
@@ -88,6 +119,7 @@ export function verifyPackage(): Promise<void> {
 
     showSection('# Verify');
 
+    await checkForSourceMaps(consumerDir);
     testConsumer(consumerDir);
 
     console.log('Package verified');
