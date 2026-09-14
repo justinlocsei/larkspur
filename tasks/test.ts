@@ -15,6 +15,13 @@ const FILTERS = C.flags({
   name: C.flag('string', 'Only run tests whose name matches the given pattern')
 });
 
+// Shared flags for pre-test builds
+const BUILD = C.flags({
+  build: C.flag('boolean', 'Build the project before running tests', {
+    default: true
+  })
+});
+
 /**
  * Run tests using vitest
  */
@@ -54,12 +61,7 @@ export default C.group('Run tests', {
 
   integration: C(
     'Run integration tests',
-    {
-      ...FILTERS,
-      build: C.flag('boolean', 'Build the project before running tests', {
-        default: true
-      })
-    },
+    { ...BUILD, ...FILTERS },
     flags => {
       if (flags.build) {
         build();
