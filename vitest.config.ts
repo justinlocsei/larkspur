@@ -3,6 +3,13 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     chaiConfig: { truncateThreshold: 0 },
+    coverage: {
+      exclude: ['src/**/*.test.ts', 'src/tests/'],
+      include: ['src/**/*.ts'],
+      provider: 'v8',
+      reporter: ['html', 'text'],
+      skipFull: true
+    },
     environment: 'node',
     projects: [
       {

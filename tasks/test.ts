@@ -15,6 +15,24 @@ const FILTERS = C.flags({
   name: C.flag('string', 'Only run tests whose name matches the given pattern')
 });
 
+// Shared flags for pre-test builds
+const BUILD = C.flags({
+  build: C.flag('boolean', 'Build the larkspur package before running tests', {
+    default: true
+  })
+});
+
+/**
+ * Run tests using vitest
+ */
+function runTests(args: string[], env: EnvironmentVariables = {}): void {
+  run(
+    'vitest',
+    ['run', '--reporter', 'verbose', ...args],
+    { env: { ...env, NODE_OPTIONS: '--throw-deprecation' } }
+  );
+}
+
 /**
  * Run a test suite
  */
@@ -23,18 +41,14 @@ function runSuite(
   { file, name }: ValuesOf<typeof FILTERS> = {},
   env: EnvironmentVariables = {}
 ): void {
-  run(
-    'vitest',
+  runTests(
     compact([
-      'run',
       '--project',
       suite,
-      '--reporter',
-      'verbose',
-      file,
-      ...(name ? ['-t', name] : [])
+      ...(name ? ['-t', name] : []),
+      file
     ]),
-    { env: { ...env, NODE_OPTIONS: '--throw-deprecation' } }
+    env
   );
 }
 
@@ -45,14 +59,31 @@ export default C.group('Run tests', {
     }
   }),
 
-  integration: C(
-    'Run integration tests',
+  coverage: C(
+    'Run all tests with coverage',
     {
-      ...FILTERS,
-      build: C.flag('boolean', 'Build the project before running tests', {
-        default: true
+      ...BUILD,
+      reporter: C.flag('choice', 'A coverage reporter', {
+        choices: ['html', 'text'],
+        default: 'text'
       })
     },
+    flags => {
+      if (flags.build) {
+        build();
+      }
+
+      runTests([
+        '--coverage',
+        '--coverage.reporter',
+        flags.reporter
+      ]);
+    }
+  ),
+
+  integration: C(
+    'Run integration tests',
+    { ...BUILD, ...FILTERS },
     flags => {
       if (flags.build) {
         build();
