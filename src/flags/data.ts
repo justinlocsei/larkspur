@@ -16,12 +16,9 @@ const SETTER_PATTERN = new RegExp(`^${SETTER_PREFIX}[a-z]`);
  * Extract the possible choices available for a flag
  */
 export function choicesForFlag(flag: Flag): FlagChoices {
-  if (flag.type === 'choice') {
-    const { choices } = flag;
-    return choices ? [...choices] : undefined;
-  } else {
-    return undefined;
-  }
+  return flag.type === 'choice'
+    ? [...flag.choices]
+    : undefined;
 }
 
 /**
