@@ -9,6 +9,13 @@ export type {
 } from './commands/types.ts';
 export { OperationalError } from './errors.ts';
 export type { Flag, Flags } from './flags/types.ts';
-export type { ValuesOf } from './flags/values.ts';
+
+import type { Flags } from './flags/types.ts';
+import type { ValuesOf as RawValuesOf } from './flags/values.ts';
+
+/**
+ * Get the parsed values for a set of flags
+ */
+export type ValuesOf<T extends Flags> = RawValuesOf<T, 'narrow'>;
 
 export default factory;

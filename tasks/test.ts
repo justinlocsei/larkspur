@@ -1,5 +1,5 @@
 import C from '../src/factory.ts';
-import type { ValuesOf } from '../src/flags/values.ts';
+import type { ValuesOf } from '../src/index.ts';
 import { setConfigVariables } from '../src/tests/properties/config.ts';
 import type { EnvironmentVariables } from '../src/types.ts';
 import { compact } from '../src/utils.ts';
@@ -20,7 +20,7 @@ const FILTERS = C.flags({
  */
 function runSuite(
   suite: typeof SUITES[number],
-  { file, name }: ValuesOf<typeof FILTERS, 'narrow'> = {},
+  { file, name }: ValuesOf<typeof FILTERS> = {},
   env: EnvironmentVariables = {}
 ): void {
   run(
