@@ -35,7 +35,8 @@ function formatFullCommand(command: Usage): string {
 
   const lines = [
     `$ ${command.title}`,
-    ...(details ? ['', `    ${details}`] : [])
+    '',
+    `    ${details}`
   ];
 
   if (flags.length) {
