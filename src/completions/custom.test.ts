@@ -74,6 +74,30 @@ describe('provideCompletions', () => {
     assert.equal(result, 'alfa\nbravo\n');
   });
 
+  it('supports grouped completion functions', async () => {
+    const result = await provideCompletions(
+      {
+        commands: {
+          outer: C.group(description, {
+            inner: C(
+              description,
+              {
+                command: C.flag('string', description, {
+                  completion: () => ['alfa', 'bravo']
+                })
+              },
+              async () => {}
+            )
+          })
+        },
+        context: createTestContext()
+      },
+      { current: '', flag: 'outer:inner:command' }
+    );
+
+    assert.equal(result, 'alfa\nbravo\n');
+  });
+
   it('returns an empty string for invalid providers', async () => {
     const result = await provideCompletions(
       withCompletion(() => {
