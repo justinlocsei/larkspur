@@ -60,20 +60,14 @@ function resolveCommand(
 ): CommandHandler | undefined {
   let commands = tree;
 
-  for (const [index, name] of path.entries()) {
+  for (const name of path) {
     const command = getCommand(commands, name);
 
     if (!command) {
       return undefined;
-    }
-
-    if (index < path.length - 1) {
-      if (command.type !== 'group') {
-        return undefined;
-      }
-
+    } else if (command.type === 'group') {
       commands = command.subcommands;
-    } else if (command.type === 'handler') {
+    } else {
       return command;
     }
   }
