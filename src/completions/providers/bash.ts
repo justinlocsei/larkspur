@@ -1,6 +1,6 @@
 // biome-ignore-all lint/suspicious/noTemplateCurlyInString: used for completion scripts
 
-import { compact, drain, peek } from '../../utils.ts';
+import { compact, drain, peek, requireMapKey } from '../../utils.ts';
 import { encodeFlagPath } from '../custom.ts';
 import { scalarValueCompletion } from '../data.ts';
 import type { NameGenerator } from '../fns.ts';
@@ -309,12 +309,8 @@ To use these completions, reload your profile or start a new shell.`.trim();
 
       for (const [name, command] of entries) {
         const completions = command.type === 'group'
-          ? built.get(`${key}.${commandNames.indexOf(name)}`)
+          ? requireMapKey(built, `${key}.${commandNames.indexOf(name)}`)
           : this.completeCommand(command, [...levels, name]);
-
-        if (!completions) {
-          continue;
-        }
 
         subcommandCases.push(this.subcommandCase(name, completions, command));
         subcommandCompletions.push(completions);
@@ -333,13 +329,7 @@ To use these completions, reload your profile or start a new shell.`.trim();
       );
     }
 
-    const completion = built.get('0');
-
-    if (!completion) {
-      throw new Error('Failed to build command completions');
-    }
-
-    return completion;
+    return requireMapKey(built, '0');
   }
 
   /**
