@@ -1,6 +1,10 @@
 import { assert, describe, it } from 'vitest';
 
-import { coerceError, OperationalError } from './errors.ts';
+import {
+  coerceError,
+  extractErrorDetails,
+  OperationalError
+} from './errors.ts';
 import { checkConversion } from './tests.ts';
 
 describe('coerceError', () => {
@@ -17,6 +21,31 @@ describe('coerceError', () => {
         [{ key: 'value' }, '{"key":"value"}']
       ]
     );
+  });
+});
+
+describe('extractErrorDetails', () => {
+  it('returns the stack trace when present', () => {
+    const error = new Error('@message');
+
+    assert.isString(error.stack);
+    assert.equal(extractErrorDetails(error), error.stack);
+  });
+
+  it('falls back to the message when the stack is missing', () => {
+    const error = new Error('@message');
+
+    delete error.stack;
+
+    assert.equal(extractErrorDetails(error), '@message');
+  });
+
+  it('falls back to the message when stack is empty', () => {
+    const error = new Error('@message');
+
+    error.stack = '';
+
+    assert.equal(extractErrorDetails(error), '@message');
   });
 });
 

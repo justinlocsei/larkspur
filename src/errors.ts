@@ -4,6 +4,13 @@
 type ErrorDetails = OperationalError | string | Error;
 
 /**
+ * Get an error's stack trace, falling back to its message
+ */
+export function extractErrorDetails(error: Error): string {
+  return error.stack || error.message;
+}
+
+/**
  * Coerce a value to an error
  */
 export function coerceError(value: unknown): Error {
