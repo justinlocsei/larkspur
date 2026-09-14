@@ -109,6 +109,23 @@ describe('validateCommands', () => {
     }
   });
 
+  it('reports root command names without handlers', () => {
+    checkError(
+      () => validateCommands({ absent: undefined }, config),
+      'No definition for command: absent'
+    );
+  });
+
+  it('reports nested command names without handlers', () => {
+    checkError(
+      () =>
+        validateCommands({
+          parent: C.group(description, { child: undefined })
+        }, config),
+      'No definition for command: parent > child'
+    );
+  });
+
   it('reports invalid root command names', () => {
     checkError(
       () =>
