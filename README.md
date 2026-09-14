@@ -224,7 +224,7 @@ Larkspur can show help messages for a CLI and each of its commands via a `--help
 
 ### Command Discovery
 
-All commands and flags can be recursively listed using the top-level `explore` command. The output is structured and readable by humans or agents, and can be used to quickly gain an understanding of the full set of features offered by the CLI.
+All commands and flags can be recursively listed using the top-level `explore` command. The output is structured and readable by humans or agents, and can be used to quickly gain an understanding of the full set of features offered by the CLI.  By default, `explore` lists only your application's commands.  You can pass `--include-built-ins` to also show Larkspur's built-in commands, such as `explore` and `completions`.
 
 The `explore` command supports multiple output formats via its `--format` flag:
 
