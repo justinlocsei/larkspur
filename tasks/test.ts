@@ -59,6 +59,28 @@ export default C.group('Run tests', {
     }
   }),
 
+  coverage: C(
+    'Run all tests with coverage',
+    {
+      ...BUILD,
+      reporter: C.flag('choice', 'A coverage reporter', {
+        choices: ['html', 'text'],
+        default: 'text'
+      })
+    },
+    flags => {
+      if (flags.build) {
+        build();
+      }
+
+      runTests([
+        '--coverage',
+        '--coverage.reporter',
+        flags.reporter
+      ]);
+    }
+  ),
+
   integration: C(
     'Run integration tests',
     { ...BUILD, ...FILTERS },
