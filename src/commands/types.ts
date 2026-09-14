@@ -59,6 +59,11 @@ export type CommandTree<T extends string = string> = Partial<
 >;
 
 /**
+ * A command tree whose entries are known to be present
+ */
+export type DefinedCommandTree = Record<string, Command>;
+
+/**
  * A level within a command tree
  */
 export type TreeScope = 'command' | 'group' | 'root';
