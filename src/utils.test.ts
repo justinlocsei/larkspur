@@ -6,6 +6,7 @@ import {
   drain,
   isEmpty,
   peek,
+  requireMapKey,
   sortEntries,
   transformValues
 } from './utils.ts';
@@ -98,6 +99,33 @@ describe('peek', () => {
 
     assert.deepEqual(visited, ['c', 'b', 'a']);
     assert.deepEqual(stack, []);
+  });
+});
+
+describe('requireMapKey', () => {
+  it('returns the value of a key in a map', () => {
+    const map = new Map<string, number>();
+
+    map.set('a', 1);
+    map.set('b', 2);
+
+    assert.equal(requireMapKey(map, 'a'), 1);
+    assert.equal(requireMapKey(map, 'b'), 2);
+  });
+
+  it('throws an error if the key is not in the map', () => {
+    const map = new Map<string, number>();
+
+    map.set('alfa', 1);
+
+    assert.throws(() => requireMapKey(map, 'bravo'), 'bravo');
+  });
+
+  it('returns an explicitly undefined key', () => {
+    const map = new Map<string, number | undefined>();
+    map.set('a', undefined);
+
+    assert.isUndefined(requireMapKey(map, 'a'));
   });
 });
 

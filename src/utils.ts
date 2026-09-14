@@ -39,6 +39,17 @@ export function* peek<T>(stack: T[]): Generator<T, void> {
 }
 
 /**
+ * Get the value of a key in a map or throw an error
+ */
+export function requireMapKey<T>(map: Map<string, T>, key: string): T {
+  if (!map.has(key)) {
+    throw new Error(`Missing map key: ${key}`);
+  }
+
+  return map.get(key) as T;
+}
+
+/**
  * Get the typed entries of an object, sorted by key
  */
 export function sortEntries<T extends object>(
