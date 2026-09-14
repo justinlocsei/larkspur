@@ -286,15 +286,9 @@ To use these completions, reload your profile or start a new shell.`.trim();
       if (!frame.visited) {
         frame.visited = true;
 
-        for (let i = entries.length - 1; i >= 0; i--) {
-          const entry = entries[i];
-
-          if (!entry) {
-            continue;
-          }
-
-          const [name, command] = entry;
-
+        for (
+          const [i, [name, command]] of [...entries.entries()].toReversed()
+        ) {
           if (command.type === 'group') {
             stack.push({
               commands: command.subcommands,
