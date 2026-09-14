@@ -24,7 +24,7 @@ describe('withExploreCommands', () => {
   it('preserves the entry point if exploration is disabled', () => {
     const entry = withExploreCommand(
       {},
-      createTestContext({}, { explore: { enabled: false } })
+      createTestContext({ explore: false })
     );
 
     assert.isEmpty(entry);
@@ -35,7 +35,7 @@ describe('withExploreCommands', () => {
       () =>
         withExploreCommand(
           { discover: C('Existing command', () => {}) },
-          createTestContext({}, { explore: { command: 'discover' } })
+          createTestContext({ explore: { command: 'discover' } })
         ),
       'discover'
     );

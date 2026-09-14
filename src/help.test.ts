@@ -3,9 +3,8 @@ import { assert, describe, it } from 'vitest';
 import type { HelpScope } from './commands/types.ts';
 import C from './factory.ts';
 import { buildHelp } from './help.ts';
+import type { TestContextOptions } from './tests.ts';
 import { createTestContext } from './tests.ts';
-import type { UserConfig } from './types/config.ts';
-import type { Metadata } from './types.ts';
 
 async function handler() {}
 
@@ -19,12 +18,11 @@ const helpFlag = [
 function checkHelp(
   scope: HelpScope,
   lines: string[],
-  meta?: Partial<Metadata>,
-  config: UserConfig = {}
+  options: TestContextOptions = {}
 ) {
   assert.equal(
     buildHelp({
-      context: createTestContext(meta, config),
+      context: createTestContext(options),
       scope
     }),
     lines.join('\n')
