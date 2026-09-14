@@ -39,7 +39,7 @@ Run `./bin/larkspur explore` to list every command and flag. Formats:
 | `test unit [--name <pattern>]` | Vitest unit project (`src/**/*.test.ts`) |
 | `test integration [--name <pattern>] [--no-build]` | Vitest integration project (`test/clis/`) |
 | `test property [--runs N] [--seed N] [--name <pattern>]` | fast-check property tests (`src/**/*.prop.test.ts`) |
-| `explore [--format full\|names\|summary]` | Discover this CLI's commands |
+| `explore [--format full\|names\|summary] [--include-built-ins]` | Discover this CLI's commands |
 
 Equivalent npm scripts exist for common tasks (`npm run check`, `npm test`, etc.) but prefer `./bin/larkspur` in docs and CI.
 
