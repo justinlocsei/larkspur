@@ -57,7 +57,7 @@ function formatDetails(details?: ErrorDetails): string | undefined {
   if (details instanceof OperationalError) {
     return details.toString();
   } else if (details instanceof Error) {
-    return details.stack || details.message;
+    return extractErrorDetails(details);
   } else {
     return details;
   }

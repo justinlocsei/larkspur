@@ -1,6 +1,6 @@
 import type { EntryPoint } from './commands/types.ts';
 import { createContext } from './context.ts';
-import { OperationalError } from './errors.ts';
+import { extractErrorDetails, OperationalError } from './errors.ts';
 import { runCLI } from './runner.ts';
 import type { UserConfig } from './types/config.ts';
 import type { Metadata } from './types.ts';
@@ -92,7 +92,7 @@ export async function run(
       log.error(
         error instanceof OperationalError
           ? error.message
-          : error.stack || error.message
+          : extractErrorDetails(error)
       );
 
       onError(error);
