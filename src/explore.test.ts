@@ -1,7 +1,8 @@
 import { assert, describe, it } from 'vitest';
 
+import { withBuiltInCommands } from './built-ins.ts';
 import type { CommandTree } from './commands/types.ts';
-import type { Format } from './explore/display.ts';
+import type { ExploreOptions } from './explore.ts';
 import { buildExploreMessage } from './explore.ts';
 import C from './factory.ts';
 import { createTestContext } from './tests.ts';
@@ -19,13 +20,18 @@ const nestedCommands = {
 function checkExplore(
   commands: CommandTree,
   lines: string[],
-  format?: Format
+  {
+    context = createTestContext({ name: 'test-cli' }),
+    format,
+    includeBuiltIns
+  }: Partial<ExploreOptions> = {}
 ) {
   assert.equal(
     buildExploreMessage({
-      context: createTestContext({ name: 'test-cli' }),
       commands,
-      format
+      context,
+      format,
+      includeBuiltIns
     }),
     lines.join('\n')
   );
@@ -155,7 +161,7 @@ describe('buildExploreMessage', () => {
         'test-cli bravo charlie',
         'test-cli bravo delta'
       ],
-      'names'
+      { format: 'names' }
     );
   });
 
@@ -167,7 +173,59 @@ describe('buildExploreMessage', () => {
         'test-cli bravo charlie  # @charlie',
         'test-cli bravo delta    # @delta'
       ],
-      'summary'
+      { format: 'summary' }
+    );
+  });
+
+  it('omits built-in commands by default', () => {
+    const context = createTestContext({ name: 'test-cli' });
+
+    checkExplore(
+      withBuiltInCommands({ alfa: C('@alfa', handler) }, context),
+      ['test-cli alfa  # @alfa'],
+      { context, format: 'summary' }
+    );
+  });
+
+  it('includes built-in commands when requested', () => {
+    const context = createTestContext({ name: 'test-cli' });
+
+    checkExplore(
+      withBuiltInCommands({ alfa: C('@alfa', handler) }, context),
+      [
+        'test-cli alfa                                   # @alfa',
+        'test-cli completions generate --shell <choice>  # Generate a completion script',
+        'test-cli completions install --shell <choice>   # Show installation instructions',
+        'test-cli explore [flags]                        # Explore the CLI'
+      ],
+      { context, format: 'summary', includeBuiltIns: true }
+    );
+  });
+
+  it('does not remove user commands that share built-in names', () => {
+    const context = createTestContext(
+      { name: 'test-cli' },
+      {
+        completions: { enabled: false },
+        explore: { command: 'discover' }
+      }
+    );
+
+    checkExplore(
+      withBuiltInCommands(
+        {
+          alfa: C('@alfa', handler),
+          completions: C('@completions', handler),
+          explore: C('@explore', handler)
+        },
+        context
+      ),
+      [
+        'test-cli alfa         # @alfa',
+        'test-cli completions  # @completions',
+        'test-cli explore      # @explore'
+      ],
+      { context, format: 'summary' }
     );
   });
 });

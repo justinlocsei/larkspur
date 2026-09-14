@@ -15,18 +15,44 @@ type Frame = {
 };
 
 /**
+ * Options for the explore message
+ */
+export type ExploreOptions = {
+  context: Context;
+  format?: Format;
+  includeBuiltIns?: boolean;
+};
+
+/**
+ * Remove built-in commands from a tree
+ */
+function removeBuiltIns(commands: CommandTree, context: Context): CommandTree {
+  const { completions, explore } = context.config;
+
+  return Object.fromEntries(
+    Object.entries(commands).filter(([name]) =>
+      (!completions.enabled || name !== completions.group)
+      && (!explore.enabled || name !== explore.command)
+    )
+  );
+}
+
+/**
  * Build a message describing a CLI's executable commands and flags
  */
 export function buildExploreMessage({
   commands,
   context,
-  format
-}: {
+  format,
+  includeBuiltIns = false
+}: ExploreOptions & {
   commands: CommandTree;
-  context: Context;
-  format?: Format;
 }): string {
-  const usages = buildHandlerScopes(commands).map(scope =>
+  const tree = includeBuiltIns
+    ? commands
+    : removeBuiltIns(commands, context);
+
+  const usages = buildHandlerScopes(tree).map(scope =>
     buildUsage({
       context,
       scope,

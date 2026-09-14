@@ -1,3 +1,4 @@
+import { withBuiltInCommands } from './built-ins.ts';
 import type {
   ParsedCommand,
   ParsingResult,
@@ -5,9 +6,7 @@ import type {
 } from './commands/parsing.ts';
 import { parseCommand } from './commands/parsing.ts';
 import type { EntryPoint } from './commands/types.ts';
-import { withCompletionCommands } from './completions/commands.ts';
 import { coerceError, OperationalError } from './errors.ts';
-import { withExploreCommand } from './explore/commands.ts';
 import { buildHelp } from './help.ts';
 import type { Context } from './types.ts';
 import { validateCommands } from './validation.ts';
@@ -78,10 +77,7 @@ export async function runCLI({
   let commands: EntryPoint;
 
   try {
-    commands = withExploreCommand(
-      withCompletionCommands(entry, context),
-      context
-    );
+    commands = withBuiltInCommands(entry, context);
   } catch (error) {
     return failWith(
       OperationalError.wrap(error, 'Could not apply built-in commands')

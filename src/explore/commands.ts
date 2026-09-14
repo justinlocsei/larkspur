@@ -15,10 +15,19 @@ export function defineExploreCommand() {
       format: C.flag('choice', 'The display format', {
         choices: FORMATS,
         default: 'full'
-      })
+      }),
+      'include-built-ins': C.flag(
+        'boolean',
+        'Include built-in commands'
+      )
     },
-    ({ format }, { commands, context }) =>
-      buildExploreMessage({ commands, context, format })
+    (flags, { commands, context }) =>
+      buildExploreMessage({
+        commands,
+        context,
+        format: flags.format,
+        includeBuiltIns: flags['include-built-ins']
+      })
   );
 }
 

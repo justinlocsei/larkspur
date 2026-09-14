@@ -226,11 +226,58 @@ Larkspur can show help messages for a CLI and each of its commands via a `--help
 
 All commands and flags can be recursively listed using the top-level `explore` command. The output is structured and readable by humans or agents, and can be used to quickly gain an understanding of the full set of features offered by the CLI.
 
+By default, `explore` lists only your application's commands.  You can pass `--include-built-ins` to also show Larkspur's built-in commands, such as `explore` and `completions`.
+
 The `explore` command supports multiple output formats via its `--format` flag:
 
 * `full`: The default format, which shows all commands, descriptions, and flags
 * `names`: A compact list of the command names
 * `summary`: The `names` format with inline command descriptions
+
+In practice, this looks like the following, which is truncated output from running `explore` on Larkspur's own internal task runner:
+
+```
+$ larkspur build
+
+    Build Larkspur
+
+$ larkspur check [flags]
+
+    Check the codebase
+
+    --only <choice> ...
+      Only run the given checks
+      (Choices: code, formatting, types)
+      (Default: code, formatting, types)
+
+$ larkspur format code
+
+    Format the codebase
+
+$ larkspur format docs
+
+    Format documentation
+
+…
+
+$ larkspur test property [flags]
+
+    Run property tests
+
+    --name <string>
+      Only run tests in files matching the given pattern
+    --runs <number>
+      The number of test runs
+    --seed <number>
+      A fixed seed
+
+$ larkspur test unit [flags]
+
+    Run unit tests
+
+    --name <string>
+      Only run tests in files matching the given pattern
+```
 
 ### Shell Completions
 
