@@ -2,7 +2,7 @@
 
 import type { Flag, Flags, ScalarFlag } from '../../flags/types.ts';
 import { formatDescription } from '../../text.ts';
-import { compact, sortEntries, transformValues } from '../../utils.ts';
+import { compact, peek, sortEntries, transformValues } from '../../utils.ts';
 import { encodeFlagPath } from '../custom.ts';
 import { scalarValueCompletion } from '../data.ts';
 import type { NameGenerator } from '../fns.ts';
@@ -146,13 +146,7 @@ Then add this line before loading compinit:
     const functions: CompletionFunction[] = [];
     const stack: CommandFrame[] = [{ commands, levels: [], visited: false }];
 
-    while (stack.length > 0) {
-      const frame = stack[stack.length - 1];
-
-      if (!frame) {
-        break;
-      }
-
+    for (const frame of peek(stack)) {
       const { commands: tree, levels } = frame;
       const entries = this.visibleCommandEntries(tree);
 
