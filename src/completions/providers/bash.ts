@@ -1,6 +1,6 @@
 // biome-ignore-all lint/suspicious/noTemplateCurlyInString: used for completion scripts
 
-import { compact, drain } from '../../utils.ts';
+import { compact, drain, peek } from '../../utils.ts';
 import { encodeFlagPath } from '../custom.ts';
 import { scalarValueCompletion } from '../data.ts';
 import type { NameGenerator } from '../fns.ts';
@@ -277,13 +277,7 @@ To use these completions, reload your profile or start a new shell.`.trim();
     const built = new Map<string, Completions>();
     const stack: Frame[] = [{ commands, key: '0', levels: [], visited: false }];
 
-    while (stack.length > 0) {
-      const frame = stack[stack.length - 1];
-
-      if (!frame) {
-        break;
-      }
-
+    for (const frame of peek(stack)) {
       const { commands, key, levels } = frame;
 
       const entries = this.visibleCommandEntries(commands);
