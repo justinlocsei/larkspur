@@ -17,7 +17,7 @@ const FILTERS = C.flags({
 
 // Shared flags for pre-test builds
 const BUILD = C.flags({
-  build: C.flag('boolean', 'Build the project before running tests', {
+  build: C.flag('boolean', 'Build the larkspur package before running tests', {
     default: true
   })
 });
