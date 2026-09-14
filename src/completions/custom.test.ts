@@ -8,6 +8,7 @@ import {
   encodeFlagPath,
   provideCompletions
 } from './custom.ts';
+import type { CompletionSource } from './provider.ts';
 
 const description = 'description';
 
@@ -38,7 +39,7 @@ describe('encodeFlagPath', () => {
 });
 
 describe('provideCompletions', () => {
-  const withCompletion = (fn: UserCompletion) => ({
+  const withCompletion = (fn: UserCompletion): CompletionSource => ({
     commands: {
       command: C(
         description,
