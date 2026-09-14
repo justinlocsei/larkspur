@@ -75,7 +75,7 @@ type BuiltInShortHands<T extends keyof UserConfig> =
   & { [K in T]?: UserConfig[K] | false };
 
 /**
- * Options for createTestContext
+ * Options for creating a test contex
  */
 export type TestContextOptions =
   & Partial<Metadata>
