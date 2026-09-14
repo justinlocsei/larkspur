@@ -19,7 +19,7 @@ describe('withBuiltInCommands', () => {
   it('can opt out of the explore command', () => {
     const entry = withBuiltInCommands(
       {},
-      createTestContext({}, { explore: { enabled: false } })
+      createTestContext({ explore: false })
     );
 
     assert.isUndefined(entry.explore);
@@ -29,7 +29,7 @@ describe('withBuiltInCommands', () => {
   it('can opt out of completion commands', () => {
     const entry = withBuiltInCommands(
       {},
-      createTestContext({}, { completions: { enabled: false } })
+      createTestContext({ completions: false })
     );
 
     assert.isDefined(entry.explore);
@@ -39,13 +39,7 @@ describe('withBuiltInCommands', () => {
   it('preserves the entry point if no built-in commands are enabled', () => {
     const entry = withBuiltInCommands(
       {},
-      createTestContext(
-        {},
-        {
-          completions: { enabled: false },
-          explore: { enabled: false }
-        }
-      )
+      createTestContext({ completions: false, explore: false })
     );
 
     assert.isEmpty(entry);
@@ -55,13 +49,10 @@ describe('withBuiltInCommands', () => {
     ensure.throws(() =>
       withBuiltInCommands(
         {},
-        createTestContext(
-          {},
-          {
-            completions: { group: 'overlap' },
-            explore: { command: 'overlap' }
-          }
-        )
+        createTestContext({
+          completions: { group: 'overlap' },
+          explore: { command: 'overlap' }
+        })
       ), 'conflict');
   });
 });

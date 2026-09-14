@@ -68,16 +68,40 @@ export async function createTempDir(): Promise<string> {
 }
 
 /**
+ * Support a false shorthand to disable built-in commands
+ */
+type BuiltInShortHands<T extends keyof UserConfig> =
+  & Omit<UserConfig, T>
+  & { [K in T]?: UserConfig[K] | false };
+
+/**
+ * Options for creating a test contex
+ */
+export type TestContextOptions =
+  & Partial<Metadata>
+  & BuiltInShortHands<'completions' | 'explore'>;
+
+/**
  * Create a test context
  */
-export function createTestContext(
-  meta: Partial<Metadata> = {},
-  config: UserConfig = {}
-): Context {
-  return createContext(
-    { name: 'testing', ...meta },
-    config
-  );
+export function createTestContext({
+  completions,
+  description,
+  explore,
+  help,
+  name = 'testing'
+}: TestContextOptions = {}): Context {
+  const config: UserConfig = { help };
+
+  if (completions !== undefined) {
+    config.completions = completions || { enabled: false };
+  }
+
+  if (explore !== undefined) {
+    config.explore = explore || { enabled: false };
+  }
+
+  return createContext({ description, name }, config);
 }
 
 /**

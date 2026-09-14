@@ -19,7 +19,7 @@ Public API: `src/index.ts` exports `run`, default `C` factory, `OperationalError
 
 ## Commands
 
-Run `./bin/larkspur explore` to list every command and flag. Formats:
+Run `./bin/larkspur explore` to list every command and flag. By default, `explore` lists only application commands; pass `--include-built-ins` to also show Larkspur's built-in commands. Formats:
 
 - `--format summary` — one line per command (rake `-T` style)
 - `--format names` — flat list of usage titles
@@ -34,11 +34,11 @@ Run `./bin/larkspur explore` to list every command and flag. Formats:
 | `check --only <check>` | Run a subset: `code`, `formatting`, or `types` |
 | `format code` | Auto-format source (Biome import organize + dprint) |
 | `format docs` | Format markdown documentation |
-| `package verify` | Build, `npm pack`, install tarball in a temp consumer project, smoke test |
+| `package verify` | Build, `npm pack`, install tarball in a temp consumer project, smoke test (also asserts the published package has no source maps) |
 | `test all` | Unit, integration, and property suites in order |
-| `test unit [--name <pattern>]` | Vitest unit project (`src/**/*.test.ts`) |
-| `test integration [--name <pattern>] [--no-build]` | Vitest integration project (`test/clis/`) |
-| `test property [--runs N] [--seed N] [--name <pattern>]` | fast-check property tests (`src/**/*.prop.test.ts`) |
+| `test unit [--file <pattern>] [--name <pattern>]` | Vitest unit project (`src/**/*.test.ts`) |
+| `test integration [--file <pattern>] [--name <pattern>] [--no-build]` | Vitest integration project (`test/clis/`) |
+| `test property [--file <pattern>] [--name <pattern>] [--runs N] [--seed N]` | fast-check property tests (`src/**/*.prop.test.ts`) |
 | `explore [--format full\|names\|summary] [--include-built-ins]` | Discover this CLI's commands |
 
 Equivalent npm scripts exist for common tasks (`npm run check`, `npm test`, etc.) but prefer `./bin/larkspur` in docs and CI.
@@ -59,13 +59,16 @@ CI runs the same pipeline on Node 22 and 24 (`.github/workflows/verify.yml`).
 - **Property tests** use the `.prop.test.ts` suffix and run in a separate Vitest project
 - **Integration tests** live under `test/clis/` and may require **zsh** and **ncurses-term** (installed in CI)
 
-Run a single file with `--name`:
+Filter suites with `--file` (Vitest file pattern) or `--name` (Vitest test name pattern):
 
 ```sh
+./bin/larkspur test unit --file explore.test
 ./bin/larkspur test unit --name explore
 ```
 
 After editing a source file, run its matching test file when one exists.
+
+Use `createTestContext()` from `src/tests.ts` in unit tests. It accepts metadata and config in one object; pass `explore: false` or `completions: false` to disable built-ins.
 
 ## Code style
 
@@ -86,7 +89,9 @@ Larkspur CLIs are defined with the `C` factory (`src/factory.ts`):
 - `C.group(description, { subcommands })` — command group
 - `C.flag(type, description, options)` — flag definition
 
-Built-in commands (`explore`, `completions`) are injected by the runner — see `src/runner.ts`, `src/explore/commands.ts`, and `src/completions/commands.ts`.
+Built-in commands (`explore`, `completions`) are injected by the runner via `withBuiltInCommands()` in `src/built-ins.ts` — see `src/runner.ts`, `src/explore/commands.ts`, and `src/completions/commands.ts`.
+
+Published `dist/` contains only `index.mjs` and `index.d.mts` (no source maps). Local builds may still emit hidden maps for debugging.
 
 Configuration types live in `src/types/config.ts`; validation in `src/validation.ts` and `src/config.ts`.
 

@@ -201,10 +201,7 @@ describe('runCLI', () => {
         args: ['completions'],
         entry: {}
       },
-      createTestContext(
-        {},
-        { completions: { enabled: false } }
-      )
+      createTestContext({ completions: false })
     );
 
     assert(response.type === 'error', 'completion command was available');

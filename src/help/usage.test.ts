@@ -2,9 +2,8 @@ import { assert, describe, it } from 'vitest';
 
 import type { HelpScope } from '../commands/types.ts';
 import C from '../factory.ts';
+import type { TestContextOptions } from '../tests.ts';
 import { createTestContext } from '../tests.ts';
-import type { UserConfig } from '../types/config.ts';
-import type { Metadata } from '../types.ts';
 import type { PrintableFlag, Usage } from './usage.ts';
 import { buildUsage } from './usage.ts';
 
@@ -20,12 +19,11 @@ const helpFlag: PrintableFlag = {
 function checkUsage(
   scope: HelpScope,
   expected: Usage,
-  meta?: Partial<Metadata>,
-  config: UserConfig = {}
+  options: TestContextOptions = {}
 ) {
   assert.deepEqual(
     buildUsage({
-      context: createTestContext(meta, config),
+      context: createTestContext(options),
       scope
     }),
     expected

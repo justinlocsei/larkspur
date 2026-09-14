@@ -203,13 +203,11 @@ describe('buildExploreMessage', () => {
   });
 
   it('does not remove user commands that share built-in names', () => {
-    const context = createTestContext(
-      { name: 'test-cli' },
-      {
-        completions: { enabled: false },
-        explore: { command: 'discover' }
-      }
-    );
+    const context = createTestContext({
+      completions: false,
+      explore: { command: 'discover' },
+      name: 'test-cli'
+    });
 
     checkExplore(
       withBuiltInCommands(
