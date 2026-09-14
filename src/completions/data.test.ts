@@ -12,23 +12,28 @@ describe('scalarValueCompletion', () => {
   it('uses an appropriate completion strategy for scalar flags', () => {
     checkConversion<ScalarFlag, ScalarValueCompletion>(
       (flag, completion, message) => {
-        assert.equal(scalarValueCompletion(flag), completion, message);
+        assert.deepEqual(scalarValueCompletion(flag), completion, message);
       },
       [
-        [
-          C.flag('string', description, {
-            completion: async () => ['custom-alfa']
-          }),
-          'custom'
-        ],
-        [C.flag('path', description), 'files'],
+        [C.flag('path', description), { type: 'files' }],
         [
           C.flag('choice', description, { choices: ['alfa', 'bravo'] }),
-          'choice'
+          { type: 'choice', choices: ['alfa', 'bravo'] }
         ],
-        [C.flag('string', description), 'none'],
-        [C.flag('number', description), 'none']
+        [C.flag('string', description), { type: 'none' }],
+        [C.flag('number', description), { type: 'none' }]
       ]
+    );
+  });
+
+  it('includes a flag when completing a custom value', () => {
+    const flag = C.flag('string', description, {
+      completion: async () => ['custom-alfa']
+    });
+
+    assert.deepEqual(
+      scalarValueCompletion(flag),
+      { type: 'custom', flag }
     );
   });
 });
