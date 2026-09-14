@@ -123,12 +123,8 @@ To use these completions, reload your profile or start a new shell.`.trim();
 
       fns.push(completion.entry, ...helpers);
 
-      for (let i = children.length - 1; i >= 0; i--) {
-        const child = children[i];
-
-        if (child) {
-          stack.push(child);
-        }
+      for (const child of children.toReversed()) {
+        stack.push(child);
       }
     }
 
