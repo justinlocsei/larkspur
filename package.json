@@ -50,7 +50,7 @@
     "vitest": "^4.1.11"
   },
   "allowScripts": {
-    "dprint@0.56.0": true,
-    "fsevents@2.3.3": true
+    "fsevents@2.3.3": true,
+    "dprint@0.56.1": true
   }
 }
