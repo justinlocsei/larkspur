@@ -11,7 +11,8 @@ export default defineConfig({
       ],
       include: ['src/**/*.ts'],
       provider: 'v8',
-      reporter: ['html', 'text']
+      reporter: ['html', 'text'],
+      skipFull: true
     },
     environment: 'node',
     projects: [
