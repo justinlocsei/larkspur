@@ -41,6 +41,18 @@ describe('buildCommandHandler', () => {
     assert.isDefined(command.flags?.string);
   });
 
+  it('rejects an invalid handler request', () => {
+    assert.throws(
+      () =>
+        buildCommandHandler(
+          description,
+          { string: { description, type: 'string' } },
+          undefined as unknown as typeof handler
+        ),
+      'Invalid'
+    );
+  });
+
   it('provides handlers with narrow type information for flags', () => {
     buildCommandHandler({
       description,
