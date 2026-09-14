@@ -5,6 +5,7 @@ import {
   compact,
   drain,
   isEmpty,
+  peek,
   sortEntries,
   transformValues
 } from './utils.ts';
@@ -60,6 +61,43 @@ describe('isEmpty', () => {
   it('reports whether an object lacks properties', () => {
     assert.equal(isEmpty({}), true);
     assert.equal(isEmpty({ a: 1 }), false);
+  });
+});
+
+describe('peek', () => {
+  it('yields the top item without removing it', () => {
+    const stack = ['a', 'b', 'c'];
+
+    for (const item of peek(stack)) {
+      assert.equal(item, 'c');
+      break;
+    }
+
+    assert.deepEqual(stack, ['a', 'b', 'c']);
+  });
+
+  it('yields nothing when the stack is empty', () => {
+    assert.deepEqual([...peek([])], []);
+  });
+
+  it('yields nothing when the top slot is empty', () => {
+    const stack = ['a'];
+    delete stack[0];
+
+    assert.deepEqual([...peek(stack)], []);
+  });
+
+  it('yields the top item until the stack is empty', () => {
+    const stack = ['a', 'b', 'c'];
+    const visited: string[] = [];
+
+    for (const item of peek(stack)) {
+      visited.push(item);
+      stack.pop();
+    }
+
+    assert.deepEqual(visited, ['c', 'b', 'a']);
+    assert.deepEqual(stack, []);
   });
 });
 

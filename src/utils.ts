@@ -24,6 +24,21 @@ export function isEmpty(object: Record<string, unknown>): boolean {
 }
 
 /**
+ * Yield the top item on a stack until it is empty
+ */
+export function* peek<T>(stack: T[]): Generator<T, void> {
+  while (stack.length > 0) {
+    const value = stack.at(-1);
+
+    if (value === undefined) {
+      return;
+    }
+
+    yield value;
+  }
+}
+
+/**
  * Get the typed entries of an object, sorted by key
  */
 export function sortEntries<T extends object>(
