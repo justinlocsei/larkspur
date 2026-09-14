@@ -80,6 +80,8 @@ describe('runCLI', () => {
 
     assert.notInclude(response.output, 'Commands:');
     assert.notInclude(response.output, '--help');
+    assert.notInclude(response.output, 'completions generate');
+    assert.notInclude(response.output, 'explore');
   });
 
   it('handles parsing errors', async () => {
