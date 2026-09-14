@@ -27,7 +27,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist/index.d.mts",
+    "dist/index.mjs"
   ],
   "engines": {
     "node": ">=22.0.0"
