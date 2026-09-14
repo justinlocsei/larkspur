@@ -75,9 +75,7 @@ function buildHandlerScopes(commands: CommandTree): HelpScope[] {
     for (
       const [name, command] of sortEntries(visibleCommands(commands)).reverse()
     ) {
-      if (command !== undefined) {
-        stack.push({ command, path: [...path, name] });
-      }
+      stack.push({ command, path: [...path, name] });
     }
   };
 
