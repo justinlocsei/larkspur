@@ -18,7 +18,6 @@ import type {
 } from '../provider.ts';
 import {
   CompletionProvider,
-  choicesForFlag,
   flagToSetter,
   getFlagForms,
   isScalarFlag,
@@ -348,17 +347,17 @@ Then add this line before loading compinit:
     levels: string[]
   ): string {
     const value = `:${flag.type}:`;
-    const completion = scalarValueCompletion(flag);
+    const comp = scalarValueCompletion(flag);
 
-    if (completion === 'custom' && isSimpleScalarFlag(flag)) {
-      return `${value}${this.fns('user_fn', [...levels, name])}`;
-    } else if (completion === 'choice') {
-      const choices = choicesForFlag(flag) || [];
-      return `${value}(${choices.map(v => quote(String(v))).join(' ')})`;
-    } else if (completion === 'files') {
-      return `${value}_files`;
-    } else {
-      return `${value}_nothing`;
+    switch (comp.type) {
+      case 'custom':
+        return `${value}${this.fns('user_fn', [...levels, name])}`;
+      case 'choice':
+        return `${value}(${comp.choices.map(v => quote(String(v))).join(' ')})`;
+      case 'files':
+        return `${value}_files`;
+      case 'none':
+        return `${value}_nothing`;
     }
   }
 

@@ -1,5 +1,6 @@
 // biome-ignore-all lint/suspicious/noTemplateCurlyInString: used for completion scripts
 
+import type { ScalarFlag } from '../../flags/types.ts';
 import { compact, drain, peek, requireMapKey } from '../../utils.ts';
 import { encodeFlagPath } from '../custom.ts';
 import { scalarValueCompletion } from '../data.ts';
@@ -18,7 +19,6 @@ import type {
 } from '../provider.ts';
 import {
   CompletionProvider,
-  choicesForFlag,
   flagToSetter,
   getFlagForms,
   isScalarFlag,
@@ -437,6 +437,26 @@ To use these completions, reload your profile or start a new shell.`.trim();
     completeOn: string,
     customCompletions: CustomCompletions
   ): string[] {
+    const completeWith = (flag: ScalarFlag, path: string | undefined) => {
+      const comp = scalarValueCompletion(flag);
+
+      switch (comp.type) {
+        case 'custom':
+          return path
+            ? this.completeWithFunction(path, completeOn)
+            : this.completeWords([], completeOn);
+        case 'choice':
+          return this.completeWords(
+            [...comp.choices].sort().map(String),
+            completeOn
+          );
+        case 'files':
+          return this.complete('files', [], completeOn);
+        case 'none':
+          return this.completeWords([], completeOn);
+      }
+    };
+
     return Object.entries(flags)
       .reduce((previous: string[], [name, flag]) => {
         if (!isScalarFlag(flag)) {
@@ -448,21 +468,10 @@ To use these completions, reload your profile or start a new shell.`.trim();
           .map(f => flagToSetter(f) + suffix)
           .join('|');
 
-        const flagPath = customCompletions[name];
-        const completeWith = scalarValueCompletion(flag);
-
-        let completion: string;
-
-        if (completeWith === 'custom' && flagPath) {
-          completion = this.completeWithFunction(flagPath, completeOn);
-        } else {
-          completion = completeWith === 'files'
-            ? this.complete('files', [], completeOn)
-            : this.completeWords(
-              [...(choicesForFlag(flag) || [])].sort().map(String),
-              completeOn
-            );
-        }
+        const completion = completeWith(
+          flag,
+          customCompletions[name]
+        );
 
         previous.push(`${forms}) ${completion} ;;`);
 
