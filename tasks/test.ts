@@ -16,6 +16,17 @@ const FILTERS = C.flags({
 });
 
 /**
+ * Run tests using vitest
+ */
+function runTests(args: string[], env: EnvironmentVariables = {}): void {
+  run(
+    'vitest',
+    ['run', '--reporter', 'verbose', ...args],
+    { env: { ...env, NODE_OPTIONS: '--throw-deprecation' } }
+  );
+}
+
+/**
  * Run a test suite
  */
 function runSuite(
@@ -23,18 +34,14 @@ function runSuite(
   { file, name }: ValuesOf<typeof FILTERS> = {},
   env: EnvironmentVariables = {}
 ): void {
-  run(
-    'vitest',
+  runTests(
     compact([
-      'run',
       '--project',
       suite,
-      '--reporter',
-      'verbose',
-      file,
-      ...(name ? ['-t', name] : [])
+      ...(name ? ['-t', name] : []),
+      file
     ]),
-    { env: { ...env, NODE_OPTIONS: '--throw-deprecation' } }
+    env
   );
 }
 
