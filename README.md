@@ -50,7 +50,7 @@
 ## Installation
 
 ```sh
-git clone https://github.com/justinlocsei/larkspur.git
+npm install larkspur
 ```
 
 ## Quick Start
