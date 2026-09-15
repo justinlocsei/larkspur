@@ -12,7 +12,13 @@ export default defineConfig({
       include: ['src/**/*.ts'],
       provider: 'v8',
       reporter: ['html', 'text'],
-      skipFull: true
+      skipFull: true,
+      thresholds: {
+        branches: 100,
+        functions: 100,
+        lines: 100,
+        statements: 100
+      }
     },
     environment: 'node',
     projects: [
