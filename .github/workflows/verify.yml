@@ -34,13 +34,14 @@ jobs:
       task: publish preflight
 
   test:
-    name: Test (v${{ matrix.node-version }})
+    name: Test / ${{ matrix.os }} / v${{ matrix.node-version }}
     needs: check
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         node-version: [22, 24]
+        os: [ubuntu-latest, windows-latest]
     steps:
       - name: Clone Larkspur
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -51,13 +52,17 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Install zsh
+        if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y ncurses-term zsh
 
       - name: Run unit tests
-        run: ./bin/larkspur test unit
+        shell: bash
+        run: node bin/larkspur test unit
 
       - name: Run integration tests
-        run: ./bin/larkspur test integration
+        shell: bash
+        run: node bin/larkspur test integration
 
       - name: Run property tests
-        run: ./bin/larkspur test property --runs 1000
+        shell: bash
+        run: node bin/larkspur test property --runs 1000

@@ -11,7 +11,9 @@ import { OperationalError } from './errors.ts';
 import C from './factory.ts';
 import { ensure, testLogging } from './tests.ts';
 
-const filename = import.meta.filename;
+import path from 'node:path';
+
+const filename = path.basename(import.meta.filename);
 
 async function testRun(
   entry: EntryPointProvider,
