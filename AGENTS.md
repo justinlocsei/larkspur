@@ -13,7 +13,7 @@ Before finishing work:
 ```sh
 ./bin/larkspur check
 ./bin/larkspur test all
-./bin/larkspur package verify   # when packaging or publish-related code changed
+./bin/larkspur publish preflight   # when packaging or publish-related code changed
 ```
 
 Filter tests with `--file` (Vitest file pattern) or `--name` (test name pattern). Coverage: `./bin/larkspur test coverage` (100% thresholds on `src/`; see `vitest.config.ts`).
