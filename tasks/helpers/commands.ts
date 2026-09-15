@@ -4,6 +4,7 @@ import { REPO_ROOT } from './paths.ts';
 
 import type { SpawnSyncOptions, SpawnSyncReturns } from 'node:child_process';
 import { spawnSync } from 'node:child_process';
+import path from 'node:path';
 
 /**
  * Options for running a command
@@ -21,7 +22,11 @@ export function captureOutput(
   args: string[],
   options: SpawnSyncOptions
 ): SpawnSyncReturns<string> {
-  const result = spawnSync(command, args, {
+  const spawn = process.platform === 'win32' && !path.extname(command)
+    ? `${command}.cmd`
+    : command;
+
+  const result = spawnSync(spawn, args, {
     ...options,
     cwd: options.cwd ?? REPO_ROOT,
     encoding: 'utf8',
