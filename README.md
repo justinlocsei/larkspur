@@ -148,9 +148,9 @@ Larkspur CLIs only support long flag names like `--reporter`, rather than short 
 
 ## Distribution
 
-Larkspur runs on Node 22 or later, in a Linux, Mac, or Windows environment.  It is optimized for internal CLIs, and the ideal distribution route is as a repository with a `package.json` that includes `larkspur` as a dependency.
+Larkspur runs on Node 22 or later, in a Linux, Mac, or Windows environment.  It is optimized for internal CLIs, and the ideal distribution route is via a repository with a `package.json` that includes `larkspur` as a dependency.
 
-In that project, your CLI's entry point will be a `.ts` or `.mjs` file that calls the `run` function exported from `larkspur`.  This entry point should be added to the package's `bin` field:
+In that repo, your CLI's entry point will be a `.ts` or `.mjs` file that calls the `run` function exported from `larkspur`.  This entry point should be added to your package's `bin` field:
 
 ```json
 {
@@ -162,9 +162,11 @@ In that project, your CLI's entry point will be a `.ts` or `.mjs` file that call
 
 This will allow your users to check out your repo and run `npm install`, which will create a `my-cli` executable in `node_modules/.bin`.  Your users can then invoke the CLI by running `npx my-cli` or add your project's `node_modules/.bin` to their `PATH` and run `my-cli` directly.
 
+As long as you are using Node 22.18 or above, you should be able to directly execute most `.ts` files without a build step. If your particular CLI needs to support older Node 22 versions or involves syntax that cannot be directly executed, you can run your CLI using `tsx` or similar tools.
+
 ### Extended Entry Points
 
-Larkspur does not constrain you to a single `.mjs` entry point.  You can define multiple entry points as `.ts` or `.mjs` files, each of which must call `run`, and expose them as separate executables via your `package.json`:
+Larkspur does not constrain you to a single CLI.  You can define multiple entry points as `.ts` or `.mjs` files, each of which must call `run`, and expose them as separate executables via your `package.json`:
 
 ```json
 {
@@ -176,8 +178,6 @@ Larkspur does not constrain you to a single `.mjs` entry point.  You can define 
 ```
 
 An `npm install` of this package would add a `my-app-cli` and a `my-core-cli` executable.
-
-As long as you are using Node 22.18 or above, you should be able to directly execute most `.ts` files without a build step. If your particular CLI needs to support older Node 22 versions or involves syntax that cannot be directly executed, you can run your CLI using `tsx` or similar tools.
 
 ## Documentation Conventions
 
