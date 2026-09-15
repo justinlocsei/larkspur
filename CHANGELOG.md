@@ -2,13 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.0.2] (2027-09-13)
+## [0.0.2] (2026-09-13)
 
 ### Features
 
 - Configure trusted publishing
 
-## [0.0.1] (2027-09-13)
+## [0.0.1] (2026-09-13)
 
 ### Features
 

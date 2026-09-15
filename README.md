@@ -13,10 +13,11 @@
 <!-- <toc> -->
 - [Installation](#installation)
 - [Quick Start](#quick-start)
-- [Usage](#usage)
+- [Distribution](#distribution)
+  - [Extended Entry Points](#extended-entry-points)
+- [Documentation Conventions](#documentation-conventions)
 - [Defining a CLI](#defining-a-cli)
   - [CLI Structure](#cli-structure)
-  - [File Properties](#file-properties)
   - [Modular Definitions](#modular-definitions)
 - [CLI Features](#cli-features)
   - [Help Messages](#help-messages)
@@ -50,16 +51,17 @@
 ## Installation
 
 ```sh
-git clone https://github.com/justinlocsei/larkspur.git
+npm install larkspur
 ```
 
 ## Quick Start
 
-Define the CLI in a `run-task` file:
+> [!NOTE]
+> While this example uses `.mjs` for simplicity, Larkspur really shines when used in a `.ts` file.  TypeScript gives you narrowly typed flag values in command handlers, with required flags, choice unions, repeatable values, and defaults all reflected in the types.  You also get compile-time validation when building command trees and power tools like `ValuesOf<Flags>`.  See [TypeScript](#typescript) for details.
+
+Define the CLI as an ESM module in a file named `my-cli.mjs`:
 
 ```js
-#!/usr/bin/env node
-
 import C, { run } from 'larkspur';
 
 await run({
@@ -121,40 +123,71 @@ Run the CLI:
 
 ```sh
 # Show root commands
-./run-task --help
+node my-cli.mjs --help
 
 # Show nested commands
-./run-task test --help
+node my-cli.mjs test --help
 
 # Show flags for a command
-./run-task build --help
+node my-cli.mjs build --help
 
 # Recursively show all commands in the CLI
-./run-task explore
+node my-cli.mjs explore
 
 # Build an image
-./run-task build --mode development
-./run-task build --mode=production --tag=alfa --tag=bravo --verbose
+node my-cli.mjs build --mode development
+node my-cli.mjs build --mode=production --tag=alfa --tag=bravo --verbose
 
 # Run tests
-./run-task test integration
-./run-task test integration --cores 8 --file test/integration/core.test.js --no-verbose
-./run-task test unit --reporter=dot test/unit/parsing.test.ts test/unit/validation.test.ts
+node my-cli.mjs test integration
+node my-cli.mjs test integration --cores 8 --file test/integration/core.test.js --no-verbose
+node my-cli.mjs test unit --reporter=dot --file test/unit/parsing.test.ts --file test/unit/validation.test.ts
 ```
 
 Larkspur CLIs only support long flag names like `--reporter`, rather than short flags like `-r`.  Values can be passed to flags using either `--reporter dot` or `--reporter=dot` syntax, and the two can be used interchangeably in the same command invocation.  While restrictive, the use of long flag names is a design choice that optimizes for discoverability and readability.
 
-## Usage
+## Distribution
 
-Larkspur has a minimal public API that makes defining simple tools easy and complex ones possible, both of which will be explored in the following sections.  All examples assume that the CLI code resides in a file named `my-cli` that has been marked as executable and starts with a shebang of `#!/usr/bin/env node`.  The shebang will be omitted from most example code for clarity, but must be present in any CLI tools that you write with Larkspur.
+Larkspur runs on Node 22 or later, in a Linux, Mac, or Windows environment.  It is optimized for internal CLIs, and the ideal distribution route is via a repository with a `package.json` that includes `larkspur` as a dependency.
+
+In that repo, your CLI's entry point will be a `.ts` or `.mjs` file that calls the `run` function exported from `larkspur`.  This entry point should be added to your package's `bin` field:
+
+```json
+{
+  "bin": {
+    "my-cli": "./src/my-cli.ts"
+  }
+}
+```
+
+This will allow your users to check out your repo and run `npm install`, which will create a `my-cli` executable in `node_modules/.bin`.  Your users can then invoke the CLI by running `npx my-cli` or adding your project's `node_modules/.bin` directory to their `PATH` and running `my-cli` directly.
+
+As long as you are using Node 22.18 or above, you should be able to directly execute most `.ts` files without a build step. If your particular CLI needs to support older Node 22 versions or involves syntax that cannot be directly executed, you can run your CLI using [tsx](https://www.npmjs.com/package/tsx) or similar tools.
+
+### Extended Entry Points
+
+Larkspur does not constrain you to a single CLI.  You can define multiple entry points as `.ts` or `.mjs` files, each of which must call `run`, and expose them as separate executables via your `package.json`:
+
+```json
+{
+  "bin": {
+    "my-app-cli": "./src/apps/cli.mjs",
+    "my-core-cli": "./src/cli.ts"
+  }
+}
+```
+
+An `npm install` of this package would add a `my-app-cli` and a `my-core-cli` executable.
+
+## Documentation Conventions
+
+The rest of this document provides code samples that illustrate how to use Larkspur to define your CLI.  All examples assume the use of a file named `my-cli.mjs` that is exposed as an executable named `my-cli`.
 
 ## Defining a CLI
 
-All Larkspur CLIs are exposed using the `run` function, which takes a tree of named command definitions.  A minimal CLI looks like the following:
+All Larkspur CLIs are defined using the `run` function, which takes a tree of named command definitions.  A minimal CLI looks like the following:
 
 ```js
-#!/usr/bin/env node
-
 import C, { run } from 'larkspur';
 
 await run({
@@ -162,7 +195,7 @@ await run({
 });
 ```
 
-If you were to store this code in a file named `my-cli`, you would invoke its one and only command by running `my-cli root-command`.  Keys in command definitions map exactly to command names, and support a limited set of characters that is enforced at runtime.
+To invoke the one and only command in this CLI, you would run `my-cli root-command`.  Keys in command definitions map exactly to command names, and support a limited set of characters that is enforced at runtime.
 
 ### CLI Structure
 
@@ -171,12 +204,6 @@ The tree of commands passed to `run` can define either command groups or command
 A command group contains one or more child commands, and groups can recursively contain other groups.  Each group acts as a namespace for its commands, so a group named `test` with a child command named `unit` would be invoked by running `my-cli test unit`.
 
 A command handler is a concrete function that runs an action and has access to the values of all flags associated with the command.  Handler functions are covered in detail later on, but the most basic handler is an empty function, which will allow the command to run and exit with a 0 status code.
-
-### File Properties
-
-A Larkspur CLI is intended to be directly executed, either via `./my-cli` for a local file or `my-cli` for a command that is available on a user's `PATH`.  For this to work, you must ensure that the file is marked as executable via a command like `chmod +x my-cli` and that it starts with a shebang that invokes the Node.js interpreter, such as `#!/usr/bin/env node`.
-
-Files without an extension can be troublesome to integrate with tooling, so one option is to define your CLI in a file with an extension that is covered by your build tooling and create a symlink to it without an extension.  Larkspur's own task runner does this, with a `bin/larkspur` file that is a symlink to `tasks/index.ts`.
 
 ### Modular Definitions
 
@@ -718,7 +745,7 @@ my-cli test --value test<TAB>
 
 ## TypeScript
 
-Larkspur is written in TypeScript and is at its best when consumed via a `.ts` file, which gives you access to constraints around command and flag definitions and narrowly typed flag values in handlers.  As long as you're using a recent version of Node.js 22 or later, a standard `node` shebang in your CLI will allow it to execute directly, giving you rich types from Larkspur without the need for a build process.
+Larkspur is written in TypeScript and is at its best when consumed via a `.ts` file, which gives you access to constraints around command and flag definitions and narrowly typed flag values in handlers.
 
 ### Public Types
 
