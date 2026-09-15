@@ -185,7 +185,7 @@ The rest of this document provides code samples that illustrate how to use Larks
 
 ## Defining a CLI
 
-All Larkspur CLIs are exposed using the `run` function, which takes a tree of named command definitions.  A minimal CLI looks like the following:
+All Larkspur CLIs are defined using the `run` function, which takes a tree of named command definitions.  A minimal CLI looks like the following:
 
 ```js
 import C, { run } from 'larkspur';
