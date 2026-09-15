@@ -34,7 +34,7 @@ jobs:
       task: publish preflight
 
   test:
-    name: Test / ${{ matrix.os }} / v${{ matrix.node-version }})
+    name: Test / ${{ matrix.os }} / v${{ matrix.node-version }}
     needs: check
     runs-on: ${{ matrix.os }}
     strategy:
