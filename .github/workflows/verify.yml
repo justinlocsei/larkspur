@@ -16,6 +16,14 @@ jobs:
       node-version: 24
       task: check
 
+  coverage:
+    name: Check Coverage
+    needs: test
+    uses: ./.github/workflows/run-task.yml
+    with:
+      node-version: 24
+      task: test coverage
+
   package:
     name: Verify Package
     needs: check
