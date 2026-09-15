@@ -1,4 +1,4 @@
-import { assert, describe, it } from 'vitest';
+import { afterEach, assert, describe, it, vi } from 'vitest';
 
 import type {
   EntryPointProvider,
@@ -35,6 +35,10 @@ async function testRun(
 }
 
 describe('run', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it('accepts static and dynamic entry points', async () => {
     let executed: boolean;
 
@@ -175,5 +179,34 @@ describe('run', () => {
 
     assert.isUndefined(error);
     assert.isEmpty(output.info);
+  });
+
+  it('uses default logging and error handling', async () => {
+    const { exitCode } = process;
+
+    let stdout = '';
+    let stderr = '';
+
+    vi.spyOn(console, 'error').mockImplementation(m => {
+      stderr += m;
+    });
+
+    vi.spyOn(console, 'info').mockImplementation(m => {
+      stdout += m;
+    });
+
+    await run(
+      { testing: C('@description', async () => {}) },
+      { name: 'test-cli' },
+      { args: [process.execPath, 'test-cli', 'missing-command'] }
+    );
+
+    assert.equal(process.exitCode, 1);
+
+    assert.include(stderr, 'missing-command');
+    assert.include(stdout, '--help');
+    assert.include(stdout, '@description');
+
+    process.exitCode = exitCode;
   });
 });
