@@ -13,10 +13,12 @@
 <!-- <toc> -->
 - [Installation](#installation)
 - [Quick Start](#quick-start)
+- [Supported Platforms](#supported-platforms)
+  - [Mac and Linux](#mac-and-linux)
+  - [Windows](#windows)
 - [Usage](#usage)
 - [Defining a CLI](#defining-a-cli)
   - [CLI Structure](#cli-structure)
-  - [File Properties](#file-properties)
   - [Modular Definitions](#modular-definitions)
 - [CLI Features](#cli-features)
   - [Help Messages](#help-messages)
@@ -144,9 +146,33 @@ Run the CLI:
 
 Larkspur CLIs only support long flag names like `--reporter`, rather than short flags like `-r`.  Values can be passed to flags using either `--reporter dot` or `--reporter=dot` syntax, and the two can be used interchangeably in the same command invocation.  While restrictive, the use of long flag names is a design choice that optimizes for discoverability and readability.
 
+## Supported Platforms
+
+Larkspur requires [Node.js](https://nodejs.org/) 22 or later and runs on Mac, Linux, and Windows.
+
+### Mac and Linux
+
+A Larkspur CLI is intended to be directly executed, either via `./my-cli` for a local file or `my-cli` for a command that is available on a user's `PATH`.  For this to work, you must ensure that the file is marked as executable via a command like `chmod +x my-cli` and that it starts with a shebang that invokes the Node.js interpreter, such as `#!/usr/bin/env node`.
+
+Files without an extension can be troublesome to integrate with tooling, so one option is to define your CLI in a file with an extension that is covered by your build tools and create a symlink to it without an extension.  Larkspur's own task runner does this, with a `bin/larkspur` file that is a symlink to `tasks/index.ts`.
+
+### Windows
+
+On Windows, register the CLI in your package's `bin` field:
+
+```json
+{
+  "bin": {
+    "my-cli": "./my-cli.ts"
+  }
+}
+```
+
+This will allow your users to run the CLI from npm scripts, via `npx my-cli`, or by executing `my-cli` directly if they add `node_modules/.bin` to their `PATH`.
+
 ## Usage
 
-Larkspur has a minimal public API that makes defining simple tools easy and complex ones possible, both of which will be explored in the following sections.  All examples assume that the CLI code resides in a file named `my-cli` that has been marked as executable and starts with a shebang of `#!/usr/bin/env node`.  The shebang will be omitted from most example code for clarity, but must be present in any CLI tools that you write with Larkspur.
+Larkspur has a minimal public API that makes defining simple tools easy and complex ones possible, both of which will be explored in the following sections.  All examples assume that the CLI code resides in a file named `my-cli`.  Example code omits the shebang for clarity, but you should include one if you are distributing a Larkspur CLI to Mac or Linux targets.
 
 ## Defining a CLI
 
@@ -171,12 +197,6 @@ The tree of commands passed to `run` can define either command groups or command
 A command group contains one or more child commands, and groups can recursively contain other groups.  Each group acts as a namespace for its commands, so a group named `test` with a child command named `unit` would be invoked by running `my-cli test unit`.
 
 A command handler is a concrete function that runs an action and has access to the values of all flags associated with the command.  Handler functions are covered in detail later on, but the most basic handler is an empty function, which will allow the command to run and exit with a 0 status code.
-
-### File Properties
-
-A Larkspur CLI is intended to be directly executed, either via `./my-cli` for a local file or `my-cli` for a command that is available on a user's `PATH`.  For this to work, you must ensure that the file is marked as executable via a command like `chmod +x my-cli` and that it starts with a shebang that invokes the Node.js interpreter, such as `#!/usr/bin/env node`.
-
-Files without an extension can be troublesome to integrate with tooling, so one option is to define your CLI in a file with an extension that is covered by your build tooling and create a symlink to it without an extension.  Larkspur's own task runner does this, with a `bin/larkspur` file that is a symlink to `tasks/index.ts`.
 
 ### Modular Definitions
 
