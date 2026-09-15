@@ -57,7 +57,7 @@ npm install larkspur
 
 ## Quick Start
 
-Define the CLI in a file named `my-cli`:
+Define the CLI as an ESM module in a file named `my-cli.mjs`:
 
 ```js
 #!/usr/bin/env node
