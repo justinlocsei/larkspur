@@ -162,7 +162,7 @@ In that repo, your CLI's entry point will be a `.ts` or `.mjs` file that calls t
 
 This will allow your users to check out your repo and run `npm install`, which will create a `my-cli` executable in `node_modules/.bin`.  Your users can then invoke the CLI by running `npx my-cli` or adding your project's `node_modules/.bin` directory to their `PATH` and running `my-cli` directly.
 
-As long as you are using Node 22.18 or above, you should be able to directly execute most `.ts` files without a build step. If your particular CLI needs to support older Node 22 versions or involves syntax that cannot be directly executed, you can run your CLI using `tsx` or similar tools.
+As long as you are using Node 22.18 or above, you should be able to directly execute most `.ts` files without a build step. If your particular CLI needs to support older Node 22 versions or involves syntax that cannot be directly executed, you can run your CLI using [tsx](https://www.npmjs.com/package/tsx) or similar tools.
 
 ### Extended Entry Points
 
