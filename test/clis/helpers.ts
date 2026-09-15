@@ -87,8 +87,18 @@ export const parseProvideOutput = parseCompletions;
 export function test(
   file: string,
   tests: CustomTests = {},
-  { valid = true }: { valid?: boolean } = {}
+  {
+    skipPlatforms = [],
+    valid = true
+  }: {
+    skipPlatforms?: NodeJS.Platform[];
+    valid?: boolean;
+  } = {}
 ): void {
+  if (skipPlatforms.includes(process.platform)) {
+    return;
+  }
+
   const run: RunCLI = (...args) => testCLI(file, ...args);
 
   const checkOutput: CheckOutput = (...args) => {
