@@ -123,25 +123,25 @@ Run the CLI:
 
 ```sh
 # Show root commands
-./my-cli --help
+node my-cli.mjs --help
 
 # Show nested commands
-./my-cli test --help
+node my-cli.mjs test --help
 
 # Show flags for a command
-./my-cli build --help
+node my-cli.mjs build --help
 
 # Recursively show all commands in the CLI
-./my-cli explore
+node my-cli.mjs explore
 
 # Build an image
-./my-cli build --mode development
-./my-cli build --mode=production --tag=alfa --tag=bravo --verbose
+node my-cli.mjs build --mode development
+node my-cli.mjs build --mode=production --tag=alfa --tag=bravo --verbose
 
 # Run tests
-./my-cli test integration
-./my-cli test integration --cores 8 --file test/integration/core.test.js --no-verbose
-./my-cli test unit --reporter=dot --file test/unit/parsing.test.ts --file test/unit/validation.test.ts
+node my-cli.mjs test integration
+node my-cli.mjs test integration --cores 8 --file test/integration/core.test.js --no-verbose
+node my-cli.mjs test unit --reporter=dot --file test/unit/parsing.test.ts --file test/unit/validation.test.ts
 ```
 
 Larkspur CLIs only support long flag names like `--reporter`, rather than short flags like `-r`.  Values can be passed to flags using either `--reporter dot` or `--reporter=dot` syntax, and the two can be used interchangeably in the same command invocation.  While restrictive, the use of long flag names is a design choice that optimizes for discoverability and readability.
