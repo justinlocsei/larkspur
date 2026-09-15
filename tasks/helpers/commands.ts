@@ -22,11 +22,8 @@ export function captureOutput(
   args: string[],
   options: SpawnSyncOptions
 ): SpawnSyncReturns<string> {
-  const spawn = process.platform === 'win32' && !path.extname(command)
-    ? `${command}.cmd`
-    : command;
-
-  const result = spawnSync(spawn, args, {
+  const result = spawnSync(command, args, {
+    shell: process.platform === 'win32' && !path.extname(command),
     ...options,
     cwd: options.cwd ?? REPO_ROOT,
     encoding: 'utf8',
