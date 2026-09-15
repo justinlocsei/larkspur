@@ -1,7 +1,13 @@
 // biome-ignore-all lint/suspicious/noTemplateCurlyInString: used for completion scripts
 
 import type { ScalarFlag } from '../../flags/types.ts';
-import { compact, drain, peek, requireMapKey } from '../../utils.ts';
+import {
+  compact,
+  drain,
+  peek,
+  requireMapKey,
+  requireProperty
+} from '../../utils.ts';
 import { encodeFlagPath } from '../custom.ts';
 import { scalarValueCompletion } from '../data.ts';
 import type { NameGenerator } from '../fns.ts';
@@ -437,14 +443,15 @@ To use these completions, reload your profile or start a new shell.`.trim();
     completeOn: string,
     customCompletions: CustomCompletions
   ): string[] {
-    const completeWith = (flag: ScalarFlag, path: string | undefined) => {
+    const completeWith = (flag: ScalarFlag, name: string) => {
       const comp = scalarValueCompletion(flag);
 
       switch (comp.type) {
         case 'custom':
-          return path
-            ? this.completeWithFunction(path, completeOn)
-            : this.completeWords([], completeOn);
+          return this.completeWithFunction(
+            requireProperty(customCompletions, name),
+            completeOn
+          );
         case 'choice':
           return this.completeWords(
             [...comp.choices].sort().map(String),
@@ -468,12 +475,7 @@ To use these completions, reload your profile or start a new shell.`.trim();
           .map(f => flagToSetter(f) + suffix)
           .join('|');
 
-        const completion = completeWith(
-          flag,
-          customCompletions[name]
-        );
-
-        previous.push(`${forms}) ${completion} ;;`);
+        previous.push(`${forms}) ${completeWith(flag, name)} ;;`);
 
         return previous;
       }, [])
