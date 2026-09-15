@@ -58,4 +58,4 @@ export type Subset<T extends object, K extends keyof T> = Pick<T, K>;
 /**
  * Define a member of a tagged union
  */
-export type Variant<T extends string, V> = { type: T } & V;
+export type Variant<T extends string, V = unknown> = { type: T } & V;

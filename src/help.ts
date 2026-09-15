@@ -2,6 +2,7 @@ import type { HelpScope } from './commands/types.ts';
 import type { PrintableCommand, PrintableFlag, Usage } from './help/usage.ts';
 import { buildUsage } from './help/usage.ts';
 import type { Context } from './types.ts';
+import { compact } from './utils.ts';
 
 /**
  * Build a CLI's help message
@@ -39,11 +40,12 @@ function formatHelp(usage: Usage, indentSize: number): string {
     );
   }
 
-  if (flags.length) {
-    lines.push('', formatFlags(flags, indent));
-  }
+  const flagList = formatFlags(flags, indent);
 
-  return lines.join('\n');
+  return [
+    ...lines,
+    ...compact([flagList && `\n${flagList}`])
+  ].join('\n');
 }
 
 /**
@@ -82,18 +84,14 @@ function formatFlags(flags: PrintableFlag[], indent: string): string {
     ].join('\n\n');
   };
 
-  if (!optional.length) {
-    return format(required, 'Required Flags');
-  }
-
   if (!required.length) {
     return format(optional, 'Flags');
   }
 
-  return [
-    format(required, 'Required Flags'),
-    format(optional, 'Optional Flags')
-  ].join('\n\n');
+  return compact([
+    required.length && format(required, 'Required Flags'),
+    required.length && format(optional, 'Optional Flags')
+  ]).join('\n\n');
 }
 
 /**

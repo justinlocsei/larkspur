@@ -58,4 +58,16 @@ describe('visibleCommands', () => {
       'nested filtering failed'
     );
   });
+
+  it('excludes undefined commands', () => {
+    const tree: CommandTree = {
+      alfa: C('alfa', handler),
+      bravo: undefined
+    };
+
+    const filtered = visibleCommands(tree);
+
+    assert.sameMembers(Object.keys(filtered), ['alfa']);
+    assert.notProperty(filtered, 'bravo');
+  });
 });

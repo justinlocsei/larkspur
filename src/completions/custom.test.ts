@@ -8,6 +8,7 @@ import {
   encodeFlagPath,
   provideCompletions
 } from './custom.ts';
+import type { CompletionSource } from './provider.ts';
 
 const description = 'description';
 
@@ -38,7 +39,7 @@ describe('encodeFlagPath', () => {
 });
 
 describe('provideCompletions', () => {
-  const withCompletion = (fn: UserCompletion) => ({
+  const withCompletion = (fn: UserCompletion): CompletionSource => ({
     commands: {
       command: C(
         description,
@@ -68,6 +69,30 @@ describe('provideCompletions', () => {
     const result = await provideCompletions(
       withCompletion(() => ['alfa', 'bravo']),
       { current: '', flag: 'command:valid' }
+    );
+
+    assert.equal(result, 'alfa\nbravo\n');
+  });
+
+  it('supports grouped completion functions', async () => {
+    const result = await provideCompletions(
+      {
+        commands: {
+          outer: C.group(description, {
+            inner: C(
+              description,
+              {
+                command: C.flag('string', description, {
+                  completion: () => ['alfa', 'bravo']
+                })
+              },
+              async () => {}
+            )
+          })
+        },
+        context: createTestContext()
+      },
+      { current: '', flag: 'outer:inner:command' }
     );
 
     assert.equal(result, 'alfa\nbravo\n');

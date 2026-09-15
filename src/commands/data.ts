@@ -1,4 +1,4 @@
-import type { Command, CommandTree } from './types.ts';
+import type { Command, CommandTree, DefinedCommandTree } from './types.ts';
 
 /**
  * Get a named command from a tree
@@ -16,11 +16,11 @@ export function getCommand(
 /**
  * Filter hidden handlers from a tree
  */
-export function visibleCommands(tree: CommandTree): CommandTree {
+export function visibleCommands(tree: CommandTree): DefinedCommandTree {
   return Object.fromEntries(
     Object.entries(tree).filter(([_, command]) =>
       command !== undefined
       && (command.type === 'group' || !command.hidden)
     )
-  );
+  ) as DefinedCommandTree;
 }

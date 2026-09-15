@@ -45,8 +45,14 @@ export function validateCommands(
 
   function push(commands: CommandTree, path: string[]): void {
     for (const [name, command] of sortEntries(commands).reverse()) {
+      const currentPath = [...path, name];
+
       if (command) {
-        stack.push({ command, name, path: [...path, name] });
+        stack.push({ command, name, path: currentPath });
+      } else {
+        throw new OperationalError(
+          `No definition for command: ${currentPath.join(' > ')}`
+        );
       }
     }
   }

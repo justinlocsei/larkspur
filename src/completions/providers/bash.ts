@@ -1,6 +1,13 @@
 // biome-ignore-all lint/suspicious/noTemplateCurlyInString: used for completion scripts
 
-import { compact, drain } from '../../utils.ts';
+import type { ScalarFlag } from '../../flags/types.ts';
+import {
+  compact,
+  drain,
+  peek,
+  requireMapKey,
+  requireProperty
+} from '../../utils.ts';
 import { encodeFlagPath } from '../custom.ts';
 import { scalarValueCompletion } from '../data.ts';
 import type { NameGenerator } from '../fns.ts';
@@ -18,7 +25,6 @@ import type {
 } from '../provider.ts';
 import {
   CompletionProvider,
-  choicesForFlag,
   flagToSetter,
   getFlagForms,
   isScalarFlag,
@@ -123,12 +129,8 @@ To use these completions, reload your profile or start a new shell.`.trim();
 
       fns.push(completion.entry, ...helpers);
 
-      for (let i = children.length - 1; i >= 0; i--) {
-        const child = children[i];
-
-        if (child) {
-          stack.push(child);
-        }
+      for (const child of children.toReversed()) {
+        stack.push(child);
       }
     }
 
@@ -281,13 +283,7 @@ To use these completions, reload your profile or start a new shell.`.trim();
     const built = new Map<string, Completions>();
     const stack: Frame[] = [{ commands, key: '0', levels: [], visited: false }];
 
-    while (stack.length > 0) {
-      const frame = stack[stack.length - 1];
-
-      if (!frame) {
-        break;
-      }
-
+    for (const frame of peek(stack)) {
       const { commands, key, levels } = frame;
 
       const entries = this.visibleCommandEntries(commands);
@@ -296,15 +292,9 @@ To use these completions, reload your profile or start a new shell.`.trim();
       if (!frame.visited) {
         frame.visited = true;
 
-        for (let i = entries.length - 1; i >= 0; i--) {
-          const entry = entries[i];
-
-          if (!entry) {
-            continue;
-          }
-
-          const [name, command] = entry;
-
+        for (
+          const [i, [name, command]] of [...entries.entries()].toReversed()
+        ) {
           if (command.type === 'group') {
             stack.push({
               commands: command.subcommands,
@@ -325,12 +315,8 @@ To use these completions, reload your profile or start a new shell.`.trim();
 
       for (const [name, command] of entries) {
         const completions = command.type === 'group'
-          ? built.get(`${key}.${commandNames.indexOf(name)}`)
+          ? requireMapKey(built, `${key}.${commandNames.indexOf(name)}`)
           : this.completeCommand(command, [...levels, name]);
-
-        if (!completions) {
-          continue;
-        }
 
         subcommandCases.push(this.subcommandCase(name, completions, command));
         subcommandCompletions.push(completions);
@@ -349,13 +335,7 @@ To use these completions, reload your profile or start a new shell.`.trim();
       );
     }
 
-    const completion = built.get('0');
-
-    if (!completion) {
-      throw new Error('Failed to build command completions');
-    }
-
-    return completion;
+    return requireMapKey(built, '0');
   }
 
   /**
@@ -463,6 +443,27 @@ To use these completions, reload your profile or start a new shell.`.trim();
     completeOn: string,
     customCompletions: CustomCompletions
   ): string[] {
+    const completeWith = (flag: ScalarFlag, name: string) => {
+      const comp = scalarValueCompletion(flag);
+
+      switch (comp.type) {
+        case 'custom':
+          return this.completeWithFunction(
+            requireProperty(customCompletions, name),
+            completeOn
+          );
+        case 'choice':
+          return this.completeWords(
+            [...comp.choices].sort().map(String),
+            completeOn
+          );
+        case 'files':
+          return this.complete('files', [], completeOn);
+        case 'none':
+          return this.completeWords([], completeOn);
+      }
+    };
+
     return Object.entries(flags)
       .reduce((previous: string[], [name, flag]) => {
         if (!isScalarFlag(flag)) {
@@ -474,23 +475,7 @@ To use these completions, reload your profile or start a new shell.`.trim();
           .map(f => flagToSetter(f) + suffix)
           .join('|');
 
-        const flagPath = customCompletions[name];
-        const completeWith = scalarValueCompletion(flag);
-
-        let completion: string;
-
-        if (completeWith === 'custom' && flagPath) {
-          completion = this.completeWithFunction(flagPath, completeOn);
-        } else {
-          completion = completeWith === 'files'
-            ? this.complete('files', [], completeOn)
-            : this.completeWords(
-              [...(choicesForFlag(flag) || [])].sort().map(String),
-              completeOn
-            );
-        }
-
-        previous.push(`${forms}) ${completion} ;;`);
+        previous.push(`${forms}) ${completeWith(flag, name)} ;;`);
 
         return previous;
       }, [])

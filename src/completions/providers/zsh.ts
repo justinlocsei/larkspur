@@ -2,7 +2,7 @@
 
 import type { Flag, Flags, ScalarFlag } from '../../flags/types.ts';
 import { formatDescription } from '../../text.ts';
-import { compact, sortEntries, transformValues } from '../../utils.ts';
+import { compact, peek, sortEntries, transformValues } from '../../utils.ts';
 import { encodeFlagPath } from '../custom.ts';
 import { scalarValueCompletion } from '../data.ts';
 import type { NameGenerator } from '../fns.ts';
@@ -18,7 +18,6 @@ import type {
 } from '../provider.ts';
 import {
   CompletionProvider,
-  choicesForFlag,
   flagToSetter,
   getFlagForms,
   isScalarFlag,
@@ -146,13 +145,7 @@ Then add this line before loading compinit:
     const functions: CompletionFunction[] = [];
     const stack: CommandFrame[] = [{ commands, levels: [], visited: false }];
 
-    while (stack.length > 0) {
-      const frame = stack[stack.length - 1];
-
-      if (!frame) {
-        break;
-      }
-
+    for (const frame of peek(stack)) {
       const { commands: tree, levels } = frame;
       const entries = this.visibleCommandEntries(tree);
 
@@ -266,8 +259,7 @@ Then add this line before loading compinit:
       '[[ "$words[CURRENT]" == --*=* ]]',
       patterns.scalar && `[[ "$words[CURRENT-1]" == ${patterns.scalar} ]]`,
       patterns.boolean
-        ? `{ [[ "$words[CURRENT]" == --* ]] && [[ "$words[CURRENT]" != ${patterns.boolean} ]]; }`
-        : '[[ "$words[CURRENT]" == --* ]]'
+      && `{ [[ "$words[CURRENT]" == --* ]] && [[ "$words[CURRENT]" != ${patterns.boolean} ]]; }`
     ]);
 
     return [
@@ -355,17 +347,17 @@ Then add this line before loading compinit:
     levels: string[]
   ): string {
     const value = `:${flag.type}:`;
-    const completion = scalarValueCompletion(flag);
+    const comp = scalarValueCompletion(flag);
 
-    if (completion === 'custom' && isSimpleScalarFlag(flag)) {
-      return `${value}${this.fns('user_fn', [...levels, name])}`;
-    } else if (completion === 'choice') {
-      const choices = choicesForFlag(flag) || [];
-      return `${value}(${choices.map(v => quote(String(v))).join(' ')})`;
-    } else if (completion === 'files') {
-      return `${value}_files`;
-    } else {
-      return `${value}_nothing`;
+    switch (comp.type) {
+      case 'custom':
+        return `${value}${this.fns('user_fn', [...levels, name])}`;
+      case 'choice':
+        return `${value}(${comp.choices.map(v => quote(String(v))).join(' ')})`;
+      case 'files':
+        return `${value}_files`;
+      case 'none':
+        return `${value}_nothing`;
     }
   }
 

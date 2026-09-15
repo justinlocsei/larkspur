@@ -2,7 +2,12 @@ import type { NormalizedArgs } from '../args.ts';
 import { expandPath } from '../paths.ts';
 import type { OneOrMany } from '../types/utils.ts';
 import { sortEntries } from '../utils.ts';
-import { flagToSetter, isFlagSetter, isScalarFlag } from './data.ts';
+import {
+  flagToSetter,
+  isFlagSetter,
+  isRepeatableFlag,
+  isRequiredFlag
+} from './data.ts';
 import { NEGATE_BOOLEAN } from './names.ts';
 import type { SharedFlags } from './shared.ts';
 import type {
@@ -97,20 +102,6 @@ export class ParsingError extends Error {
 }
 
 /**
- * Report whether a flag is repeatable
- */
-function flagIsRepeatable(flag: Flag): boolean {
-  return isScalarFlag(flag) ? flag.repeatable === true : false;
-}
-
-/**
- * Report whether a flag is required
- */
-function flagIsRequired(flag: Flag): boolean {
-  return isScalarFlag(flag) ? flag.required === true : false;
-}
-
-/**
  * Options for parsing flags
  */
 export type ParsingOptions = {
@@ -159,7 +150,7 @@ export function parseFlags(
       providedFlags.push(name);
     }
 
-    if (value === undefined && flagIsRequired(flag)) {
+    if (value === undefined && isRequiredFlag(flag)) {
       throw new ParsingError(`Missing value for required flag: ${name}`);
     } else if (value !== undefined) {
       previous[name] = { flag, value };
@@ -356,7 +347,7 @@ function forbidScalarDefault(
   flag: ScalarFlag
 ): void {
   if (
-    flagIsRepeatable(flag)
+    isRepeatableFlag(flag)
     && flag.default !== undefined
     && !isMultiValueDefault(flag.default)
   ) {
@@ -496,14 +487,16 @@ function parseScalarInputs<T extends ScalarFlag>(
     values = defaults.map(v => validate(v as Value, JSON.stringify(v)));
   }
 
-  if (values.length > 1 && !flagIsRepeatable(flag)) {
+  const isRepeatable = isRepeatableFlag(flag);
+
+  if (values.length > 1 && !isRepeatable) {
     forbidDuplicates(context);
   }
 
   let value: Value[] | Value | undefined;
 
-  if (flagIsRepeatable(flag)) {
-    if (flagIsRequired(flag) && !values.length) {
+  if (isRepeatable) {
+    if (isRequiredFlag(flag) && !values.length) {
       value = undefined;
     } else {
       value = values;

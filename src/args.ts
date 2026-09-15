@@ -20,22 +20,12 @@ export class NormalizedArgs {
   private normalize(args: string[]): string[] {
     return args.reduce((previous: string[], arg) => {
       const match = COMBINED_FLAG.exec(arg);
+      const [, name, rawValue = ''] = match ?? [];
 
-      let name: string | undefined;
-      let rawValue: string | undefined;
-      let value: string | undefined;
+      if (name !== undefined) {
+        const quoteMatch = QUOTED.exec(rawValue);
+        const value = quoteMatch?.[1] ?? rawValue;
 
-      if (match) {
-        name = match[1];
-        rawValue = match[2];
-
-        if (rawValue) {
-          const quoteMatch = QUOTED.exec(rawValue);
-          value = quoteMatch ? quoteMatch[1] : rawValue;
-        }
-      }
-
-      if (name && value) {
         previous.push(flagToSetter(name));
         previous.push(value);
       } else {

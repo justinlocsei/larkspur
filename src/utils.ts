@@ -24,6 +24,46 @@ export function isEmpty(object: Record<string, unknown>): boolean {
 }
 
 /**
+ * Yield the top item on a stack until it is empty
+ */
+export function* peek<T>(stack: T[]): Generator<T, void> {
+  while (stack.length > 0) {
+    const value = stack.at(-1);
+
+    if (value === undefined) {
+      return;
+    }
+
+    yield value;
+  }
+}
+
+/**
+ * Get the value of a property on an object or throw an error
+ */
+export function requireProperty<
+  T extends Record<PropertyKey, unknown>,
+  K extends keyof T
+>(object: T, key: K): NonNullable<T[K]> {
+  if (!(key in object)) {
+    throw new Error(`Missing property: ${String(key)}`);
+  }
+
+  return object[key] as NonNullable<T[K]>;
+}
+
+/**
+ * Get the value of a key in a map or throw an error
+ */
+export function requireMapKey<T>(map: Map<string, T>, key: string): T {
+  if (!map.has(key)) {
+    throw new Error(`Missing map key: ${key}`);
+  }
+
+  return map.get(key) as T;
+}
+
+/**
  * Get the typed entries of an object, sorted by key
  */
 export function sortEntries<T extends object>(

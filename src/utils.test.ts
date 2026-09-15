@@ -5,6 +5,9 @@ import {
   compact,
   drain,
   isEmpty,
+  peek,
+  requireMapKey,
+  requireProperty,
   sortEntries,
   transformValues
 } from './utils.ts';
@@ -60,6 +63,85 @@ describe('isEmpty', () => {
   it('reports whether an object lacks properties', () => {
     assert.equal(isEmpty({}), true);
     assert.equal(isEmpty({ a: 1 }), false);
+  });
+});
+
+describe('peek', () => {
+  it('yields the top item without removing it', () => {
+    const stack = ['a', 'b', 'c'];
+
+    for (const item of peek(stack)) {
+      assert.equal(item, 'c');
+      break;
+    }
+
+    assert.deepEqual(stack, ['a', 'b', 'c']);
+  });
+
+  it('yields nothing when the stack is empty', () => {
+    assert.deepEqual([...peek([])], []);
+  });
+
+  it('yields nothing when the top slot is empty', () => {
+    const stack = ['a'];
+    delete stack[0];
+
+    assert.deepEqual([...peek(stack)], []);
+  });
+
+  it('yields the top item until the stack is empty', () => {
+    const stack = ['a', 'b', 'c'];
+    const visited: string[] = [];
+
+    for (const item of peek(stack)) {
+      visited.push(item);
+      stack.pop();
+    }
+
+    assert.deepEqual(visited, ['c', 'b', 'a']);
+    assert.deepEqual(stack, []);
+  });
+});
+
+describe('requireMapKey', () => {
+  it('returns the value of a key in a map', () => {
+    const map = new Map<string, number>();
+
+    map.set('a', 1);
+    map.set('b', 2);
+
+    assert.equal(requireMapKey(map, 'a'), 1);
+    assert.equal(requireMapKey(map, 'b'), 2);
+  });
+
+  it('throws an error if the key is not in the map', () => {
+    const map = new Map<string, number>();
+
+    map.set('alfa', 1);
+
+    assert.throws(() => requireMapKey(map, 'bravo'), 'bravo');
+  });
+
+  it('returns an explicitly undefined key', () => {
+    const map = new Map<string, number | undefined>();
+    map.set('a', undefined);
+
+    assert.isUndefined(requireMapKey(map, 'a'));
+  });
+});
+
+describe('requireProperty', () => {
+  it('returns the value of a property on an object', () => {
+    const object = { alfa: 1, bravo: 'two' };
+
+    assert.equal(requireProperty(object, 'alfa'), 1);
+    assert.equal(requireProperty(object, 'bravo'), 'two');
+  });
+
+  it('throws an error if the property is not on the object', () => {
+    const object: Record<string, number> = { alfa: 1 };
+
+    assert.throws(() => requireProperty(object, 'bravo'), 'bravo');
   });
 });
 

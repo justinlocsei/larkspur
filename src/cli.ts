@@ -1,6 +1,6 @@
 import type { EntryPoint } from './commands/types.ts';
 import { createContext } from './context.ts';
-import { OperationalError } from './errors.ts';
+import { extractErrorDetails, OperationalError } from './errors.ts';
 import { runCLI } from './runner.ts';
 import type { UserConfig } from './types/config.ts';
 import type { Metadata } from './types.ts';
@@ -10,7 +10,7 @@ import path from 'node:path';
 /**
  * A logging function
  */
-type Logger = (message?: string) => void;
+type Logger = (message: string) => void;
 
 /**
  * A supported log level
@@ -56,8 +56,8 @@ export async function run(
   const {
     args = process.argv,
     logging: log = {
-      error: m => console.error(m || ''),
-      info: m => console.info(m || '')
+      error: m => console.error(m),
+      info: m => console.info(m)
     },
     onError = () => (process.exitCode = 1)
   } = internal;
@@ -86,13 +86,13 @@ export async function run(
 
       if (help) {
         log.info(help);
-        log.info();
+        log.info('');
       }
 
       log.error(
         error instanceof OperationalError
           ? error.message
-          : error.stack || error.message
+          : extractErrorDetails(error)
       );
 
       onError(error);

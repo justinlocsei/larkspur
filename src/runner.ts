@@ -104,9 +104,7 @@ export async function runCLI({
     case 'error':
       return failWith(
         new OperationalError(parsing.message),
-        parsing.help
-          ? buildHelp({ context, scope: parsing.help })
-          : undefined
+        parsing.help && buildHelp({ context, scope: parsing.help })
       );
 
     case 'help':

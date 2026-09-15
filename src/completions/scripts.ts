@@ -1,3 +1,5 @@
+import { peek } from '../utils.ts';
+
 /**
  * Lines in a generated completion script
  */
@@ -23,13 +25,7 @@ export function formatScript(
     { index: 0, level: 0, lines }
   ];
 
-  while (stack.length > 0) {
-    const frame = stack[stack.length - 1];
-
-    if (!frame) {
-      break;
-    }
-
+  for (const frame of peek(stack)) {
     const line = frame.lines[frame.index++];
 
     if (line === undefined) {

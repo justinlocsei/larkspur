@@ -108,12 +108,8 @@ export abstract class CompletionProvider {
   /**
    * List visible commands in a tree, sorted by name
    */
-  protected visibleCommandEntries(
-    tree: CommandTree
-  ): [string, Command][] {
-    return sortEntries(visibleCommands(tree)).filter(
-      (entry): entry is [string, Command] => entry[1] !== undefined
-    );
+  protected visibleCommandEntries(tree: CommandTree): [string, Command][] {
+    return sortEntries(visibleCommands(tree));
   }
 }
 
