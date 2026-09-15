@@ -37,7 +37,7 @@
     "build": "node bin/larkspur build",
     "check": "node bin/larkspur check",
     "format": "node bin/larkspur format code",
-    "prepublishOnly": "node bin/larkspur package verify",
+    "prepublishOnly": "node bin/larkspur publish preflight",
     "test": "node bin/larkspur test all"
   },
   "devDependencies": {
