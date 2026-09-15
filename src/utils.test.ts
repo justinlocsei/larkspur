@@ -7,6 +7,7 @@ import {
   isEmpty,
   peek,
   requireMapKey,
+  requireProperty,
   sortEntries,
   transformValues
 } from './utils.ts';
@@ -126,6 +127,21 @@ describe('requireMapKey', () => {
     map.set('a', undefined);
 
     assert.isUndefined(requireMapKey(map, 'a'));
+  });
+});
+
+describe('requireProperty', () => {
+  it('returns the value of a property on an object', () => {
+    const object = { alfa: 1, bravo: 'two' };
+
+    assert.equal(requireProperty(object, 'alfa'), 1);
+    assert.equal(requireProperty(object, 'bravo'), 'two');
+  });
+
+  it('throws an error if the property is not on the object', () => {
+    const object: Record<string, number> = { alfa: 1 };
+
+    assert.throws(() => requireProperty(object, 'bravo'), 'bravo');
   });
 });
 

@@ -39,6 +39,20 @@ export function* peek<T>(stack: T[]): Generator<T, void> {
 }
 
 /**
+ * Get the value of a property on an object or throw an error
+ */
+export function requireProperty<
+  T extends Record<PropertyKey, unknown>,
+  K extends keyof T
+>(object: T, key: K): NonNullable<T[K]> {
+  if (!(key in object)) {
+    throw new Error(`Missing property: ${String(key)}`);
+  }
+
+  return object[key] as NonNullable<T[K]>;
+}
+
+/**
  * Get the value of a key in a map or throw an error
  */
 export function requireMapKey<T>(map: Map<string, T>, key: string): T {
