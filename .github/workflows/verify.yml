@@ -50,7 +50,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Install zsh
-        run: sudo apt-get install -y ncurses-term zsh
+        run: sudo apt-get update && sudo apt-get install -y ncurses-term zsh
 
       - name: Run unit tests
         run: ./bin/larkspur test unit
