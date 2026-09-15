@@ -55,7 +55,7 @@ git clone https://github.com/justinlocsei/larkspur.git
 
 ## Quick Start
 
-Define the CLI in a `run-task` file:
+Define the CLI in a file named `my-cli`:
 
 ```js
 #!/usr/bin/env node
@@ -121,25 +121,25 @@ Run the CLI:
 
 ```sh
 # Show root commands
-./run-task --help
+./my-cli --help
 
 # Show nested commands
-./run-task test --help
+./my-cli test --help
 
 # Show flags for a command
-./run-task build --help
+./my-cli build --help
 
 # Recursively show all commands in the CLI
-./run-task explore
+./my-cli explore
 
 # Build an image
-./run-task build --mode development
-./run-task build --mode=production --tag=alfa --tag=bravo --verbose
+./my-cli build --mode development
+./my-cli build --mode=production --tag=alfa --tag=bravo --verbose
 
 # Run tests
-./run-task test integration
-./run-task test integration --cores 8 --file test/integration/core.test.js --no-verbose
-./run-task test unit --reporter=dot test/unit/parsing.test.ts test/unit/validation.test.ts
+./my-cli test integration
+./my-cli test integration --cores 8 --file test/integration/core.test.js --no-verbose
+./my-cli test unit --reporter=dot --file test/unit/parsing.test.ts --file test/unit/validation.test.ts
 ```
 
 Larkspur CLIs only support long flag names like `--reporter`, rather than short flags like `-r`.  Values can be passed to flags using either `--reporter dot` or `--reporter=dot` syntax, and the two can be used interchangeably in the same command invocation.  While restrictive, the use of long flag names is a design choice that optimizes for discoverability and readability.
