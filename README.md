@@ -148,7 +148,7 @@ Larkspur CLIs only support long flag names like `--reporter`, rather than short 
 
 ## Distribution
 
-Larkspur runs on [Node.js](https://nodejs.org/) 22 or later, in a Linux, Mac, or Windows environment.  It is optimized for internal CLIs, and the ideal distribution route is as a repository with a `package.json` that includes `larkspur` as a dependency.
+Larkspur runs on Node 22 or later, in a Linux, Mac, or Windows environment.  It is optimized for internal CLIs, and the ideal distribution route is as a repository with a `package.json` that includes `larkspur` as a dependency.
 
 In that project, your CLI's entry point will be a `.ts` or `.mjs` file that calls the `run` function exported from `larkspur`.  This entry point should be added to the package's `bin` field:
 
@@ -177,7 +177,7 @@ Larkspur does not constrain you to a single `.mjs` entry point.  You can define 
 
 An `npm install` of this package would add a `my-app-cli` and a `my-core-cli` executable.
 
-As long as you are using Node.js 22.18 or above, you should be able to directly execute most `.ts` files without a build step. If your particular CLI needs to support older Node.js 22 versions or involves syntax that cannot be directly executed, you can run your CLI using `tsx` or similar tools.
+As long as you are using Node 22.18 or above, you should be able to directly execute most `.ts` files without a build step. If your particular CLI needs to support older Node 22 versions or involves syntax that cannot be directly executed, you can run your CLI using `tsx` or similar tools.
 
 ## Documentation Conventions
 
