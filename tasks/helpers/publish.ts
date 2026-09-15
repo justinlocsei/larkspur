@@ -77,22 +77,52 @@ function testConsumer(consumerDir: string): void {
 }
 
 /**
+ * Show a section heading
+ */
+function showSection(
+  label: string,
+  { first = false, trailing = true } = {}
+): void {
+  console.log(`${first ? '' : '\n'}# ${label}${trailing ? '\n' : ''}`);
+}
+
+/**
+ * Install a package in the consumer project and verify it
+ */
+async function verifyPackage(parentDir: string, spec: string): Promise<void> {
+  const consumerDir = path.join(
+    parentDir,
+    path.basename(CONSUMER_PROJECT)
+  );
+
+  await fs.mkdir(consumerDir);
+  await fs.cp(CONSUMER_PROJECT, consumerDir, { recursive: true });
+
+  showSection('Install', { trailing: false });
+
+  showOutput(
+    'npm',
+    ['install', '--quiet', spec],
+    { cwd: consumerDir }
+  );
+
+  showSection('Verify');
+
+  await checkForSourceMaps(consumerDir);
+
+  testConsumer(consumerDir);
+}
+
+/**
  * Verify that Larkspur can be packed and consumed from a tarball
  */
-export function verifyPackage(): Promise<void> {
-  const showSection = (
-    label: string,
-    { first = false, trailing = true } = {}
-  ) => {
-    console.log(`${first ? '' : '\n'}${label}${trailing ? '\n' : ''}`);
-  };
-
+export function runPreflightChecks(): Promise<void> {
   return useTempDir(async packDir => {
-    showSection('# Build', { first: true });
+    showSection('Build', { first: true });
 
     build();
 
-    showSection('# Package');
+    showSection('Package');
 
     showOutput('npm', [
       'pack',
@@ -101,27 +131,25 @@ export function verifyPackage(): Promise<void> {
       '--quiet'
     ]);
 
-    const consumerDir = path.join(
-      packDir,
-      path.basename(CONSUMER_PROJECT)
-    );
+    await verifyPackage(packDir, await findPackedTarball(packDir));
 
-    await fs.mkdir(consumerDir);
-    await fs.cp(CONSUMER_PROJECT, consumerDir, { recursive: true });
+    console.log('Preflight checks passed');
+  });
+}
 
-    showSection('# Install', { trailing: false });
+/**
+ * Verify a published Larkspur version from npm
+ */
+export function verifyPublishedPackage(version: string): Promise<void> {
+  return useTempDir(async workDir => {
+    const spec = `larkspur@${version}`;
 
-    showOutput(
-      'npm',
-      ['install', '--quiet', await findPackedTarball(packDir)],
-      { cwd: consumerDir, env: process.env }
-    );
+    showSection('Registry', { first: true });
 
-    showSection('# Verify');
+    showOutput('npm', ['view', spec, 'version']);
 
-    await checkForSourceMaps(consumerDir);
-    testConsumer(consumerDir);
+    await verifyPackage(workDir, spec);
 
-    console.log('Package verified');
+    console.log(`Published ${spec} verified`);
   });
 }
