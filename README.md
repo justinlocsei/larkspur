@@ -181,7 +181,7 @@ An `npm install` of this package would add a `my-app-cli` and a `my-core-cli` ex
 
 ## Documentation Conventions
 
-The rest of this document provides code samples that illustrate how to use Larkspur to define your CLI.  All examples assume a CLI defined in a file named `my-cli.mjs` and exposed as an executable named `my-cli`.
+The rest of this document provides code samples that illustrate how to use Larkspur to define your CLI.  All examples assume the use of a file named `my-cli.mjs` that is exposed as an executable named `my-cli`.
 
 ## Defining a CLI
 
