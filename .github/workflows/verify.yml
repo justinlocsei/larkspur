@@ -22,6 +22,7 @@ jobs:
     uses: ./.github/workflows/run-task.yml
     with:
       node-version: 24
+      packages: ncurses-term zsh
       task: test coverage
 
   package:
