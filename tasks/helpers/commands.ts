@@ -35,10 +35,13 @@ export function captureOutput(
   }
 
   if (result.status !== 0) {
+    const output = result
+      .output
+      .filter(Boolean)
+      .join('\n');
+
     throw new OperationalError(
-      `${label} exited with code ${result.status ?? 'unknown'}${
-        result.stderr ? `\n${result.stderr}` : ''
-      }`
+      `${label} exited with code ${result.status ?? 'unknown'}\n${output}`
     );
   }
 

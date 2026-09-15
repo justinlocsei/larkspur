@@ -31,7 +31,7 @@ jobs:
     uses: ./.github/workflows/run-task.yml
     with:
       node-version: 24
-      task: package verify
+      task: publish preflight
 
   test:
     name: Test (v${{ matrix.node-version }})
