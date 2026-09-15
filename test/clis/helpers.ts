@@ -1,4 +1,4 @@
-import { assert, it } from 'vitest';
+import { assert, describe, it } from 'vitest';
 
 import { parseCompletions } from '../../src/completions/output.ts';
 import type { SupportedShell } from '../../src/completions/shells.ts';
@@ -95,58 +95,56 @@ export function test(
     valid?: boolean;
   } = {}
 ): void {
-  if (skipPlatforms.includes(process.platform)) {
-    return;
-  }
+  describe.skipIf(skipPlatforms.includes(process.platform))('the CLI', () => {
+    const run: RunCLI = (...args) => testCLI(file, ...args);
 
-  const run: RunCLI = (...args) => testCLI(file, ...args);
+    const checkOutput: CheckOutput = (...args) => {
+      const result = run(...args);
 
-  const checkOutput: CheckOutput = (...args) => {
-    const result = run(...args);
+      assert.equal(result.status, 0);
+      assert.isEmpty(result.stderr);
 
-    assert.equal(result.status, 0);
-    assert.isEmpty(result.stderr);
+      return result.stdout;
+    };
 
-    return result.stdout;
-  };
+    const testCompletions: TestCompletions = async (
+      shell,
+      cases,
+      { files = [] } = {}
+    ) => {
+      const script = run('completions', 'generate', '--shell', shell);
 
-  const testCompletions: TestCompletions = async (
-    shell,
-    cases,
-    { files = [] } = {}
-  ) => {
-    const script = run('completions', 'generate', '--shell', shell);
+      assert.equal(script.status, 0);
+      assert.isEmpty(script.stderr);
 
-    assert.equal(script.status, 0);
-    assert.isEmpty(script.stderr);
+      for (const [inputs, outputs] of cases) {
+        assert.sameMembers(
+          await runShellCompletions(shell, {
+            cliName: file,
+            files,
+            inputs,
+            script: script.stdout
+          }),
+          outputs,
+          `${shell} completions for: ${inputs.join(' ')}`
+        );
+      }
+    };
 
-    for (const [inputs, outputs] of cases) {
-      assert.sameMembers(
-        await runShellCompletions(shell, {
-          cliName: file,
-          files,
-          inputs,
-          script: script.stdout
-        }),
-        outputs,
-        `${shell} completions for: ${inputs.join(' ')}`
-      );
-    }
-  };
+    const actions: TestActions = { checkOutput, run, testCompletions };
 
-  const actions: TestActions = { checkOutput, run, testCompletions };
-
-  if (valid) {
-    it('shows help', () => {
-      assert.include(checkOutput('--help'), '--help');
-    });
-  }
-
-  Object.entries(tests).forEach(([name, test]) => {
-    if (test) {
-      it(name, async () => {
-        await test(actions);
+    if (valid) {
+      it('shows help', () => {
+        assert.include(checkOutput('--help'), '--help');
       });
     }
+
+    Object.entries(tests).forEach(([name, test]) => {
+      if (test) {
+        it(name, async () => {
+          await test(actions);
+        });
+      }
+    });
   });
 }
