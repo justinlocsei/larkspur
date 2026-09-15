@@ -1,16 +1,11 @@
 import { OperationalError } from '../../src/errors.ts';
 import { useTempDir } from '../../src/tests.ts';
 import { build } from '../build.ts';
-import { captureOutput, showOutput } from './commands.ts';
+import { showOutput } from './commands.ts';
+import { prepareConsumerDir, testConsumer } from './consumer-project.ts';
 
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-const CONSUMER_PROJECT = path.join(
-  path.dirname(fileURLToPath(import.meta.url)),
-  'consumer-test'
-);
 
 const SOURCEMAP_REFERENCE = /sourceMappingURL=/;
 
@@ -59,24 +54,6 @@ async function checkForSourceMaps(consumerDir: string): Promise<void> {
 }
 
 /**
- * Run the consumer test code against the local Larkspur package
- */
-function testConsumer(consumerDir: string): void {
-  const { stdout, stderr } = captureOutput(
-    process.execPath,
-    ['cli.mjs', 'check'],
-    { cwd: consumerDir }
-  );
-
-  if (!stdout.includes('success')) {
-    throw new OperationalError(
-      'The consumer produced incorrect output:',
-      [stdout, stderr].map(Boolean).join('\n')
-    );
-  }
-}
-
-/**
  * Show a section heading
  */
 function showSection(
@@ -90,13 +67,7 @@ function showSection(
  * Install a package in the consumer project and verify it
  */
 async function verifyPackage(parentDir: string, spec: string): Promise<void> {
-  const consumerDir = path.join(
-    parentDir,
-    path.basename(CONSUMER_PROJECT)
-  );
-
-  await fs.mkdir(consumerDir);
-  await fs.cp(CONSUMER_PROJECT, consumerDir, { recursive: true });
+  const consumerDir = prepareConsumerDir(parentDir);
 
   showSection('Install', { trailing: false });
 
@@ -133,7 +104,7 @@ export function runPreflightChecks(): Promise<void> {
 
     await verifyPackage(packDir, await findPackedTarball(packDir));
 
-    console.log('Preflight checks passed');
+    console.log('\nPreflight checks passed');
   });
 }
 

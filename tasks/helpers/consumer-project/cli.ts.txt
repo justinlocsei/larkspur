@@ -1,0 +1,54 @@
+import type { ValuesOf } from 'larkspur';
+import C, { run } from 'larkspur';
+
+const FLAGS = C.flags({
+  'default-number': C.flag('number', 'A default number', { default: 10 }),
+  'default-on': C.flag('boolean', 'An enabled boolean flag', { default: true }),
+  'repeatable-string': C.flag('string', 'A repeatable string', { repeatable: true }),
+  'required-choice': C.flag('choice', 'A choice', { choices: ['charlie', 'delta'], required: true })
+});
+
+function assert(condition: boolean, message: string): void {
+  if (!condition) {
+    throw new Error(message);
+  }
+}
+
+function verify(flags: ValuesOf<typeof FLAGS>): void {
+  assert(
+    Math.round(flags['default-number'] * 0.51) === 5,
+    'Incorrect number flag'
+  );
+
+  assert(
+    flags['default-on'],
+    'Incorrect boolean flag'
+  );
+
+  assert(
+    flags['repeatable-string']
+      .map(s => s.toUpperCase())
+      .join(',') === 'ALFA,BRAVO',
+    'Incorrect repeatable string'
+  );
+
+  assert(
+    flags['required-choice'] === 'charlie',
+    'Incorrect required choice'
+  );
+}
+
+await run(
+  {
+    verify: C.group('Verification commands', {
+      larkspur: C.group('Larkspur commands', {
+        package: C(
+          'Verify a Larkspur package',
+          FLAGS,
+          flags => verify(flags)
+        )
+      })
+    })
+  },
+  { name: 'cli' }
+);
