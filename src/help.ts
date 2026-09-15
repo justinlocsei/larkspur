@@ -40,11 +40,12 @@ function formatHelp(usage: Usage, indentSize: number): string {
     );
   }
 
-  if (flags.length) {
-    lines.push('', formatFlags(flags, indent));
-  }
+  const flagList = formatFlags(flags, indent);
 
-  return lines.join('\n');
+  return [
+    ...lines,
+    ...compact([flagList && `\n${flagList}`])
+  ].join('\n');
 }
 
 /**
