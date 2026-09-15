@@ -10,7 +10,7 @@ import path from 'node:path';
 /**
  * A logging function
  */
-type Logger = (message?: string) => void;
+type Logger = (message: string) => void;
 
 /**
  * A supported log level
@@ -56,8 +56,8 @@ export async function run(
   const {
     args = process.argv,
     logging: log = {
-      error: m => console.error(m || ''),
-      info: m => console.info(m || '')
+      error: m => console.error(m),
+      info: m => console.info(m)
     },
     onError = () => (process.exitCode = 1)
   } = internal;
@@ -86,7 +86,7 @@ export async function run(
 
       if (help) {
         log.info(help);
-        log.info();
+        log.info('');
       }
 
       log.error(
