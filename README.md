@@ -56,6 +56,9 @@ npm install larkspur
 
 ## Quick Start
 
+> [!NOTE]
+> While this example uses `.mjs` for simplicity, Larkspur really shines when used in a `.ts` file.  TypeScript gives you narrowly typed flag values in command handlers, with required flags, choice unions, repeatable values, and defaults all reflected in the types.  You also get compile-time validation when building command trees and power tools like `ValuesOf<Flags>`.  See [TypeScript](#typescript) for details.
+
 Define the CLI as an ESM module in a file named `my-cli.mjs`:
 
 ```js
@@ -152,12 +155,12 @@ In that project, your CLI's entry point will be a `.ts` or `.mjs` file that call
 ```json
 {
   "bin": {
-    "my-cli": "./src/my-cli.mjs"
+    "my-cli": "./src/my-cli.ts"
   }
 }
 ```
 
-This will allow your users to get the source code for your project and run `npm install`, which will create a `my-cli` executable in `node_modules/.bin`.  Your users can then invoke the CLI by running `npx my-cli` or add your project's `node_modules/.bin` to their `PATH` and run `my-cli` directly.
+This will allow your users to check out your repo and run `npm install`, which will create a `my-cli` executable in `node_modules/.bin`.  Your users can then invoke the CLI by running `npx my-cli` or add your project's `node_modules/.bin` to their `PATH` and run `my-cli` directly.
 
 ### Extended Entry Points
 
