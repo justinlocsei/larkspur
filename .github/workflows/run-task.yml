@@ -10,6 +10,10 @@ on:
         description: The Node.js version to use
         required: true
         type: number
+      packages:
+        default: ''
+        description: A list of packages to install
+        type: string
       task:
         description: The Larkspur task to run
         required: true
@@ -30,6 +34,10 @@ jobs:
         name: Install Node.js ${{ inputs.node-version }}
         with:
           node-version: ${{ inputs.node-version }}
+
+      - name: Install packages
+        if: inputs.packages != ''
+        run: sudo apt-get update && sudo apt-get install -y ${{ inputs.packages }}
 
       - name: Run larkspur ${{ inputs.task }}
         run: ./bin/larkspur ${{ inputs.task }} ${{ inputs.flags }}
