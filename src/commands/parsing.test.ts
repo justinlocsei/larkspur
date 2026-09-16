@@ -461,7 +461,7 @@ describe('parseCommand', () => {
     const command = C(description, {
       boolean: { default: false, description, type: 'boolean' },
       number: { default: 1, description, type: 'number' },
-      path: { default: '/', description, type: 'path' },
+      path: { default: 'tmp', description, type: 'path' },
       string: { default: '1', description, type: 'string' }
     }, async () => {});
 
@@ -485,7 +485,7 @@ describe('parseCommand', () => {
         [['--boolean'], ['boolean']],
         [['--no-boolean'], ['boolean']],
         [['--number', '2'], ['number']],
-        [['--path', '/tmp'], ['path']],
+        [['--path', 'file'], ['path']],
         [['--string', 'value'], ['string']],
         [
           [
@@ -493,7 +493,7 @@ describe('parseCommand', () => {
             '--number',
             '2',
             '--path',
-            '/tmp',
+            'dir',
             '--string',
             'value'
           ],
