@@ -757,6 +757,8 @@ my-cli test --value test<TAB>
 # => test-alfa test-bravo
 ```
 
+While this is an advanced feature, it provides excellent completions in cases where building the list of suggestions requires complex logic.  For example, [Larkspur's own test commands](https://github.com/justinlocsei/larkspur/blob/main/tasks/test.ts) use custom completions for a `--file` flag that search the source tree for test files and provide them as relative paths without extensions, matching the expectations of Vitest.
+
 ## TypeScript
 
 Larkspur is written in TypeScript and is at its best when consumed via a `.ts` file, which gives you access to constraints around command and flag definitions and narrowly typed flag values in handlers.
