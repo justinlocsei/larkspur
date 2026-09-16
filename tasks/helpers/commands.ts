@@ -79,7 +79,7 @@ export function showOutput(
 /**
  * Run a command from node_modules via npm exec
  */
-export function run(
+export function npx(
   npmBin: string,
   args: string[] = [],
   options: Subset<CommandOptions, 'env'> = {}

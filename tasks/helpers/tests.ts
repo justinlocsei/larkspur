@@ -2,7 +2,7 @@ import C from '../../src/factory.ts';
 import type { UserCompletion } from '../../src/flags/types.ts';
 import type { EnvironmentVariables } from '../../src/types.ts';
 import { compact } from '../../src/utils.ts';
-import { run } from './commands.ts';
+import { npx } from './commands.ts';
 import { REPO_ROOT } from './paths.ts';
 
 import { globSync } from 'node:fs';
@@ -69,7 +69,7 @@ export function defineFilters(files: FileLocator) {
  * Run tests using Vitest
  */
 export function runTests(args: string[], env: EnvironmentVariables = {}): void {
-  run(
+  npx(
     'vitest',
     ['run', '--reporter', 'verbose', ...args],
     { env: { ...env, NODE_OPTIONS: '--throw-deprecation' } }
