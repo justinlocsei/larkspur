@@ -1,6 +1,7 @@
 // biome-ignore-all lint/suspicious/noTemplateCurlyInString: used for completion scripts
 
 import type { Flag, Flags, ScalarFlag } from '../../flags/types.ts';
+import { quote } from '../../shells.ts';
 import { formatDescription } from '../../text.ts';
 import { compact, peek, sortEntries, transformValues } from '../../utils.ts';
 import { encodeFlagPath } from '../custom.ts';
@@ -24,7 +25,6 @@ import {
   isSimpleScalarFlag,
   useSharedFlags
 } from '../provider.ts';
-import { quote } from '../scripts.ts';
 
 /**
  * A stack frame used when building command completions

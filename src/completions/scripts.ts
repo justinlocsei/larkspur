@@ -6,13 +6,6 @@ import { peek } from '../utils.ts';
 export type ScriptLines = Array<string | ScriptLines>;
 
 /**
- * Quote a string for safe use in a shell script
- */
-export function quote(value: string): string {
-  return `'${value.replace(/'/g, `'\\''`)}'`;
-}
-
-/**
  * Format a script's lines as indented text
  */
 export function formatScript(

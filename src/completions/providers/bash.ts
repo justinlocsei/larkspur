@@ -1,6 +1,7 @@
 // biome-ignore-all lint/suspicious/noTemplateCurlyInString: used for completion scripts
 
 import type { ScalarFlag } from '../../flags/types.ts';
+import { quote } from '../../shells.ts';
 import {
   compact,
   drain,
@@ -31,7 +32,6 @@ import {
   isSimpleScalarFlag,
   useSharedFlags
 } from '../provider.ts';
-import { quote } from '../scripts.ts';
 
 /**
  * Generated completions
