@@ -15,12 +15,13 @@ permissions:
 
 jobs:
   verify:
-    name: Verify (v${{ matrix.node-version }})
-    runs-on: ubuntu-latest
+    name: Verify / ${{ matrix.os }} / v${{ matrix.node-version }}
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         node-version: [22, 24]
+        os: [ubuntu-latest, windows-latest]
     steps:
       - name: Clone Larkspur
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -31,4 +32,5 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Verify larkspur@${{ inputs.version }}
-        run: ./bin/larkspur publish verify --version ${{ inputs.version }}
+        shell: bash
+        run: node bin/larkspur publish verify --version ${{ inputs.version }}
