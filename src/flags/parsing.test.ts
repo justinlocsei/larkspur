@@ -3,7 +3,6 @@ import { afterEach, assert, beforeEach, describe, it } from 'vitest';
 import { NormalizedArgs } from '../args.ts';
 import { resolveConfig } from '../config.ts';
 import C from '../factory.ts';
-import { expandPath } from '../paths.ts';
 import { checkConversion, ensure, inspect } from '../tests.ts';
 import type { DistributiveOmit } from '../types/utils.ts';
 import { useFlag, useFlags } from './definition.ts';
@@ -68,14 +67,11 @@ describe('parseFlags', () => {
   const rootDir = path.parse(process.cwd()).root;
   let savedCwd: string;
 
-  /** Absolute path as a user would type on this platform */
+  /**
+   * Produce a platform-appropriate absolute path
+   */
   function abs(...segments: string[]): string {
     return path.join(rootDir, ...segments);
-  }
-
-  /** Parsed path flag value under the shared root cwd */
-  function resolved(...segments: string[]): string {
-    return path.resolve(expandPath(...segments));
   }
 
   beforeEach(() => {
@@ -118,8 +114,8 @@ describe('parseFlags', () => {
         [['number', ['--test', '1.5']], 1.5],
         [['number', ['--test', '1e3']], 1000],
         [['number', ['--test', '2']], 2],
-        [['path', ['--test', 'alfa']], resolved('alfa')],
-        [['path', ['--test', abs('bravo')]], resolved('bravo')],
+        [['path', ['--test', 'alfa']], abs('alfa')],
+        [['path', ['--test', abs('bravo')]], abs('bravo')],
         [['string', ['--test', '1']], '1'],
         [['string', ['--test', '2']], '2']
       ]
@@ -185,15 +181,15 @@ describe('parseFlags', () => {
           ['number', ['--test', '2', '--test', '3']],
           [2, 3]
         ],
-        [['path', ['--test=alfa']], [resolved('alfa')]],
-        [['path', ['--test', 'alfa']], [resolved('alfa')]],
+        [['path', ['--test=alfa']], [abs('alfa')]],
+        [['path', ['--test', 'alfa']], [abs('alfa')]],
         [
           ['path', ['--test=alfa', '--test=bravo']],
-          [resolved('alfa'), resolved('bravo')]
+          [abs('alfa'), abs('bravo')]
         ],
         [
           ['path', ['--test', 'alfa', '--test', 'bravo']],
-          [resolved('alfa'), resolved('bravo')]
+          [abs('alfa'), abs('bravo')]
         ],
         [['string', ['--test=1']], ['1']],
         [['string', ['--test', '1']], ['1']],
@@ -304,10 +300,10 @@ describe('parseFlags', () => {
         [['number', '--test=1'], 1],
         [['number', '--test=2'], 2],
         [['number', '--test="3"'], 3],
-        [['path', '--test=alfa'], resolved('alfa')],
-        [['path', '--test=bravo'], resolved('bravo')],
-        [['path', '--test="alfa"'], resolved('alfa')],
-        [['path', '--test="alfa bravo"'], resolved('alfa bravo')],
+        [['path', '--test=alfa'], abs('alfa')],
+        [['path', '--test=bravo'], abs('bravo')],
+        [['path', '--test="alfa"'], abs('alfa')],
+        [['path', '--test="alfa bravo"'], abs('alfa bravo')],
         [['string', '--test=1'], '1'],
         [['string', '--test=2'], '2'],
         [['string', '--test="3"'], '3'],
@@ -337,8 +333,10 @@ describe('parseFlags', () => {
         [['number', 0], 0],
         [['number', 1], 1],
         [['number', 2], 2],
-        [['path', '1'], '1'],
-        [['path', '2'], '2'],
+        [['path', '1'], abs('1')],
+        [['path', '2'], abs('2')],
+        [['path', abs('tmp')], abs('tmp')],
+        [['path', '~/bin'], path.join(os.homedir(), 'bin')],
         [['string', '1'], '1'],
         [['string', '2'], '2']
       ]
@@ -402,7 +400,7 @@ describe('parseFlags', () => {
       [
         [['boolean', true, ['--no-test']], false],
         [['number', 1, ['--test', '2']], 2],
-        [['path', 'alfa', ['--test', 'bravo']], resolved('bravo')],
+        [['path', 'alfa', ['--test', 'bravo']], abs('bravo')],
         [['string', '1', ['--test', '2']], '2']
       ]
     );
@@ -471,7 +469,7 @@ describe('parseFlags', () => {
       [
         [['boolean', true], true],
         [['number', 1], 1],
-        [['path', '1'], '1'],
+        [['path', '1'], abs('1')],
         [['string', '1'], '1']
       ]
     );
@@ -485,9 +483,9 @@ describe('parseFlags', () => {
         assert.strictEqual(flags.test.value, parsed, message);
       },
       [
-        [abs('tmp'), resolved('tmp')],
-        [abs('tmp', '..', 'var'), resolved('tmp', '..', 'var')],
-        ['tmp', resolved('tmp')],
+        [abs('tmp'), abs('tmp')],
+        [abs('tmp', '..', 'var'), abs('var')],
+        ['tmp', abs('tmp')],
         ['~/bin', path.join(os.homedir(), 'bin')]
       ]
     );
@@ -722,7 +720,7 @@ describe('parseFlags', () => {
       ]
     > = [
       ['number', v => v === 1, '1', '2'],
-      ['path', v => v === resolved('alfa'), abs('alfa'), abs('bravo')],
+      ['path', v => v === abs('alfa'), abs('alfa'), abs('bravo')],
       ['string', v => v === '1', '1', '2']
     ];
 
