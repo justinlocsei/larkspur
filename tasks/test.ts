@@ -1,13 +1,7 @@
 import C from '../src/factory.ts';
 import { setConfigVariables } from '../src/tests/properties/config.ts';
 import { build } from './build.ts';
-import { runSuite, runTests, SUITES } from './helpers/tests.ts';
-
-// Shared filter flags for all test suites
-const FILTERS = C.flags({
-  file: C.flag('string', 'Only run tests in files matching the given pattern'),
-  name: C.flag('string', 'Only run tests whose name matches the given pattern')
-});
+import { defineFilters, runSuite, runTests, SUITES } from './helpers/tests.ts';
 
 // Shared flags for pre-test builds
 const BUILD = C.flags({
@@ -51,7 +45,13 @@ export default C.group('Run tests', {
 
   integration: C(
     'Run integration tests',
-    { ...BUILD, ...FILTERS },
+    {
+      ...BUILD,
+      ...defineFilters({
+        extension: 'test.ts',
+        root: ['test', 'clis']
+      })
+    },
     flags => {
       if (flags.build) {
         build();
@@ -64,7 +64,10 @@ export default C.group('Run tests', {
   property: C(
     'Run property tests',
     {
-      ...FILTERS,
+      ...defineFilters({
+        extension: 'prop.test.ts',
+        root: ['src']
+      }),
       runs: C.flag('number', 'The number of test runs'),
       seed: C.flag('number', 'A fixed seed')
     },
@@ -81,7 +84,11 @@ export default C.group('Run tests', {
 
   unit: C(
     'Run unit tests',
-    FILTERS,
+    defineFilters({
+      exclude: 'prop.test.ts',
+      extension: 'test.ts',
+      root: ['src']
+    }),
     flags => runSuite('unit', flags)
   )
 });

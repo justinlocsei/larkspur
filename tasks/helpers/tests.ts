@@ -1,12 +1,72 @@
+import C from '../../src/factory.ts';
+import type { UserCompletion } from '../../src/flags/types.ts';
 import type { EnvironmentVariables } from '../../src/types.ts';
 import { compact } from '../../src/utils.ts';
 import { run } from '../helpers.ts';
+import { REPO_ROOT } from './paths.ts';
+
+import { globSync } from 'node:fs';
+import path from 'node:path';
 
 // The available test suites, in order of execution
 export const SUITES = ['unit', 'integration', 'properties'] as const;
 
 /**
- * Run tests using vitest
+ * A locator for test files
+ */
+type FileLocator = {
+  exclude?: string;
+  extension: string;
+  root: string[];
+};
+
+/**
+ * Create a completion provider for test files
+ */
+function suggestTestFiles(
+  { exclude, extension, root }: FileLocator
+): UserCompletion {
+  const rootDir = path.join(REPO_ROOT, ...root);
+  const glob = (ext: string) => path.join(rootDir, '**', `*.${ext}`);
+
+  const includeGlob = glob(extension);
+  const excludeGlob = exclude && glob(exclude);
+  const extSlice = extension.length * -1 - 1;
+
+  return () => {
+    let files = globSync(includeGlob);
+
+    if (excludeGlob) {
+      const skip = new Set(globSync(excludeGlob));
+      files = files.filter(f => !skip.has(f));
+    }
+
+    return files
+      .map(f => path.relative(rootDir, f))
+      .map(f => f.slice(0, extSlice))
+      .sort();
+  };
+}
+
+/**
+ * Define shared filtering flags
+ */
+export function defineFilters(files: FileLocator) {
+  return C.flags({
+    file: C.flag(
+      'string',
+      'Only run tests in files whose name matches the given pattern',
+      { completion: suggestTestFiles(files) }
+    ),
+    name: C.flag(
+      'string',
+      'Only run tests whose name matches the given pattern'
+    )
+  });
+}
+
+/**
+ * Run tests using Vitest
  */
 export function runTests(args: string[], env: EnvironmentVariables = {}): void {
   run(
