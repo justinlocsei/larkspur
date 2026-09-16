@@ -9,6 +9,7 @@ import { run } from './cli.ts';
 import type { EntryPoint } from './commands/types.ts';
 import { OperationalError } from './errors.ts';
 import C from './factory.ts';
+import { abs } from './tests/paths.ts';
 import { ensure, testLogging } from './tests.ts';
 
 import path from 'node:path';
@@ -112,7 +113,7 @@ describe('run', () => {
   it('infers the CLI name from the received arguments', async () => {
     const { output } = await testRun(
       { testing: C('description', async () => {}) },
-      ['/bin/cli-name.mjs', '--help']
+      [abs('bin', 'cli-name.mjs'), '--help']
     );
 
     assert.include(output.info, 'cli-name');
