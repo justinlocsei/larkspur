@@ -3,6 +3,9 @@ import {
   runPreflightChecks,
   verifyPublishedPackage
 } from './helpers/publish.ts';
+import { buildReleaseNotes } from './helpers/release.ts';
+
+const version = C.flag('string', 'A version number', { required: true });
 
 export default C.group('Manage package publishing', {
   preflight: C(
@@ -10,9 +13,15 @@ export default C.group('Manage package publishing', {
     runPreflightChecks
   ),
 
+  'release-notes': C(
+    'Build release notes for a version',
+    { version },
+    flags => buildReleaseNotes(flags.version)
+  ),
+
   verify: C(
     'Verify a published Larkspur version',
-    { version: C.flag('string', 'A published version', { required: true }) },
+    { version },
     flags => verifyPublishedPackage(flags.version)
   )
 });
