@@ -572,12 +572,24 @@ C(
 );
 ```
 
+On Mac and Linux:
+
 ```sh
-my-cli test --file relative/path.ts
+my-cli test --file ./relative/path.ts
 # => path.ts:true
 
-my-cli test --file /tmp/path.ts
+my-cli test --file /tmp/file.ts
+# => file.ts:true
+```
+
+On Windows:
+
+```powershell
+my-cli test --file .\relative\path.ts
 # => path.ts:true
+
+my-cli test --file C:\temp\file.ts
+# => file.ts:true
 ```
 
 ### Number Flags
