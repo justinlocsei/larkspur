@@ -454,7 +454,8 @@ describe('buildUsage', () => {
             foxtrot: C.flag('string', '@foxtrot', {
               default: ['alfa', 'bravo'],
               repeatable: true
-            })
+            }),
+            golf: C.flag('path', '@golf', { default: 'C:\\Windows' })
           },
           handler
         ),
@@ -500,6 +501,12 @@ describe('buildUsage', () => {
             details: ['Default: alfa, bravo'],
             required: false,
             setter: '--foxtrot <string> ...'
+          },
+          {
+            description: '@golf',
+            details: ['Default: C:\\Windows'],
+            required: false,
+            setter: '--golf <path>'
           },
           helpFlag
         ],
