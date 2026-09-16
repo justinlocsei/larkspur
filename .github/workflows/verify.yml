@@ -56,10 +56,13 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y ncurses-term zsh
 
       - name: Run unit tests
+        shell: bash
         run: node bin/larkspur test unit
 
       - name: Run integration tests
+        shell: bash
         run: node bin/larkspur test integration
 
       - name: Run property tests
+        shell: bash
         run: node bin/larkspur test property --runs 1000
