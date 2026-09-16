@@ -113,13 +113,13 @@ describe('buildFlag', () => {
 
   it('supports path flags', () => {
     const flag = buildFlag('path', description, {
-      default: ['/tmp'],
+      default: ['tmp'],
       repeatable: true,
       required: true
     });
 
     assert.deepEqual(flag, {
-      default: ['/tmp'],
+      default: ['tmp'],
       description,
       repeatable: true,
       required: true,
@@ -129,7 +129,7 @@ describe('buildFlag', () => {
     T.assert<T.Assignable<typeof flag, PathFlag>>(true);
 
     // @ts-expect-error Scalar defaults require an array when repeatable is true
-    buildFlag('path', description, { repeatable: true, default: '/tmp' });
+    buildFlag('path', description, { repeatable: true, default: 'tmp' });
 
     // @ts-expect-error Extra options are not allowed
     buildFlag('path', description, { other: 'value' });
