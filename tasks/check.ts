@@ -1,5 +1,5 @@
 import C from '../src/factory.ts';
-import { run } from './helpers.ts';
+import { run } from './helpers/commands.ts';
 
 const CHECKS = ['code', 'formatting', 'types'] as const;
 

@@ -1,7 +1,7 @@
 import C from '../src/factory.ts';
+import { run } from './helpers/commands.ts';
 import { refreshTableOfContents } from './helpers/docs.ts';
 import { localFile } from './helpers/paths.ts';
-import { run } from './helpers.ts';
 
 export default C.group('Manage formatting', {
   code: C('Format the codebase', () => {

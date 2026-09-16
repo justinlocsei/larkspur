@@ -1,5 +1,5 @@
 import C from '../src/factory.ts';
-import { run } from './helpers.ts';
+import { run } from './helpers/commands.ts';
 
 /**
  * Build the project

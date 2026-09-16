@@ -2,7 +2,7 @@ import C from '../../src/factory.ts';
 import type { UserCompletion } from '../../src/flags/types.ts';
 import type { EnvironmentVariables } from '../../src/types.ts';
 import { compact } from '../../src/utils.ts';
-import { run } from '../helpers.ts';
+import { run } from './commands.ts';
 import { REPO_ROOT } from './paths.ts';
 
 import { globSync } from 'node:fs';
