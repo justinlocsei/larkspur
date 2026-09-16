@@ -53,7 +53,11 @@ function runSuite(
 }
 
 export default C.group('Run tests', {
-  all: C('Run all tests', () => {
+  all: C('Run all tests', BUILD, flags => {
+    if (flags.build) {
+      build();
+    }
+
     for (const suite of SUITES) {
       runSuite(suite);
     }
