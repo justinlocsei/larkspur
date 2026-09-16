@@ -7,13 +7,6 @@ export const REPO_ROOT = path.resolve(
 );
 
 /**
- * Produce the path to a node_modules executable
- */
-export function localBin(name: string): string {
-  return path.join(REPO_ROOT, 'node_modules', '.bin', name);
-}
-
-/**
  * Produce the path to a file relative to the repository root
  */
 export function localFile(name: string): string {

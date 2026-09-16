@@ -28,10 +28,30 @@ describe('buildFlag', () => {
   });
 
   it('supports default values for basic flags', () => {
-    buildFlag('boolean', description, { default: true });
-    buildFlag('number', description, { default: 1 });
-    buildFlag('path', description, { default: '/tmp' });
-    buildFlag('string', description, { default: 'value' });
+    assert.equal(
+      buildFlag('boolean', description, { default: true }).default,
+      true
+    );
+
+    assert.equal(
+      buildFlag('number', description, { default: 1 }).default,
+      1
+    );
+
+    assert.equal(
+      buildFlag('path', description, { default: '/tmp' }).default,
+      '/tmp'
+    );
+
+    assert.equal(
+      buildFlag('path', description, { default: 'C:\\Windows' }).default,
+      'C:\\Windows'
+    );
+
+    assert.equal(
+      buildFlag('string', description, { default: 'value' }).default,
+      'value'
+    );
   });
 
   it('supports complex boolean flags', () => {
@@ -93,13 +113,13 @@ describe('buildFlag', () => {
 
   it('supports path flags', () => {
     const flag = buildFlag('path', description, {
-      default: ['/tmp'],
+      default: ['tmp'],
       repeatable: true,
       required: true
     });
 
     assert.deepEqual(flag, {
-      default: ['/tmp'],
+      default: ['tmp'],
       description,
       repeatable: true,
       required: true,
@@ -109,7 +129,7 @@ describe('buildFlag', () => {
     T.assert<T.Assignable<typeof flag, PathFlag>>(true);
 
     // @ts-expect-error Scalar defaults require an array when repeatable is true
-    buildFlag('path', description, { repeatable: true, default: '/tmp' });
+    buildFlag('path', description, { repeatable: true, default: 'tmp' });
 
     // @ts-expect-error Extra options are not allowed
     buildFlag('path', description, { other: 'value' });

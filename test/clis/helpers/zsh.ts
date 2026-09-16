@@ -2,7 +2,7 @@
 
 import { assert } from 'vitest';
 
-import { quote } from '../../../src/completions/scripts.ts';
+import { quote } from '../../../src/shells.ts';
 import type { CompletionsTester } from './completions.ts';
 
 import { spawnSync } from 'node:child_process';

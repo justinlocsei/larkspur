@@ -387,7 +387,8 @@ describe('buildHelp', () => {
             foxtrot: C.flag('string', '@foxtrot', {
               default: ['alfa', 'bravo'],
               repeatable: true
-            })
+            }),
+            golf: C.flag('path', '@golf', { default: 'C:\\Windows' })
           },
           handler
         ),
@@ -412,6 +413,8 @@ describe('buildHelp', () => {
         '                          (Default: /tmp)',
         '  --foxtrot <string> ...  @foxtrot',
         '                          (Default: alfa, bravo)',
+        '  --golf <path>           @golf',
+        '                          (Default: C:\\Windows)',
         '  --help                  Show help'
       ]
     );

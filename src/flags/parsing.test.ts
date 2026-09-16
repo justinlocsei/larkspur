@@ -1,8 +1,9 @@
-import { assert, describe, it } from 'vitest';
+import { afterEach, assert, beforeEach, describe, it } from 'vitest';
 
 import { NormalizedArgs } from '../args.ts';
 import { resolveConfig } from '../config.ts';
 import C from '../factory.ts';
+import { abs, filesystemRoot } from '../tests/paths.ts';
 import { checkConversion, ensure, inspect } from '../tests.ts';
 import type { DistributiveOmit } from '../types/utils.ts';
 import { useFlag, useFlags } from './definition.ts';
@@ -64,16 +65,16 @@ describe('getSharedFlagValue', () => {
 });
 
 describe('parseFlags', () => {
-  function useWorkingDir<T>(absPath: string, useDir: () => T): T {
-    const cwd = process.cwd();
+  let savedCwd: string;
 
-    try {
-      process.chdir(absPath);
-      return useDir();
-    } finally {
-      process.chdir(cwd);
-    }
-  }
+  beforeEach(() => {
+    savedCwd = process.cwd();
+    process.chdir(filesystemRoot());
+  });
+
+  afterEach(() => {
+    process.chdir(savedCwd);
+  });
 
   function checkFlag<T extends string>(
     name: T,
@@ -91,10 +92,7 @@ describe('parseFlags', () => {
   it('can apply values to all supported flag types', () => {
     checkConversion<[SimpleFlagType, string[]], unknown>(
       ([type, args], value) => {
-        const { flags } = useWorkingDir(
-          '/',
-          () => checkFlag('test', { type }, args)
-        );
+        const { flags } = checkFlag('test', { type }, args);
 
         assert.strictEqual(
           flags.test.value,
@@ -109,8 +107,8 @@ describe('parseFlags', () => {
         [['number', ['--test', '1.5']], 1.5],
         [['number', ['--test', '1e3']], 1000],
         [['number', ['--test', '2']], 2],
-        [['path', ['--test', 'alfa']], '/alfa'],
-        [['path', ['--test', '/bravo']], '/bravo'],
+        [['path', ['--test', 'alfa']], abs('alfa')],
+        [['path', ['--test', abs('bravo')]], abs('bravo')],
         [['string', ['--test', '1']], '1'],
         [['string', ['--test', '2']], '2']
       ]
@@ -157,10 +155,7 @@ describe('parseFlags', () => {
   it('supports setting multiple values for flags', () => {
     checkConversion<[ScalarType, string[]], ScalarValue[]>(
       ([type, args], value) => {
-        const { flags } = useWorkingDir(
-          '/',
-          () => checkFlag('test', { repeatable: true, type }, args)
-        );
+        const { flags } = checkFlag('test', { repeatable: true, type }, args);
 
         assert.deepStrictEqual(
           flags.test.value as ScalarValue[],
@@ -179,15 +174,15 @@ describe('parseFlags', () => {
           ['number', ['--test', '2', '--test', '3']],
           [2, 3]
         ],
-        [['path', ['--test=alfa']], ['/alfa']],
-        [['path', ['--test', 'alfa']], ['/alfa']],
+        [['path', ['--test=alfa']], [abs('alfa')]],
+        [['path', ['--test', 'alfa']], [abs('alfa')]],
         [
           ['path', ['--test=alfa', '--test=bravo']],
-          ['/alfa', '/bravo']
+          [abs('alfa'), abs('bravo')]
         ],
         [
           ['path', ['--test', 'alfa', '--test', 'bravo']],
-          ['/alfa', '/bravo']
+          [abs('alfa'), abs('bravo')]
         ],
         [['string', ['--test=1']], ['1']],
         [['string', ['--test', '1']], ['1']],
@@ -286,10 +281,7 @@ describe('parseFlags', () => {
   it('supports equal-sign bindings for flags', () => {
     checkConversion<[ScalarType, string], unknown>(
       ([type, arg], parsed) => {
-        const { flags } = useWorkingDir(
-          '/',
-          () => checkFlag('test', { type }, [arg])
-        );
+        const { flags } = checkFlag('test', { type }, [arg]);
 
         assert.strictEqual(
           flags.test.value,
@@ -301,10 +293,10 @@ describe('parseFlags', () => {
         [['number', '--test=1'], 1],
         [['number', '--test=2'], 2],
         [['number', '--test="3"'], 3],
-        [['path', '--test=alfa'], '/alfa'],
-        [['path', '--test=bravo'], '/bravo'],
-        [['path', '--test="alfa"'], '/alfa'],
-        [['path', '--test="alfa bravo"'], '/alfa bravo'],
+        [['path', '--test=alfa'], abs('alfa')],
+        [['path', '--test=bravo'], abs('bravo')],
+        [['path', '--test="alfa"'], abs('alfa')],
+        [['path', '--test="alfa bravo"'], abs('alfa bravo')],
         [['string', '--test=1'], '1'],
         [['string', '--test=2'], '2'],
         [['string', '--test="3"'], '3'],
@@ -334,8 +326,10 @@ describe('parseFlags', () => {
         [['number', 0], 0],
         [['number', 1], 1],
         [['number', 2], 2],
-        [['path', '1'], '1'],
-        [['path', '2'], '2'],
+        [['path', '1'], abs('1')],
+        [['path', '2'], abs('2')],
+        [['path', abs('tmp')], abs('tmp')],
+        [['path', '~/bin'], path.join(os.homedir(), 'bin')],
         [['string', '1'], '1'],
         [['string', '2'], '2']
       ]
@@ -384,9 +378,10 @@ describe('parseFlags', () => {
       SupportedValue
     >(
       ([type, value, args], parsed) => {
-        const { flags } = useWorkingDir(
-          '/',
-          () => checkFlag('test', { default: value, type } as SimpleFlag, args)
+        const { flags } = checkFlag(
+          'test',
+          { default: value, type } as SimpleFlag,
+          args
         );
 
         assert.strictEqual(
@@ -398,7 +393,7 @@ describe('parseFlags', () => {
       [
         [['boolean', true, ['--no-test']], false],
         [['number', 1, ['--test', '2']], 2],
-        [['path', 'alfa', ['--test', 'bravo']], '/bravo'],
+        [['path', 'alfa', ['--test', 'bravo']], abs('bravo')],
         [['string', '1', ['--test', '2']], '2']
       ]
     );
@@ -467,7 +462,7 @@ describe('parseFlags', () => {
       [
         [['boolean', true], true],
         [['number', 1], 1],
-        [['path', '1'], '1'],
+        [['path', '1'], abs('1')],
         [['string', '1'], '1']
       ]
     );
@@ -476,17 +471,14 @@ describe('parseFlags', () => {
   it('expands all paths', () => {
     checkConversion<string, string>(
       (arg, parsed, message) => {
-        const { flags } = useWorkingDir(
-          '/',
-          () => checkFlag('test', { type: 'path' }, ['--test', arg])
-        );
+        const { flags } = checkFlag('test', { type: 'path' }, ['--test', arg]);
 
         assert.strictEqual(flags.test.value, parsed, message);
       },
       [
-        ['/tmp', '/tmp'],
-        ['/tmp/../var', '/var'],
-        ['tmp', '/tmp'],
+        [abs('tmp'), abs('tmp')],
+        [abs('tmp', '..', 'var'), abs('var')],
+        ['tmp', abs('tmp')],
         ['~/bin', path.join(os.homedir(), 'bin')]
       ]
     );
@@ -721,19 +713,22 @@ describe('parseFlags', () => {
       ]
     > = [
       ['number', v => v === 1, '1', '2'],
-      ['path', v => v === '/alfa', '/alfa', '/bravo'],
+      ['path', v => v === abs('alfa'), abs('alfa'), abs('bravo')],
       ['string', v => v === '1', '1', '2']
     ];
 
     cases.forEach(([type, isValid, valid, invalid]) => {
+      const check = (args: string[]) =>
+        checkFlag('test', { isValid, type }, args);
+
       ensure.throws(
-        () => checkFlag('test', { isValid, type }, ['--test', invalid]),
+        () => check(['--test', invalid]),
         'Unsupported value',
         `An invalid ${type} value was allowed`
       );
 
       assert.isDefined(
-        checkFlag('test', { isValid, type }, ['--test', valid]).flags.test,
+        check(['--test', valid]).flags.test,
         `A valid ${type} value was rejected`
       );
     });
