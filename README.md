@@ -557,7 +557,9 @@ my-cli test --always alfa --optional bravo --required charlie
 
 ### Path Flags
 
-Path flags are specialized string flags that normalize user-provided paths as absolute paths.  When shell completions are enabled, they provide filesystem paths as suggestions.
+Path flags are specialized string flags that normalize both user-provided and default paths as absolute values.  When shell completions are enabled, they provide filesystem paths as suggestions.
+
+If a path flag uses a default value, you'll want to decide how to handle portability.  In general, if you are supporting multiple platforms, it's better to determine a default path in a handler function based on the current platform.  If you are only supporting a single environment, though, using default values of well-known paths like `/tmp` or `C:\Windows` is fully supported.
 
 ```js
 import C from 'larkspur';
