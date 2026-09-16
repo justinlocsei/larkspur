@@ -1,5 +1,6 @@
 import { OperationalError } from '../../src/errors.ts';
 import { quote } from '../../src/shells.ts';
+import type { Subset } from '../../src/types/utils.ts';
 import type { EnvironmentVariables } from '../../src/types.ts';
 import { REPO_ROOT } from './paths.ts';
 
@@ -73,4 +74,15 @@ export function showOutput(
     args,
     { ...options, stdio: 'inherit' }
   );
+}
+
+/**
+ * Run a command from node_modules via npm exec
+ */
+export function npx(
+  npmBin: string,
+  args: string[] = [],
+  options: Subset<CommandOptions, 'env'> = {}
+): void {
+  showOutput('npm', ['exec', '--', npmBin, ...args], options);
 }

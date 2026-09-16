@@ -1,12 +1,12 @@
 import C from '../src/factory.ts';
+import { npx } from './helpers/commands.ts';
 import { refreshTableOfContents } from './helpers/docs.ts';
 import { localFile } from './helpers/paths.ts';
-import { run } from './helpers.ts';
 
 export default C.group('Manage formatting', {
   code: C('Format the codebase', () => {
-    run('biome', ['check', '--write', '--linter-enabled=false', '.']);
-    run('dprint', ['fmt']);
+    npx('biome', ['check', '--write', '--linter-enabled=false', '.']);
+    npx('dprint', ['fmt']);
   }),
 
   docs: C('Format documentation', () => {

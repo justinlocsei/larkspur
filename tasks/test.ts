@@ -1,19 +1,7 @@
 import C from '../src/factory.ts';
-import type { ValuesOf } from '../src/index.ts';
 import { setConfigVariables } from '../src/tests/properties/config.ts';
-import type { EnvironmentVariables } from '../src/types.ts';
-import { compact } from '../src/utils.ts';
 import { build } from './build.ts';
-import { run } from './helpers.ts';
-
-// The available test suites, in order of execution
-const SUITES = ['unit', 'integration', 'properties'] as const;
-
-// Shared filter flags for all test suites
-const FILTERS = C.flags({
-  file: C.flag('string', 'Only run tests in files matching the given pattern'),
-  name: C.flag('string', 'Only run tests whose name matches the given pattern')
-});
+import { defineFilters, runSuite, runTests, SUITES } from './helpers/tests.ts';
 
 // Shared flags for pre-test builds
 const BUILD = C.flags({
@@ -21,36 +9,6 @@ const BUILD = C.flags({
     default: true
   })
 });
-
-/**
- * Run tests using vitest
- */
-function runTests(args: string[], env: EnvironmentVariables = {}): void {
-  run(
-    'vitest',
-    ['run', '--reporter', 'verbose', ...args],
-    { env: { ...env, NODE_OPTIONS: '--throw-deprecation' } }
-  );
-}
-
-/**
- * Run a test suite
- */
-function runSuite(
-  suite: typeof SUITES[number],
-  { file, name }: ValuesOf<typeof FILTERS> = {},
-  env: EnvironmentVariables = {}
-): void {
-  runTests(
-    compact([
-      '--project',
-      suite,
-      ...(name ? ['-t', name] : []),
-      file
-    ]),
-    env
-  );
-}
 
 export default C.group('Run tests', {
   all: C('Run all tests', BUILD, flags => {
@@ -87,7 +45,13 @@ export default C.group('Run tests', {
 
   integration: C(
     'Run integration tests',
-    { ...BUILD, ...FILTERS },
+    {
+      ...BUILD,
+      ...defineFilters({
+        extension: 'test.ts',
+        root: ['test', 'clis']
+      })
+    },
     flags => {
       if (flags.build) {
         build();
@@ -100,7 +64,10 @@ export default C.group('Run tests', {
   property: C(
     'Run property tests',
     {
-      ...FILTERS,
+      ...defineFilters({
+        extension: 'prop.test.ts',
+        root: ['src']
+      }),
       runs: C.flag('number', 'The number of test runs'),
       seed: C.flag('number', 'A fixed seed')
     },
@@ -117,7 +84,11 @@ export default C.group('Run tests', {
 
   unit: C(
     'Run unit tests',
-    FILTERS,
+    defineFilters({
+      exclude: 'prop.test.ts',
+      extension: 'test.ts',
+      root: ['src']
+    }),
     flags => runSuite('unit', flags)
   )
 });

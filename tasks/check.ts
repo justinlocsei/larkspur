@@ -1,5 +1,5 @@
 import C from '../src/factory.ts';
-import { run } from './helpers.ts';
+import { npx } from './helpers/commands.ts';
 
 const CHECKS = ['code', 'formatting', 'types'] as const;
 
@@ -14,16 +14,16 @@ export default C(
   },
   ({ only }) => {
     if (only.includes('code')) {
-      run('biome', ['lint', '.', '--error-on-warnings']);
+      npx('biome', ['lint', '.', '--error-on-warnings']);
     }
 
     if (only.includes('formatting')) {
-      run('biome', ['ci', '--linter-enabled=false', '.']);
-      run('dprint', ['check']);
+      npx('biome', ['ci', '--linter-enabled=false', '.']);
+      npx('dprint', ['check']);
     }
 
     if (only.includes('types')) {
-      run('tsc', ['--noEmit']);
+      npx('tsc', ['--noEmit']);
     }
   }
 );
