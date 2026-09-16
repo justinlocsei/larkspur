@@ -35,7 +35,7 @@ export function captureOutput(
 
   const result = process.platform === 'win32'
     ? spawnSync(
-      [command, ...args.map(quote)].join(' '),
+      [command, ...args].map(quote).join(' '),
       { ...spawnOptions, shell: 'bash' }
     )
     : spawnSync(command, args, spawnOptions);
