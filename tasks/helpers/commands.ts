@@ -1,10 +1,14 @@
 import { OperationalError } from '../../src/errors.ts';
+import { quote } from '../../src/shells.ts';
 import type { EnvironmentVariables } from '../../src/types.ts';
 import { REPO_ROOT } from './paths.ts';
 
-import type { SpawnSyncOptions, SpawnSyncReturns } from 'node:child_process';
+import type {
+  SpawnSyncOptions,
+  SpawnSyncOptionsWithStringEncoding,
+  SpawnSyncReturns
+} from 'node:child_process';
 import { spawnSync } from 'node:child_process';
-import path from 'node:path';
 
 /**
  * Options for running a command
@@ -22,13 +26,19 @@ export function captureOutput(
   args: string[],
   options: SpawnSyncOptions
 ): SpawnSyncReturns<string> {
-  const result = spawnSync(command, args, {
-    shell: process.platform === 'win32' && !path.extname(command),
+  const spawnOptions: SpawnSyncOptionsWithStringEncoding = {
     ...options,
     cwd: options.cwd ?? REPO_ROOT,
     encoding: 'utf8',
     env: { ...process.env, ...options.env }
-  });
+  };
+
+  const result = process.platform === 'win32'
+    ? spawnSync(
+      [command, ...args.map(quote)].join(' '),
+      { ...spawnOptions, shell: 'bash' }
+    )
+    : spawnSync(command, args, spawnOptions);
 
   const label = [command, ...args].join(' ');
 
