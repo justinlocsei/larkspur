@@ -484,7 +484,13 @@ function parseScalarInputs<T extends ScalarFlag>(
       defaults = [flag.default];
     }
 
-    values = defaults.map(v => validate(v as Value, JSON.stringify(v)));
+    values = defaults.map(v => {
+      const value = flag.type === 'path'
+        ? parse(String(v))
+        : v as Value;
+
+      return validate(value, JSON.stringify(v));
+    });
   }
 
   const isRepeatable = isRepeatableFlag(flag);
