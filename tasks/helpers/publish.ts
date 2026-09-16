@@ -121,6 +121,6 @@ export function verifyPublishedPackage(version: string): Promise<void> {
 
     await verifyPackage(workDir, spec);
 
-    console.log(`Published ${spec} verified`);
+    console.log(`${spec} verified`);
   });
 }
