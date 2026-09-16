@@ -3,6 +3,7 @@ import { afterEach, assert, beforeEach, describe, it } from 'vitest';
 import { NormalizedArgs } from '../args.ts';
 import { resolveConfig } from '../config.ts';
 import C from '../factory.ts';
+import { abs, filesystemRoot } from '../tests/paths.ts';
 import { checkConversion, ensure, inspect } from '../tests.ts';
 import type { DistributiveOmit } from '../types/utils.ts';
 import { useFlag, useFlags } from './definition.ts';
@@ -64,19 +65,11 @@ describe('getSharedFlagValue', () => {
 });
 
 describe('parseFlags', () => {
-  const rootDir = path.parse(process.cwd()).root;
   let savedCwd: string;
-
-  /**
-   * Produce a platform-appropriate absolute path
-   */
-  function abs(...segments: string[]): string {
-    return path.join(rootDir, ...segments);
-  }
 
   beforeEach(() => {
     savedCwd = process.cwd();
-    process.chdir(rootDir);
+    process.chdir(filesystemRoot());
   });
 
   afterEach(() => {
