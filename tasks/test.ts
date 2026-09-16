@@ -1,13 +1,7 @@
 import C from '../src/factory.ts';
-import type { ValuesOf } from '../src/index.ts';
 import { setConfigVariables } from '../src/tests/properties/config.ts';
-import type { EnvironmentVariables } from '../src/types.ts';
-import { compact } from '../src/utils.ts';
 import { build } from './build.ts';
-import { run } from './helpers.ts';
-
-// The available test suites, in order of execution
-const SUITES = ['unit', 'integration', 'properties'] as const;
+import { runSuite, runTests, SUITES } from './helpers/tests.ts';
 
 // Shared filter flags for all test suites
 const FILTERS = C.flags({
@@ -21,36 +15,6 @@ const BUILD = C.flags({
     default: true
   })
 });
-
-/**
- * Run tests using vitest
- */
-function runTests(args: string[], env: EnvironmentVariables = {}): void {
-  run(
-    'vitest',
-    ['run', '--reporter', 'verbose', ...args],
-    { env: { ...env, NODE_OPTIONS: '--throw-deprecation' } }
-  );
-}
-
-/**
- * Run a test suite
- */
-function runSuite(
-  suite: typeof SUITES[number],
-  { file, name }: ValuesOf<typeof FILTERS> = {},
-  env: EnvironmentVariables = {}
-): void {
-  runTests(
-    compact([
-      '--project',
-      suite,
-      ...(name ? ['-t', name] : []),
-      file
-    ]),
-    env
-  );
-}
 
 export default C.group('Run tests', {
   all: C('Run all tests', BUILD, flags => {
