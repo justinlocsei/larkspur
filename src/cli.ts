@@ -51,7 +51,9 @@ export async function run(
   options: UserOptions = {},
   internal: InternalOptions = {}
 ): Promise<void> {
-  const resolvedEntry = await resolveEntryPoint(entry);
+  const resolvedEntry = typeof entry === 'function'
+    ? await entry()
+    : entry;
 
   const {
     args = process.argv,
@@ -118,17 +120,6 @@ export async function run(
       log.info(response.message);
       break;
   }
-}
-
-/**
- * Resolve the requested entry point
- */
-async function resolveEntryPoint(
-  provider: EntryPointProvider
-): Promise<EntryPoint> {
-  return typeof provider === 'function'
-    ? provider()
-    : provider;
 }
 
 /**
