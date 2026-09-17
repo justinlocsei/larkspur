@@ -89,7 +89,7 @@ describe('runCLI', () => {
           file: scriptPath
         },
         createTestContext({
-          version: c => fs.readFile(c.getScriptFile(), 'utf8')
+          version: c => fs.readFile(c.getEntryFile(), 'utf8')
         })
       );
 

@@ -30,13 +30,13 @@ describe('resolveVersion', () => {
     assert.equal(await resolveVersion(async () => '2.0.0'), '2.0.0');
   });
 
-  it('exposes the absolute path to the script file', async () => {
+  it('exposes the absolute path to the entry file', async () => {
     await useTempDir(async dir => {
       const scriptPath = path.join(dir, 'cli.mjs');
       await fs.writeFile(scriptPath, '');
 
       const script = await resolveVersion(
-        c => c.getScriptFile(),
+        c => c.getEntryFile(),
         scriptPath
       );
 
@@ -44,7 +44,7 @@ describe('resolveVersion', () => {
     });
   });
 
-  it('follows symlinks when resolving the script file', async () => {
+  it('follows symlinks when resolving the entry file', async () => {
     await useTempDir(async dir => {
       const scriptPath = path.join(dir, 'cli.mjs');
       const linkPath = path.join(dir, 'linked.mjs');
@@ -53,7 +53,7 @@ describe('resolveVersion', () => {
       await linkTo(scriptPath, linkPath);
 
       const script = await resolveVersion(
-        c => c.getScriptFile(),
+        c => c.getEntryFile(),
         linkPath
       );
 
@@ -61,21 +61,7 @@ describe('resolveVersion', () => {
     });
   });
 
-  it('exposes the absolute path to the script directory', async () => {
-    await useTempDir(async dir => {
-      const scriptPath = path.join(dir, 'cli.mjs');
-      await fs.writeFile(scriptPath, '');
-
-      const scriptDir = await resolveVersion(
-        ({ getScriptDir }) => getScriptDir(),
-        scriptPath
-      );
-
-      assert.equal(scriptDir, dir);
-    });
-  });
-
-  it('does not resolve the script file unless the provider uses it', async () => {
+  it('does not resolve the entry file unless the provider uses it', async () => {
     await useTempDir(async dir => {
       const linkPath = path.join(dir, 'linked.mjs');
 
@@ -88,36 +74,36 @@ describe('resolveVersion', () => {
     });
   });
 
-  it('lazily resolves the script file', async () => {
+  it('lazily resolves the entry file', async () => {
     await useTempDir(async dir => {
       const scriptPath = path.join(dir, 'cli.mjs');
       const linkPath = path.join(dir, 'linked.mjs');
 
       await linkTo(scriptPath, linkPath);
 
-      const script = await resolveVersion(async ({ getScriptFile }) => {
+      const script = await resolveVersion(async ({ getEntryFile }) => {
         await fs.writeFile(scriptPath, '');
 
-        return getScriptFile();
+        return getEntryFile();
       }, linkPath);
 
       assert.equal(script, scriptPath);
     });
   });
 
-  it('throws when script resolution is performed without a file', async () => {
+  it('throws when entry resolution is performed without a file', async () => {
     await ensure.rejects(
-      () => resolveVersion(c => c.getScriptFile()),
-      'script file'
+      () => resolveVersion(c => c.getEntryFile()),
+      'No entry file was provided'
     );
   });
 
-  it('throws when script resolution fails', async () => {
+  it('throws when entry resolution fails', async () => {
     await useTempDir(async dir => {
       await ensure.rejects(
         () =>
           resolveVersion(
-            c => c.getScriptFile(),
+            c => c.getEntryFile(),
             path.join(dir, 'missing.mjs')
           ),
         'missing.mjs'

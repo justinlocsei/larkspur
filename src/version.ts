@@ -8,13 +8,11 @@ import path from 'node:path';
  * Build a version context from a possible file path
  */
 function createContext(file?: string): VersionContext {
-  const getScriptFile = () => resolveScriptFile(file);
-  const getScriptDir = () => path.dirname(getScriptFile());
+  const getEntryFile = () => resolveEntryFile(file);
 
   return {
-    getPackageVersion: () => readPackageVersion(getScriptDir()),
-    getScriptDir,
-    getScriptFile
+    getEntryFile,
+    getPackageVersion: () => readPackageVersion(path.dirname(getEntryFile()))
   };
 }
 
@@ -65,11 +63,11 @@ function readPackageVersion(startDir: string): string {
 }
 
 /**
- * Determine the absolute path to a script's source file
+ * Determine the absolute path to a CLI entry file
  */
-function resolveScriptFile(file?: string): string {
+function resolveEntryFile(file?: string): string {
   if (!file) {
-    throw new Error('No script file was provided');
+    throw new Error('No entry file was provided');
   }
 
   const absolute = path.resolve(file);
@@ -77,7 +75,7 @@ function resolveScriptFile(file?: string): string {
   try {
     return fs.realpathSync(absolute);
   } catch {
-    throw new Error(`Could not resolve script path: ${file}`);
+    throw new Error(`Could not resolve entry path: ${file}`);
   }
 }
 
