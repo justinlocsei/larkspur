@@ -59,7 +59,9 @@ export function buildUsage({
     context,
     display: scopeToDisplay(scope, context.meta.description),
     flags: {
-      ...(sharedFlags ? useSharedFlags(context.config) : {}),
+      ...(sharedFlags
+        ? useSharedFlags(context, scope.type === 'root' ? 'root' : 'global')
+        : {}),
       ...(scope.type === 'command' ? scope.command.flags : {})
     },
     scope,
