@@ -24,6 +24,7 @@ function createContext(file?: string): VersionContext {
 function resolvePackageManifest(directory: string): string | undefined {
   const candidate = path.join(directory, PACKAGE_JSON);
 
+  // codeql[js/path-injection] Entry path is canonicalized with realpath; only the fixed filename package.json is checked while walking parent directories
   if (!fs.existsSync(candidate)) {
     return undefined;
   }
@@ -50,6 +51,7 @@ function readPackageVersion(entryFile: string): string {
       let parsed: unknown;
 
       try {
+        // codeql[js/path-injection] Manifest path is canonicalized with realpath and basename validation; only the version field is read and returned as a string
         parsed = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
       } catch (error) {
         throw new Error(
