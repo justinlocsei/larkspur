@@ -1,4 +1,4 @@
-import type { Config } from '../types/config.ts';
+import type { Config, Context } from '../types.ts';
 import { useFlags } from './definition.ts';
 import type { Flags } from './types.ts';
 
@@ -11,16 +11,38 @@ const STATIC_FLAGS = useFlags({
   }
 });
 
+// Fixed flags available to the CLI root
+const ROOT_FLAGS = useFlags({
+  version: {
+    default: false,
+    description: 'Show version',
+    type: 'boolean'
+  }
+});
+
 /**
  * All shared flags
  */
-export type SharedFlags = typeof STATIC_FLAGS;
+export type SharedFlags = typeof STATIC_FLAGS & typeof ROOT_FLAGS;
 
 /**
- * Use shared flags based on the given configuration
+ * Produce shared flags available to every command
  */
-export function useSharedFlags(_config: Config): Flags {
+export function useSharedFlags(_: Config): Flags {
   return { ...STATIC_FLAGS };
+}
+
+/**
+ * Produce shared flags available only at the root
+ */
+export function useSharedRootFlags(context: Context): Flags {
+  const flags = useSharedFlags(context.config);
+
+  if (context.meta.version !== undefined) {
+    flags.version = ROOT_FLAGS.version;
+  }
+
+  return flags;
 }
 
 /**
