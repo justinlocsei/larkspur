@@ -91,22 +91,32 @@ describe('validateCommands', () => {
   });
 
   it('rejects flags that conflict with core flags', () => {
-    for (const flag of ['help']) {
-      ensure.throws(
-        () =>
-          validateCommands(
-            {
-              command: C(
-                description,
-                { [flag]: C.flag('string', description) },
-                handler
-              )
-            },
-            resolveConfig()
-          ),
-        'internal use'
-      );
-    }
+    ensure.throws(
+      () =>
+        validateCommands(
+          {
+            command: C(
+              description,
+              { help: C.flag('string', description) },
+              handler
+            )
+          },
+          resolveConfig()
+        ),
+      'internal use'
+    );
+  });
+
+  it('allows a version flag on commands', () => {
+    assert.doesNotThrow(() =>
+      validateCommands({
+        command: C(
+          description,
+          { version: C.flag('string', description) },
+          handler
+        )
+      }, config)
+    );
   });
 
   it('reports root command names without handlers', () => {
