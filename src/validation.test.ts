@@ -1,17 +1,16 @@
 import { assert, describe, it } from 'vitest';
 
 import type { CommandTree } from './commands/types.ts';
-import { resolveConfig } from './config.ts';
 import { OperationalError } from './errors.ts';
 import C from './factory.ts';
-import { checkConversion, ensure } from './tests.ts';
+import { checkConversion, createTestContext, ensure } from './tests.ts';
 import {
   isValidCommandName,
   isValidFlagName,
   validateCommands
 } from './validation.ts';
 
-const config = resolveConfig();
+const context = createTestContext();
 const description = 'description';
 const handler = async () => {};
 
@@ -76,7 +75,7 @@ describe('validateCommands', () => {
             handler
           )
         })
-      }, config)
+      }, context)
     );
   });
 
@@ -87,7 +86,7 @@ describe('validateCommands', () => {
       commands = { [`command-${i}`]: C.group(description, commands) };
     }
 
-    assert.doesNotThrow(() => validateCommands(commands, config));
+    assert.doesNotThrow(() => validateCommands(commands, context));
   });
 
   it('rejects flags that conflict with core flags', () => {
@@ -101,7 +100,7 @@ describe('validateCommands', () => {
               handler
             )
           },
-          resolveConfig()
+          context
         ),
       'internal use'
     );
@@ -115,13 +114,13 @@ describe('validateCommands', () => {
           { version: C.flag('string', description) },
           handler
         )
-      }, config)
+      }, context)
     );
   });
 
   it('reports root command names without handlers', () => {
     checkError(
-      () => validateCommands({ absent: undefined }, config),
+      () => validateCommands({ absent: undefined }, context),
       'No definition for command: absent'
     );
   });
@@ -131,7 +130,7 @@ describe('validateCommands', () => {
       () =>
         validateCommands({
           parent: C.group(description, { child: undefined })
-        }, config),
+        }, context),
       'No definition for command: parent > child'
     );
   });
@@ -141,7 +140,7 @@ describe('validateCommands', () => {
       () =>
         validateCommands({
           Wrong: C(description, handler)
-        }, config),
+        }, context),
       'Invalid command name: Wrong'
     );
   });
@@ -153,7 +152,7 @@ describe('validateCommands', () => {
           parent: C.group(description, {
             'bad child': C(description, handler)
           })
-        }, config),
+        }, context),
       'Invalid command name: parent > bad child'
     );
   });
@@ -169,7 +168,7 @@ describe('validateCommands', () => {
               handler
             )
           })
-        }, config),
+        }, context),
       'Invalid flag --BadFlag on command: parent > leaf'
     );
   });
@@ -183,7 +182,7 @@ describe('validateCommands', () => {
             { 'no-verbose': C.flag('boolean', description) },
             handler
           )
-        }, config),
+        }, context),
       e => {
         assert.instanceOf(e, OperationalError);
 

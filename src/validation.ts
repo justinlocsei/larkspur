@@ -4,7 +4,7 @@ import { flagToSetter } from './flags/data.ts';
 import { NEGATE_BOOLEAN } from './flags/names.ts';
 import { getReservedFlagNames } from './flags/shared.ts';
 import type { Flags } from './flags/types.ts';
-import type { Config } from './types/config.ts';
+import type { Context } from './types.ts';
 import { drain, sortEntries } from './utils.ts';
 
 export { NEGATE_BOOLEAN };
@@ -39,7 +39,7 @@ export function isValidFlagName(name: string): boolean {
  */
 export function validateCommands(
   tree: CommandTree,
-  config: Config
+  context: Context
 ): void {
   const stack: Array<{ command: Command; name: string; path: string[] }> = [];
 
@@ -68,7 +68,7 @@ export function validateCommands(
     if (command.type === 'group') {
       push(command.subcommands, path);
     } else if (command.flags) {
-      validateFlags(command.flags, scope, config);
+      validateFlags(command.flags, scope, context);
     }
   }
 }
@@ -90,9 +90,9 @@ function validateCommandName(name: string, scope: string): void {
 function validateFlags(
   flags: Flags,
   scope: string,
-  config: Config
+  context: Context
 ): void {
-  const reserved = getReservedFlagNames(config);
+  const reserved = getReservedFlagNames(context);
 
   for (const name of Object.keys(flags)) {
     const setter = flagToSetter(name);
