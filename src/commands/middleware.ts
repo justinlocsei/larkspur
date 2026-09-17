@@ -34,7 +34,7 @@ export type FlagValues = Record<string, unknown>;
 /**
  * A middleware command's handler
  */
-type Handler<
+export type MiddlewareHandler<
   F extends Flags = Flags,
   C extends FlagContext = 'wide'
 > = (
@@ -45,11 +45,51 @@ type Handler<
 /**
  * A middleware command
  */
-export type MiddlewareCommand<T extends Flags = Flags> = {
-  flags?: T;
-  handler: Handler<T>;
+export type MiddlewareCommand = {
+  flags?: Flags;
+  handler: MiddlewareHandler;
   id: string;
 };
+
+/**
+ * A middleware handler without flags
+ */
+type FlaglessHandler = (next: NextFn) => Promise<void>;
+
+/**
+ * Build a middleware command
+ */
+export function buildMiddleware(
+  id: string,
+  handler: FlaglessHandler
+): MiddlewareCommand;
+export function buildMiddleware<T extends Flags>(
+  id: string,
+  flags: T,
+  handler: MiddlewareHandler<T, 'narrow'>
+): MiddlewareCommand;
+export function buildMiddleware<T extends Flags>(
+  id: string,
+  flags?: T | FlaglessHandler,
+  handler?: MiddlewareHandler<T, 'narrow'>
+): MiddlewareCommand {
+  if (typeof flags === 'function') {
+    return {
+      handler: async next => flags(next),
+      id
+    };
+  }
+
+  if (typeof handler !== 'function') {
+    throw new Error('Invalid middleware request');
+  }
+
+  return {
+    flags,
+    handler: handler as MiddlewareHandler,
+    id
+  };
+}
 
 /**
  * Pick a subset of parsed flag values

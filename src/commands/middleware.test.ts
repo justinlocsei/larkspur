@@ -2,30 +2,82 @@ import { assert, describe, it } from 'vitest';
 
 import { OperationalError } from '../errors.ts';
 import C from '../factory.ts';
-import { createTestContext, description, handler } from '../tests.ts';
-import type { FlagValues, MiddlewareCommand } from './middleware.ts';
-import { applyMiddleware } from './middleware.ts';
+import { createTestContext, description, handler, T } from '../tests.ts';
+import type { FlagValues, MiddlewareHandler } from './middleware.ts';
+import { applyMiddleware, buildMiddleware } from './middleware.ts';
 import { parseCommand } from './parsing.ts';
 
 const context = createTestContext();
 
-function middleware(
-  id: string,
-  options: Omit<MiddlewareCommand, 'id'> = { handler: async next => next() }
-): MiddlewareCommand {
-  return { ...options, id };
-}
+describe('buildMiddleware', () => {
+  it('can define middleware with only a handler', () => {
+    const command = buildMiddleware('logging', async next => next());
+
+    assert.equal(command.id, 'logging');
+    assert.isUndefined(command.flags);
+    assert.isFunction(command.handler);
+  });
+
+  it('can define middleware with flags', () => {
+    const command = buildMiddleware(
+      'logging',
+      { verbose: { description, type: 'boolean' } },
+      async (next, flags) => {
+        assert.isDefined(flags.verbose);
+        return next();
+      }
+    );
+
+    assert.equal(command.id, 'logging');
+    assert.isDefined(command.flags?.verbose);
+  });
+
+  it('provides handlers with narrow type information for flags', () => {
+    buildMiddleware(
+      'logging',
+      {
+        boolean: { description, type: 'boolean' },
+        number: { description, type: 'number' },
+        string: { description, required: true, type: 'string' }
+      },
+      async (next, flags) => {
+        T.assert<
+          T.Equivalent<
+            typeof flags,
+            {
+              boolean: boolean;
+              number?: number;
+              string: string;
+            }
+          >
+        >(true);
+
+        await next();
+      }
+    );
+  });
+
+  it('rejects an invalid middleware request', () => {
+    assert.throws(
+      () =>
+        buildMiddleware(
+          'logging',
+          { verbose: { description, type: 'boolean' } },
+          undefined as unknown as MiddlewareHandler
+        ),
+      'Invalid middleware request'
+    );
+  });
+});
 
 describe('applyMiddleware', () => {
   it('returns a handler immediately when given a command handler', async () => {
     let ran = false;
 
     const wrapped = applyMiddleware([
-      middleware('logging', {
-        handler: async next => {
-          ran = true;
-          return next();
-        }
+      buildMiddleware('logging', async next => {
+        ran = true;
+        await next();
       })
     ], C(description, handler));
 
@@ -41,10 +93,11 @@ describe('applyMiddleware', () => {
   it('merges middleware flags into a command', () => {
     const wrapped = applyMiddleware(
       [
-        middleware('logging', {
-          flags: { verbose: { description, type: 'boolean' } },
-          handler: async next => next()
-        })
+        buildMiddleware(
+          'logging',
+          { verbose: { description, type: 'boolean' } },
+          async next => next()
+        )
       ],
       C(description, {
         message: { description, type: 'string' }
@@ -64,10 +117,11 @@ describe('applyMiddleware', () => {
       () =>
         applyMiddleware(
           [
-            middleware('logging', {
-              flags: { verbose: { description, type: 'boolean' } },
-              handler: async next => next()
-            })
+            buildMiddleware(
+              'logging',
+              { verbose: { description, type: 'boolean' } },
+              async next => next()
+            )
           ],
           C.tree({
             echo: C(description, {
@@ -84,14 +138,16 @@ describe('applyMiddleware', () => {
       () =>
         applyMiddleware(
           [
-            middleware('logging', {
-              flags: { verbose: { description, type: 'boolean' } },
-              handler: async next => next()
-            }),
-            middleware('timing', {
-              flags: { verbose: { description, type: 'boolean' } },
-              handler: async next => next()
-            })
+            buildMiddleware(
+              'logging',
+              { verbose: { description, type: 'boolean' } },
+              async next => next()
+            ),
+            buildMiddleware(
+              'timing',
+              { verbose: { description, type: 'boolean' } },
+              async next => next()
+            )
           ],
           C.tree({
             deploy: C(description, handler)
@@ -106,11 +162,9 @@ describe('applyMiddleware', () => {
 
     const group = applyMiddleware(
       [
-        middleware('logging', {
-          handler: async next => {
-            ran = true;
-            return next();
-          }
+        buildMiddleware('logging', async next => {
+          ran = true;
+          await next();
         })
       ],
       C.group(description, {
@@ -131,19 +185,15 @@ describe('applyMiddleware', () => {
     const order: string[] = [];
 
     const stack = [
-      middleware('outer', {
-        handler: async next => {
-          order.push('outer:before');
-          await next();
-          order.push('outer:after');
-        }
+      buildMiddleware('outer', async next => {
+        order.push('outer:before');
+        await next();
+        order.push('outer:after');
       }),
-      middleware('inner', {
-        handler: async next => {
-          order.push('inner:before');
-          await next();
-          order.push('inner:after');
-        }
+      buildMiddleware('inner', async next => {
+        order.push('inner:before');
+        await next();
+        order.push('inner:after');
       })
     ];
 
@@ -193,9 +243,7 @@ describe('applyMiddleware', () => {
   it('returns string output from the wrapped command handler', async () => {
     const tree = applyMiddleware(
       [
-        middleware('logging', {
-          handler: async next => next()
-        })
+        buildMiddleware('logging', async next => next())
       ],
       C.tree({
         echo: C(description, async () => '@output')
@@ -218,13 +266,14 @@ describe('applyMiddleware', () => {
 
     const tree = applyMiddleware(
       [
-        middleware('logging', {
-          flags: { verbose: { description, type: 'boolean' } },
-          handler: async (next, flags) => {
+        buildMiddleware(
+          'logging',
+          { verbose: { description, type: 'boolean' } },
+          async (next, flags) => {
             seen.logging = flags;
-            return next();
+            await next();
           }
-        })
+        )
       ],
       C.tree({
         echo: C(description, {
@@ -254,10 +303,8 @@ describe('applyMiddleware', () => {
 
     const tree = applyMiddleware(
       [
-        middleware('guard', {
-          handler: async () => {
-            throw new OperationalError('@blocked');
-          }
+        buildMiddleware('guard', async () => {
+          throw new OperationalError('@blocked');
         })
       ],
       C.tree({
@@ -281,9 +328,7 @@ describe('applyMiddleware', () => {
   it('propagates operational errors thrown by the command through middleware', async () => {
     const tree = applyMiddleware(
       [
-        middleware('logging', {
-          handler: async next => next()
-        })
+        buildMiddleware('logging', async next => next())
       ],
       C.tree({
         deploy: C(description, async () => {
@@ -305,9 +350,7 @@ describe('applyMiddleware', () => {
   it('throws when middleware exits without continuing the chain', async () => {
     const tree = applyMiddleware(
       [
-        middleware('broken', {
-          handler: async () => {}
-        })
+        buildMiddleware('broken', async () => {})
       ],
       C.tree({
         deploy: C(description, handler)
