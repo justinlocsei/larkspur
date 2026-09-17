@@ -15,6 +15,7 @@ import { ensure, testLogging } from './tests.ts';
 import path from 'node:path';
 
 const filename = path.basename(import.meta.filename);
+const handler = async () => {};
 
 async function testRun(
   entry: EntryPointProvider,
@@ -87,7 +88,7 @@ describe('run', () => {
 
   it('can show help', async () => {
     const { output: { error, info } } = await testRun(
-      { testing: C('description', async () => {}) },
+      { testing: C('description', handler) },
       ['test-cli', '--help']
     );
 
@@ -98,7 +99,7 @@ describe('run', () => {
 
   it('can use a custom CLI name and description', async () => {
     const { output } = await testRun(
-      { testing: C('description', async () => {}) },
+      { testing: C('description', handler) },
       [process.execPath, 'file-name', '--help'],
       {
         description: '@description',
@@ -112,7 +113,7 @@ describe('run', () => {
 
   it('infers the CLI name from the received arguments', async () => {
     const { output } = await testRun(
-      { testing: C('description', async () => {}) },
+      { testing: C('description', handler) },
       [abs('bin', 'cli-name.mjs'), '--help']
     );
 
@@ -122,7 +123,7 @@ describe('run', () => {
 
   it('throws an error if the CLI name cannot be inferred', async () => {
     const entry: EntryPoint = {
-      testing: C('description', async () => {})
+      testing: C('description', handler)
     };
 
     await ensure.rejects(() => testRun(entry, []), 'infer');
@@ -137,7 +138,7 @@ describe('run', () => {
 
   it('shows operational errors with a help message', async () => {
     const { error, output } = await testRun(
-      { testing: C('@description', async () => {}) },
+      { testing: C('@description', handler) },
       ['test-cli', 'missing-command']
     );
 
@@ -199,7 +200,7 @@ describe('run', () => {
     });
 
     await run(
-      { testing: C('@description', async () => {}) },
+      { testing: C('@description', handler) },
       { name: 'test-cli' },
       { args: [process.execPath, 'test-cli', 'missing-command'] }
     );
