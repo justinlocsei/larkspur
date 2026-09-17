@@ -10,6 +10,7 @@ import { coerceError, OperationalError } from './errors.ts';
 import { buildHelp } from './help.ts';
 import type { Context } from './types.ts';
 import { validateCommands } from './validation.ts';
+import { resolveVersion } from './version.ts';
 
 /**
  * A request to run a CLI
@@ -127,7 +128,7 @@ export async function runCLI({
       const { version } = parsing;
 
       return {
-        message: typeof version === 'function' ? await version() : version,
+        message: await resolveVersion(version, file),
         type: 'version'
       };
     }
