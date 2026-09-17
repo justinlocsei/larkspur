@@ -15,7 +15,7 @@ const STATIC_FLAGS = useFlags({
 const ROOT_FLAGS = useFlags({
   version: {
     default: false,
-    description: 'Show version',
+    description: 'Show the current version',
     type: 'boolean'
   }
 });
