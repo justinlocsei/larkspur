@@ -66,11 +66,12 @@ export async function run(
     completions,
     description,
     help,
-    name = inferName(args)
+    name = inferName(args),
+    version
   } = options;
 
   const context = createContext(
-    { description, name },
+    { description, name, version },
     { completions, help }
   );
 
@@ -109,7 +110,13 @@ export async function run(
       if (output) {
         log.info(output);
       }
+
+      break;
     }
+
+    case 'version':
+      log.info(response.message);
+      break;
   }
 }
 

@@ -97,6 +97,17 @@ describe('run', () => {
     assert.include(info, 'help');
   });
 
+  it('can show the version', async () => {
+    const { output: { error, info } } = await testRun(
+      { testing: C('description', handler) },
+      ['test-cli', '--version'],
+      { version: '1.2.3' }
+    );
+
+    assert.isEmpty(error);
+    assert.equal(info.trim(), '1.2.3');
+  });
+
   it('can use a custom CLI name and description', async () => {
     const { output } = await testRun(
       { testing: C('description', handler) },
