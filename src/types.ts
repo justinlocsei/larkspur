@@ -6,6 +6,7 @@ export type { Config };
  * A context available to functional version providers
  */
 export type VersionContext = {
+  getPackageVersion(): string;
   getScriptDir(): string;
   getScriptFile(): string;
 };

@@ -1,3 +1,4 @@
+import { coerceError } from './errors.ts';
 import type { VersionContext, VersionProvider } from './types.ts';
 
 import fs from 'node:fs';
@@ -7,18 +8,60 @@ import path from 'node:path';
  * Build a version context from a possible file path
  */
 function createContext(file?: string): VersionContext {
-  let script: string | undefined;
-
-  const resolveScript = (): string => {
-    script ??= resolveScriptFile(file);
-
-    return script;
-  };
+  const getScriptFile = () => resolveScriptFile(file);
+  const getScriptDir = () => path.dirname(getScriptFile());
 
   return {
-    getScriptDir: () => path.dirname(resolveScript()),
-    getScriptFile: resolveScript
+    getPackageVersion: () => readPackageVersion(getScriptDir()),
+    getScriptDir,
+    getScriptFile
   };
+}
+
+/**
+ * Read the version from the nearest package.json file
+ */
+function readPackageVersion(startDir: string): string {
+  let dir = startDir;
+
+  while (true) {
+    const packagePath = path.join(dir, 'package.json');
+
+    if (fs.existsSync(packagePath)) {
+      let parsed: unknown;
+
+      try {
+        parsed = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
+      } catch (error) {
+        throw new Error(
+          `Could not parse package.json: ${packagePath}`,
+          { cause: coerceError(error) }
+        );
+      }
+
+      const manifest = parsed as { version: string };
+
+      if (
+        typeof parsed !== 'object'
+        || parsed === null
+        || typeof manifest.version !== 'string'
+      ) {
+        throw new Error(
+          `Could not read a version from package.json: ${packagePath}`
+        );
+      }
+
+      return manifest.version;
+    }
+
+    const parent = path.dirname(dir);
+
+    if (parent === dir) {
+      throw new Error('No package.json was found');
+    }
+
+    dir = parent;
+  }
 }
 
 /**
