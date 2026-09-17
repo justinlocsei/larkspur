@@ -3,10 +3,8 @@ import { assert, describe, it } from 'vitest';
 import type { CommandHandler } from '../commands/types.ts';
 import C from '../factory.ts';
 import { buildUsage } from '../help/usage.ts';
-import { createTestContext } from '../tests.ts';
+import { createTestContext, handler } from '../tests.ts';
 import { formatCommands } from './display.ts';
-
-async function handler() {}
 
 function buildUsageFor(command: CommandHandler, path: string[]) {
   return buildUsage({

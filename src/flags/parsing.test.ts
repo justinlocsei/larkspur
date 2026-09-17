@@ -6,6 +6,7 @@ import { abs, filesystemRoot } from '../tests/paths.ts';
 import {
   checkConversion,
   createTestContext,
+  description,
   ensure,
   inspect
 } from '../tests.ts';
@@ -29,7 +30,6 @@ import path from 'node:path';
 type ScalarType = SimpleScalarFlag['type'];
 type SimpleFlagType = SimpleFlag['type'];
 
-const description = 'description';
 const scalarTypes: ScalarType[] = ['number', 'path', 'string'];
 
 function parse(
@@ -91,7 +91,7 @@ describe('parseFlags', () => {
     return parse(args, {
       [name]: {
         ...flag,
-        description: 'description'
+        description
       }
     });
   }

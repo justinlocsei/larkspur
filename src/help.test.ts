@@ -4,9 +4,7 @@ import type { HelpScope } from './commands/types.ts';
 import C from './factory.ts';
 import { buildHelp } from './help.ts';
 import type { TestContextOptions } from './tests.ts';
-import { createTestContext } from './tests.ts';
-
-async function handler() {}
+import { createTestContext, handler } from './tests.ts';
 
 const helpFlag = [
   '',

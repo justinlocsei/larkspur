@@ -4,10 +4,9 @@ import { assert } from 'vitest';
 import { NormalizedArgs } from '../args.ts';
 import C from '../factory.ts';
 import { flagName } from '../tests/properties.ts';
+import { description } from '../tests.ts';
 import type { FlagParsing } from './parsing.ts';
 import { parseFlags } from './parsing.ts';
-
-const description = 'description';
 
 function checkScalarParsing(
   parsed: FlagParsing,

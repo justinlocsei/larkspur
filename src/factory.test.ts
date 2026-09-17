@@ -1,10 +1,7 @@
 import { assert, describe, it } from 'vitest';
 
 import C from './factory.ts';
-import { T } from './tests.ts';
-
-const description = 'description';
-const handler = async () => {};
+import { description, handler, T } from './tests.ts';
 
 describe('C', () => {
   it('can define a command handler', () => {

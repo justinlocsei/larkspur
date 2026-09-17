@@ -2,15 +2,13 @@ import { assert, describe, it } from 'vitest';
 
 import C from '../factory.ts';
 import type { UserCompletion } from '../flags/types.ts';
-import { createTestContext } from '../tests.ts';
+import { createTestContext, description, handler } from '../tests.ts';
 import {
   decodeFlagPath,
   encodeFlagPath,
   provideCompletions
 } from './custom.ts';
 import type { CompletionSource } from './provider.ts';
-
-const description = 'description';
 
 describe('decodeFlagPath', () => {
   it('decodes a path to a command flag', () => {
@@ -47,7 +45,7 @@ describe('provideCompletions', () => {
           invalid: C.flag('string', description),
           valid: C.flag('string', description, { completion: fn })
         },
-        async () => {}
+        handler
       )
     },
     context: createTestContext()
@@ -86,7 +84,7 @@ describe('provideCompletions', () => {
                   completion: () => ['alfa', 'bravo']
                 })
               },
-              async () => {}
+              handler
             )
           })
         },

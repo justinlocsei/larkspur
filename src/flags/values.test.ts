@@ -1,13 +1,11 @@
 import { assert, describe, it } from 'vitest';
 
 import C from '../factory.ts';
-import { T } from '../tests.ts';
+import { description, T } from '../tests.ts';
 import { useFlag, useFlags } from './definition.ts';
 import type { DefaultFor } from './types.ts';
 import type { ValueOf, ValuesOf } from './values.ts';
 import { isMultiValueDefault } from './values.ts';
-
-const description = 'description';
 
 describe('ValueOf', () => {
   it('reports the most inclusive value of all supported flags', () => {

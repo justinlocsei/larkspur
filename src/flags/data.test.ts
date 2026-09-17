@@ -1,7 +1,7 @@
 import { assert, describe, it } from 'vitest';
 
 import C from '../factory.ts';
-import { checkConversion } from '../tests.ts';
+import { checkConversion, description } from '../tests.ts';
 import {
   choicesForFlag,
   flagToSetter,
@@ -13,8 +13,6 @@ import {
   isSimpleScalarFlag
 } from './data.ts';
 import type { Flag, FlagChoices } from './types.ts';
-
-const description = 'description';
 
 const boolean = C.flag('boolean', description);
 const number = C.flag('number', description);

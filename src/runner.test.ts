@@ -5,12 +5,14 @@ import { OperationalError } from './errors.ts';
 import C from './factory.ts';
 import type { RunRequest } from './runner.ts';
 import { runCLI } from './runner.ts';
-import { createTestContext, useTempFile } from './tests.ts';
+import {
+  createTestContext,
+  description,
+  handler,
+  useTempFile
+} from './tests.ts';
 
 import fs from 'node:fs/promises';
-
-const description = 'description';
-const handler = async () => {};
 
 function testCLI(
   options: Omit<RunRequest, 'context'>,

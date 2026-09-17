@@ -10,6 +10,9 @@ import path from 'node:path';
 export * as ensure from './tests/assertions.ts';
 export * as T from './tests/types.ts';
 
+export const description = 'description';
+export const handler = async () => {};
+
 /**
  * Produce a readable representation of an object
  */

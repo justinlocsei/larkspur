@@ -10,12 +10,11 @@ import type { EntryPoint } from './commands/types.ts';
 import { OperationalError } from './errors.ts';
 import C from './factory.ts';
 import { abs } from './tests/paths.ts';
-import { ensure, testLogging } from './tests.ts';
+import { description, ensure, handler, testLogging } from './tests.ts';
 
 import path from 'node:path';
 
 const filename = path.basename(import.meta.filename);
-const handler = async () => {};
 
 async function testRun(
   entry: EntryPointProvider,
@@ -47,7 +46,7 @@ describe('run', () => {
     let executed: boolean;
 
     const entry: EntryPoint = {
-      testing: C('description', async () => {
+      testing: C(description, async () => {
         executed = true;
       })
     };
@@ -73,8 +72,8 @@ describe('run', () => {
     await testRun(
       {
         echo: C(
-          'description',
-          { message: C.flag('string', 'description') },
+          description,
+          { message: C.flag('string', description) },
           async (flags) => {
             message = flags.message;
           }
@@ -88,7 +87,7 @@ describe('run', () => {
 
   it('can show help', async () => {
     const { output: { error, info } } = await testRun(
-      { testing: C('description', handler) },
+      { testing: C(description, handler) },
       ['test-cli', '--help']
     );
 
@@ -99,7 +98,7 @@ describe('run', () => {
 
   it('can show the version', async () => {
     const { output: { error, info } } = await testRun(
-      { testing: C('description', handler) },
+      { testing: C(description, handler) },
       ['test-cli', '--version'],
       { version: '1.2.3' }
     );
@@ -110,7 +109,7 @@ describe('run', () => {
 
   it('can use a custom CLI name and description', async () => {
     const { output } = await testRun(
-      { testing: C('description', handler) },
+      { testing: C(description, handler) },
       [process.execPath, 'file-name', '--help'],
       {
         description: '@description',
@@ -124,7 +123,7 @@ describe('run', () => {
 
   it('infers the CLI name from the received arguments', async () => {
     const { output } = await testRun(
-      { testing: C('description', handler) },
+      { testing: C(description, handler) },
       [abs('bin', 'cli-name.mjs'), '--help']
     );
 
@@ -134,7 +133,7 @@ describe('run', () => {
 
   it('throws an error if the CLI name cannot be inferred', async () => {
     const entry: EntryPoint = {
-      testing: C('description', handler)
+      testing: C(description, handler)
     };
 
     await ensure.rejects(() => testRun(entry, []), 'infer');
@@ -163,7 +162,7 @@ describe('run', () => {
   it('logs standard errors with a stack trace', async () => {
     const { error, output } = await testRun(
       {
-        testing: C('description', async () => {
+        testing: C(description, async () => {
           throw new Error('@handler');
         })
       },
@@ -178,7 +177,7 @@ describe('run', () => {
 
   it('logs a string returned by a command handler', async () => {
     const { error, output } = await testRun(
-      { echo: C('description', async () => '@output') },
+      { echo: C(description, async () => '@output') },
       ['test-cli', 'echo']
     );
 
@@ -188,7 +187,7 @@ describe('run', () => {
 
   it('does not log blank strings returned by a command handler', async () => {
     const { error, output } = await testRun(
-      { silent: C('description', async () => '   ') },
+      { silent: C(description, async () => '   ') },
       ['test-cli', 'silent']
     );
 

@@ -1,7 +1,7 @@
 import { assert, describe, it } from 'vitest';
 
 import C from '../factory.ts';
-import { createTestContext } from '../tests.ts';
+import { createTestContext, description, handler } from '../tests.ts';
 import type { CompletionScript } from './provider.ts';
 import { CompletionProvider } from './provider.ts';
 import type { SupportedShell } from './shells.ts';
@@ -30,7 +30,7 @@ class TestCompletionProvider extends CompletionProvider {
 describe('CompletionProvider', () => {
   describe('buildScript', () => {
     function testScript() {
-      const command = C('description', async () => {});
+      const command = C(description, handler);
 
       return new TestCompletionProvider({
         commands: {

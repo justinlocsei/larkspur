@@ -1,14 +1,11 @@
 import { assert, describe, it } from 'vitest';
 
-import { T } from '../tests.ts';
+import { description, handler, T } from '../tests.ts';
 import {
   buildCommandGroup,
   buildCommandHandler,
   buildCommandTree
 } from './factories.ts';
-
-const description = 'description';
-const handler = async () => {};
 
 describe('buildCommandHandler', () => {
   it('can define a command handler from a request object', () => {
