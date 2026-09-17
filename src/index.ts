@@ -9,6 +9,7 @@ export type {
 } from './commands/types.ts';
 export { OperationalError } from './errors.ts';
 export type { Flag, Flags } from './flags/types.ts';
+export type { VersionProvider } from './types.ts';
 
 import type { Flags } from './flags/types.ts';
 import type { ValuesOf as RawValuesOf } from './flags/values.ts';
