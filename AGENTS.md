@@ -41,6 +41,7 @@ After editing a source file, run its matching test file when one exists.
 - `import type` for type-only imports
 - Sort keys alphabetically in plain object literals
 - Comments only for non-obvious logic; minimize scope; match existing patterns
+- Do not reword existing code comments — leave their wording unchanged unless the underlying behavior changed and the comment is no longer accurate
 
 ## Library internals
 
