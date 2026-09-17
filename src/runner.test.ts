@@ -59,6 +59,26 @@ describe('runCLI', () => {
     assert.include(response.message, 'Show help');
   });
 
+  it('can show the version', async () => {
+    const response = await testCLI({
+      args: ['--version'],
+      entry: { command: C(description, handler) }
+    }, createTestContext({ version: '1.2.3' }));
+
+    assert(response.type === 'version', 'version not returned');
+    assert.equal(response.message, '1.2.3');
+  });
+
+  it('supports async version providers', async () => {
+    const response = await testCLI({
+      args: ['--version'],
+      entry: { command: C(description, handler) }
+    }, createTestContext({ version: async () => '2.0.0' }));
+
+    assert(response.type === 'version', 'version not returned');
+    assert.equal(response.message, '2.0.0');
+  });
+
   it('can explore the CLI', async () => {
     const response = await testCLI({
       args: ['explore'],

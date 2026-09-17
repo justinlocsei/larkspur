@@ -43,6 +43,13 @@ type HelpRunResponse = IsRunResponse<'help', {
 }>;
 
 /**
+ * A CLI run that returned early with a version message
+ */
+type VersionRunResponse = IsRunResponse<'version', {
+  message: string;
+}>;
+
+/**
  * A CLI run that completed successfully
  */
 type SuccessRunResponse = IsRunResponse<'success', {
@@ -56,7 +63,8 @@ type SuccessRunResponse = IsRunResponse<'success', {
 export type RunResponse =
   | ErrorRunResponse
   | HelpRunResponse
-  | SuccessRunResponse;
+  | SuccessRunResponse
+  | VersionRunResponse;
 
 /**
  * Report a CLI failure
@@ -85,7 +93,7 @@ export async function runCLI({
   }
 
   try {
-    validateCommands(commands, context.config);
+    validateCommands(commands, context);
   } catch (error) {
     return failWith(
       OperationalError.wrap(error, 'Could not validate CLI commands')
@@ -93,7 +101,7 @@ export async function runCLI({
   }
 
   try {
-    parsing = parseCommand(args, commands);
+    parsing = parseCommand(args, commands, context);
   } catch (error) {
     return failWith(
       OperationalError.wrap(error, 'Could not parse CLI arguments')
@@ -112,6 +120,15 @@ export async function runCLI({
         message: buildHelp({ context, scope: parsing.scope }),
         type: 'help'
       };
+
+    case 'version': {
+      const { version } = parsing;
+
+      return {
+        message: typeof version === 'function' ? await version() : version,
+        type: 'version'
+      };
+    }
   }
 
   let execution: RunResult;
