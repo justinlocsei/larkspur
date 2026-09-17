@@ -4,6 +4,8 @@ import type { VersionContext, VersionProvider } from './types.ts';
 import fs from 'node:fs';
 import path from 'node:path';
 
+const PACKAGE_JSON = 'package.json';
+
 /**
  * Build a version context from a possible file path
  */
@@ -12,20 +14,39 @@ function createContext(file?: string): VersionContext {
 
   return {
     getEntryFile,
-    getPackageVersion: () => readPackageVersion(path.dirname(getEntryFile()))
+    getPackageVersion: () => readPackageVersion(getEntryFile())
   };
+}
+
+/**
+ * Resolve a package manifest path in a directory
+ */
+function resolvePackageManifest(directory: string): string | undefined {
+  const candidate = path.join(directory, PACKAGE_JSON);
+
+  if (!fs.existsSync(candidate)) {
+    return undefined;
+  }
+
+  const packagePath = fs.realpathSync(candidate);
+
+  if (path.basename(packagePath) !== PACKAGE_JSON) {
+    throw new Error(`Invalid package manifest path: ${packagePath}`);
+  }
+
+  return packagePath;
 }
 
 /**
  * Read the version from the nearest package.json file
  */
-function readPackageVersion(startDir: string): string {
-  let dir = startDir;
+function readPackageVersion(entryFile: string): string {
+  let dir = path.dirname(entryFile);
 
   while (true) {
-    const packagePath = path.join(dir, 'package.json');
+    const packagePath = resolvePackageManifest(dir);
 
-    if (fs.existsSync(packagePath)) {
+    if (packagePath) {
       let parsed: unknown;
 
       try {
