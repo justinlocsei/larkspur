@@ -3,11 +3,19 @@ import type { Config } from './types/config.ts';
 export type { Config };
 
 /**
- * A provider for a CLI's version string
+ * A context available to functional version providers
+ */
+export type VersionContext = {
+  getScriptDir(): string;
+  getScriptFile(): string;
+};
+
+/**
+ * A provider for a CLI's version
  */
 export type VersionProvider =
   | string
-  | (() => string | Promise<string>);
+  | ((context: VersionContext) => string | Promise<string>);
 
 /**
  * Metadata for a CLI
