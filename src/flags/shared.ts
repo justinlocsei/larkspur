@@ -1,4 +1,4 @@
-import type { Config, Context } from '../types.ts';
+import type { Context } from '../types.ts';
 import { useFlags } from './definition.ts';
 import type { Flags } from './types.ts';
 
@@ -26,19 +26,20 @@ const ROOT_FLAGS = useFlags({
 export type SharedFlags = typeof STATIC_FLAGS & typeof ROOT_FLAGS;
 
 /**
- * Produce shared flags available to every command
+ * The scope at which shared flags are resolved
  */
-export function useSharedFlags(_: Config): Flags {
-  return { ...STATIC_FLAGS };
-}
+export type SharedFlagsScope = 'global' | 'root';
 
 /**
- * Produce shared flags available only at the root
+ * Produce shared flags for the given scope
  */
-export function useSharedRootFlags(context: Context): Flags {
-  const flags = useSharedFlags(context.config);
+export function useSharedFlags(
+  context: Context,
+  scope: SharedFlagsScope
+): Flags {
+  const flags: Flags = { ...STATIC_FLAGS };
 
-  if (context.meta.version !== undefined) {
+  if (scope === 'root' && context.meta.version !== undefined) {
     flags.version = ROOT_FLAGS.version;
   }
 
@@ -48,6 +49,6 @@ export function useSharedRootFlags(context: Context): Flags {
 /**
  * Get the names of flags that are reserved for internal use
  */
-export function getReservedFlagNames(config: Config): string[] {
-  return Object.keys(useSharedFlags(config)).sort();
+export function getReservedFlagNames(context: Context): string[] {
+  return Object.keys(useSharedFlags(context, 'global')).sort();
 }
