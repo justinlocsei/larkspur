@@ -1,5 +1,4 @@
 import { NormalizedArgs } from '../args.ts';
-import { resolveConfig } from '../config.ts';
 import { OperationalError } from '../errors.ts';
 import type { FlagParsing, ParsedFlags } from '../flags/parsing.ts';
 import {
@@ -11,7 +10,6 @@ import {
 import { useSharedFlags } from '../flags/shared.ts';
 import type { Flags } from '../flags/types.ts';
 import type { ValuesOf } from '../flags/values.ts';
-import type { Config } from '../types/config.ts';
 import type { Variant } from '../types/utils.ts';
 import type { Context } from '../types.ts';
 import { getCommand } from './data.ts';
@@ -139,13 +137,13 @@ type FlagParsingResult =
 export function parseCommand(
   args: string[],
   commands: CommandTree,
-  config: Config = resolveConfig()
+  context: Context
 ): ParsingResult {
   const result = extractCommand({
+    context,
     current: {
       args: new NormalizedArgs(args),
       commands,
-      config,
       namespace: []
     }
   });
@@ -239,7 +237,6 @@ function buildCommandRunner(
 type TraversalState = {
   args: NormalizedArgs;
   commands: CommandTree;
-  config: Config;
   group?: CommandGroup;
   namespace: string[];
 };
@@ -247,13 +244,19 @@ type TraversalState = {
 /**
  * Extract a command from a list of arguments
  */
-function extractCommand(
-  { current }: { current: TraversalState }
-): InternalParsingResult {
+function extractCommand({
+  context,
+  current
+}: {
+  context: Context;
+  current: TraversalState;
+}): InternalParsingResult {
   while (true) {
+    const atRoot = current.namespace.length === 0;
+
     const coreFlags = tryParseFlags(
       current.args,
-      useSharedFlags(current.config),
+      useSharedFlags(context, atRoot ? 'root' : 'global'),
       { allowUnused: true }
     );
 
@@ -263,6 +266,7 @@ function extractCommand(
 
     const { flags } = coreFlags.parsed;
     const showHelp = getSharedFlagValue(flags, 'help') === true;
+    const showVersion = getSharedFlagValue(flags, 'version') === true;
 
     const { args } = current.args;
     const name = args[0];
@@ -275,7 +279,11 @@ function extractCommand(
       ? { group: current.group, path: current.namespace, type: 'group' }
       : { commands: current.commands, type: 'root' };
 
-    if (showHelp && (!name || !command)) {
+    const isUnresolved = !name || !command;
+
+    if (atRoot && showVersion && isUnresolved) {
+      return { type: 'version' };
+    } else if (showHelp && isUnresolved) {
       return { scope, type: 'help' };
     } else if (!name) {
       return {
@@ -301,10 +309,9 @@ function extractCommand(
 
     if (command.type === 'group') {
       current = {
-        commands: command.subcommands,
-        config: current.config,
-        group: command,
         args: remainingArgs,
+        commands: command.subcommands,
+        group: command,
         namespace: path
       };
 
