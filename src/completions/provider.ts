@@ -50,6 +50,7 @@ export abstract class CompletionProvider {
   protected cli: Metadata;
   protected commands: CommandTree;
   protected config: Config;
+  protected context: Context;
 
   /**
    * Create a generator for completions of a CLI's commands
@@ -57,6 +58,7 @@ export abstract class CompletionProvider {
   constructor(cli: CompletionSource) {
     const { commands, context } = cli;
 
+    this.context = context;
     this.cli = context.meta;
     this.commands = commands;
     this.config = context.config;
