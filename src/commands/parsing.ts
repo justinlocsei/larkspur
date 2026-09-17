@@ -40,7 +40,7 @@ type ParsingErrorCode = 'invalid-command' | 'invalid-flag';
 /**
  * The fields shared by all parsing results
  */
-type IsParsingResult<T extends string, U> = U & {
+type IsParsingResult<T extends string, U = unknown> = U & {
   type: T;
 };
 
@@ -100,20 +100,31 @@ type HelpParsingResult = IsParsingResult<'help', {
 }>;
 
 /**
+ * A request for the CLI version
+ */
+type VersionParsingResult = IsParsingResult<'version'>;
+
+/**
+ * A parsing result that is identical internally and externally
+ */
+type SimpleParsingResult =
+  | ErrorParsingResult
+  | HelpParsingResult
+  | VersionParsingResult;
+
+/**
  * The results of parsing CLI args
  */
 export type ParsingResult =
   | CommandParsingResult & { run: CommandRunner }
-  | ErrorParsingResult
-  | HelpParsingResult;
+  | SimpleParsingResult;
 
 /**
  * An internal parsing result
  */
 type InternalParsingResult =
   | CommandParsingResult
-  | ErrorParsingResult
-  | HelpParsingResult;
+  | SimpleParsingResult;
 
 /**
  * The results of parsing flags
