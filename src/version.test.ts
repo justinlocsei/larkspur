@@ -171,6 +171,23 @@ describe('resolveVersion', () => {
     });
   });
 
+  it('throws when package.json resolves to an unexpected path', async () => {
+    await useTempDir(async dir => {
+      const scriptPath = path.join(dir, 'cli.mjs');
+      const manifestPath = path.join(dir, 'manifest.json');
+      const linkPath = path.join(dir, 'package.json');
+
+      await fs.writeFile(scriptPath, '');
+      await fs.writeFile(manifestPath, '');
+      await linkTo(manifestPath, linkPath);
+
+      await ensure.rejects(
+        () => resolveVersion(c => c.getPackageVersion(), scriptPath),
+        'Invalid package manifest path'
+      );
+    });
+  });
+
   it('throws when package.json cannot be parsed', async () => {
     await useTempDir(async dir => {
       const scriptPath = path.join(dir, 'cli.mjs');
