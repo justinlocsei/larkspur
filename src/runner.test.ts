@@ -16,10 +16,7 @@ function testCLI(
   options: Omit<RunRequest, 'context'>,
   context = createTestContext()
 ) {
-  return runCLI({
-    ...options,
-    context
-  });
+  return runCLI({ ...options, context });
 }
 
 describe('runCLI', () => {
