@@ -1,64 +1,62 @@
+import { applyMiddleware } from '../src/commands/middleware.ts';
 import C from '../src/factory.ts';
 import { setConfigVariables } from '../src/tests/properties/config.ts';
 import { build } from './build.ts';
 import { defineFilters, runSuite, runTests, SUITES } from './helpers/tests.ts';
 
-// Shared flags for pre-test builds
-const BUILD = C.flags({
-  build: C.flag('boolean', 'Build the larkspur package before running tests', {
-    default: true
-  })
-});
-
-export default C.group('Run tests', {
-  all: C('Run all tests', BUILD, flags => {
+const preBuild = C.middleware(
+  'pre-build',
+  {
+    build: C.flag(
+      'boolean',
+      'Build the larkspur package before running tests',
+      { default: true }
+    )
+  },
+  async (next, flags) => {
     if (flags.build) {
       build();
     }
 
-    for (const suite of SUITES) {
-      runSuite(suite);
-    }
-  }),
+    await next();
+  }
+);
 
-  coverage: C(
-    'Run all tests with coverage',
-    {
-      ...BUILD,
-      reporter: C.flag('choice', 'A coverage reporter', {
-        choices: ['html', 'text'],
-        default: 'text'
-      })
-    },
-    flags => {
-      if (flags.build) {
-        build();
-      }
+export default C.group('Run tests', {
+  ...applyMiddleware(
+    [preBuild],
+    C.tree({
+      all: C('Run all tests', () => {
+        for (const suite of SUITES) {
+          runSuite(suite);
+        }
+      }),
 
-      runTests([
-        '--coverage',
-        '--coverage.reporter',
-        flags.reporter
-      ]);
-    }
-  ),
+      coverage: C(
+        'Run all tests with coverage',
+        {
+          reporter: C.flag('choice', 'A coverage reporter', {
+            choices: ['html', 'text'],
+            default: 'text'
+          })
+        },
+        flags =>
+          runTests([
+            '--coverage',
+            '--coverage.reporter',
+            flags.reporter
+          ])
+      ),
 
-  integration: C(
-    'Run integration tests',
-    {
-      ...BUILD,
-      ...defineFilters({
-        extension: 'test.ts',
-        root: ['test', 'clis']
-      })
-    },
-    flags => {
-      if (flags.build) {
-        build();
-      }
-
-      runSuite('integration', flags);
-    }
+      integration: C(
+        'Run integration tests',
+        defineFilters({
+          extension: 'test.ts',
+          root: ['test', 'clis']
+        }),
+        flags => runSuite('integration', flags)
+      )
+    })
   ),
 
   property: C(
