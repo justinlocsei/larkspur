@@ -591,7 +591,8 @@ describe('parseCommand', () => {
       command: C(description, handler)
     }, createTestContext({ version: '1.0.0' }));
 
-    assert.equal(result.type, 'version');
+    assert(result.type === 'version', 'Version not shown');
+    assert.equal(result.version, '1.0.0');
   });
 
   it('only supports a version flag when a version is defined', () => {

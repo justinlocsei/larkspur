@@ -11,7 +11,7 @@ import { useSharedFlags } from '../flags/shared.ts';
 import type { Flags } from '../flags/types.ts';
 import type { ValuesOf } from '../flags/values.ts';
 import type { Variant } from '../types/utils.ts';
-import type { Context } from '../types.ts';
+import type { Context, VersionProvider } from '../types.ts';
 import { getCommand } from './data.ts';
 import type {
   CommandGroup,
@@ -38,7 +38,7 @@ type ParsingErrorCode = 'invalid-command' | 'invalid-flag';
 /**
  * The fields shared by all parsing results
  */
-type IsParsingResult<T extends string, U = unknown> = U & {
+type IsParsingResult<T extends string, U> = U & {
   type: T;
 };
 
@@ -100,7 +100,9 @@ type HelpParsingResult = IsParsingResult<'help', {
 /**
  * A request for the CLI version
  */
-type VersionParsingResult = IsParsingResult<'version'>;
+type VersionParsingResult = IsParsingResult<'version', {
+  version: VersionProvider;
+}>;
 
 /**
  * A parsing result that is identical internally and externally
@@ -280,9 +282,10 @@ function extractCommand({
       : { commands: current.commands, type: 'root' };
 
     const isUnresolved = !name || !command;
+    const { version } = context.meta;
 
-    if (atRoot && showVersion && isUnresolved) {
-      return { type: 'version' };
+    if (atRoot && showVersion && isUnresolved && version) {
+      return { version, type: 'version' };
     } else if (showHelp && isUnresolved) {
       return { scope, type: 'help' };
     } else if (!name) {
