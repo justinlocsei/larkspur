@@ -3,12 +3,10 @@ import { assert } from 'vitest';
 
 import C from '../factory.ts';
 import { argv, identifier, singleCommand } from '../tests/properties.ts';
-import { createTestContext } from '../tests.ts';
+import { createTestContext, description, handler } from '../tests.ts';
 import { parseCommand } from './parsing.ts';
 import type { CommandTree } from './types.ts';
 
-const description = 'description';
-const handler = async () => {};
 const context = createTestContext();
 
 test.prop([singleCommand])(

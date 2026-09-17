@@ -1,11 +1,9 @@
 import { assert, describe, it } from 'vitest';
 
 import C from '../factory.ts';
-import { T } from '../tests.ts';
+import { description, T } from '../tests.ts';
 import { useFlag, useFlags } from './definition.ts';
 import type { BooleanFlag, Flags, NumberFlag, StringFlag } from './types.ts';
-
-const description = 'description';
 
 describe('useFlag', () => {
   it('returns the provided flag', () => {

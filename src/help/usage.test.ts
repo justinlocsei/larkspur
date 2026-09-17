@@ -3,11 +3,9 @@ import { assert, describe, it } from 'vitest';
 import type { HelpScope } from '../commands/types.ts';
 import C from '../factory.ts';
 import type { TestContextOptions } from '../tests.ts';
-import { createTestContext } from '../tests.ts';
+import { createTestContext, handler } from '../tests.ts';
 import type { PrintableFlag, Usage } from './usage.ts';
 import { buildUsage } from './usage.ts';
-
-async function handler() {}
 
 const helpFlag: PrintableFlag = {
   description: 'Show help',

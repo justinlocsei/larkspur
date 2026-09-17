@@ -7,7 +7,9 @@ import type { Flag, SupportedValue } from '../flags/types.ts';
 import {
   checkConversionAsync,
   createTestContext,
+  description,
   ensure,
+  handler,
   T
 } from '../tests.ts';
 import type { DistributiveOmit } from '../types/utils.ts';
@@ -16,8 +18,6 @@ import { transformValues } from '../utils.ts';
 import { parseCommand } from './parsing.ts';
 import type { CommandTree } from './types.ts';
 
-const description = 'description';
-const handler = async () => {};
 const context = createTestContext();
 
 function parse(
@@ -472,7 +472,7 @@ describe('parseCommand', () => {
       number: { default: 1, description, type: 'number' },
       path: { default: 'tmp', description, type: 'path' },
       string: { default: '1', description, type: 'string' }
-    }, async () => {});
+    }, handler);
 
     await checkConversionAsync<string[], string[]>(
       async (flags, provided, message) => {
@@ -631,7 +631,7 @@ describe('parseCommand', () => {
 
   it('can request help for a top-level command', () => {
     const result = parse(['command', '--help'], {
-      command: C('description', handler)
+      command: C(description, handler)
     });
 
     assert(result.type === 'help', 'Help not requested');
@@ -641,7 +641,7 @@ describe('parseCommand', () => {
 
     assert.equal(
       scope.command.description,
-      'description',
+      description,
       'Incorrect command selected'
     );
 

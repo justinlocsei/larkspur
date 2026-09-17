@@ -2,11 +2,9 @@ import { assert, describe, it } from 'vitest';
 
 import C from '../factory.ts';
 import type { ScalarFlag } from '../flags/types.ts';
-import { checkConversion } from '../tests.ts';
+import { checkConversion, description } from '../tests.ts';
 import type { ScalarValueCompletion } from './data.ts';
 import { scalarValueCompletion } from './data.ts';
-
-const description = 'description';
 
 describe('scalarValueCompletion', () => {
   it('uses an appropriate completion strategy for scalar flags', () => {

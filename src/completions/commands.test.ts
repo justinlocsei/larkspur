@@ -4,7 +4,7 @@ import type { ParsingResult } from '../commands/parsing.ts';
 import { parseCommand } from '../commands/parsing.ts';
 import type { EntryPoint } from '../commands/types.ts';
 import C from '../factory.ts';
-import { createTestContext, ensure } from '../tests.ts';
+import { createTestContext, description, ensure, handler } from '../tests.ts';
 import {
   defineCompletionCommands,
   withCompletionCommands
@@ -84,13 +84,13 @@ describe('defineCompletionCommands', () => {
         'bash'
       ], {
         command: C(
-          'description',
+          description,
           {
-            value: C.flag('string', 'description', {
+            value: C.flag('string', description, {
               completion: ({ current }) => [`${current}-one`]
             })
           },
-          async () => {}
+          handler
         ),
         completions: defineCompletionCommands()
       }, context);

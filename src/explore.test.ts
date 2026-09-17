@@ -5,9 +5,7 @@ import type { CommandTree } from './commands/types.ts';
 import type { ExploreOptions } from './explore.ts';
 import { buildExploreMessage } from './explore.ts';
 import C from './factory.ts';
-import { createTestContext } from './tests.ts';
-
-async function handler() {}
+import { createTestContext, handler } from './tests.ts';
 
 const nestedCommands = {
   alfa: C('@alfa', handler),

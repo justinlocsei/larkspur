@@ -1,7 +1,7 @@
 import { assert, describe, it } from 'vitest';
 
 import { buildCommandHandler } from '../commands/factories.ts';
-import { ensure, T } from '../tests.ts';
+import { description, ensure, handler, T } from '../tests.ts';
 import { buildFlag } from './factories.ts';
 import type {
   BooleanFlag,
@@ -11,8 +11,6 @@ import type {
   PathFlag,
   StringFlag
 } from './types.ts';
-
-const description = 'description';
 
 describe('buildFlag', () => {
   it('supports flags with default options', () => {
@@ -174,7 +172,7 @@ describe('buildFlag', () => {
           completion: ({ current }) => [current]
         })
       },
-      async () => {}
+      handler
     );
 
     assert.isDefined(command.flags?.value);

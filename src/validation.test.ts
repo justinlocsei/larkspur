@@ -3,7 +3,13 @@ import { assert, describe, it } from 'vitest';
 import type { CommandTree } from './commands/types.ts';
 import { OperationalError } from './errors.ts';
 import C from './factory.ts';
-import { checkConversion, createTestContext, ensure } from './tests.ts';
+import {
+  checkConversion,
+  createTestContext,
+  description,
+  ensure,
+  handler
+} from './tests.ts';
 import {
   isValidCommandName,
   isValidFlagName,
@@ -11,8 +17,6 @@ import {
 } from './validation.ts';
 
 const context = createTestContext();
-const description = 'description';
-const handler = async () => {};
 
 function testIdentifiers(validate: (name: string) => boolean) {
   checkConversion<string, boolean>(
