@@ -9,5 +9,8 @@ import test from './test.ts';
 
 await run(
   { build, check, format, publish, test },
-  { description: 'Development tasks for Larkspur' }
+  {
+    description: 'Development tasks for Larkspur',
+    version: fns => fns.getPackageVersion()
+  }
 );

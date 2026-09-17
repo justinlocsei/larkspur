@@ -51,6 +51,48 @@ describe('buildUsage', () => {
     );
   });
 
+  it('shows a version flag at the root when a version is defined', () => {
+    checkUsage(
+      {
+        commands: { alfa: C('@alfa', handler) },
+        type: 'root'
+      },
+      {
+        commands: [
+          { description: '@alfa', label: 'alfa' }
+        ],
+        flags: [
+          helpFlag,
+          {
+            description: 'Show the current version',
+            details: [],
+            required: false,
+            setter: '--version'
+          }
+        ],
+        title: 'testing <command> [flags]'
+      },
+      { version: '1.0.0' }
+    );
+  });
+
+  it('does not show a version flag for commands', () => {
+    checkUsage(
+      {
+        command: C('@alfa', handler),
+        path: ['alfa'],
+        type: 'command'
+      },
+      {
+        commands: [],
+        details: '@alfa',
+        flags: [helpFlag],
+        title: 'testing alfa [flags]'
+      },
+      { version: '1.0.0' }
+    );
+  });
+
   it('can opt out of shared flags', () => {
     const usage = buildUsage({
       context: createTestContext(),

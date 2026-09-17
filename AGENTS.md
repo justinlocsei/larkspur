@@ -4,6 +4,10 @@ Zero-dependency TypeScript CLI library: nested commands, long-flag-only parsing,
 
 Public API: `src/index.ts` exports `run`, default `C`, `OperationalError`, and curated types (see README “Public types”).
 
+## Exports
+
+Be conservative about what gets exported. Only export a type or function when another module in this repo genuinely needs it, or when explicitly requested as part of the public API in `src/index.ts`. Do not preemptively export helpers, types, or utilities “just in case” — keep symbols module-local until there is a concrete internal consumer or an intentional API decision.
+
 ## Dev commands
 
 Run `./bin/larkspur explore` to list tasks and flags. Prefer `./bin/larkspur` over npm scripts in docs and CI.
@@ -37,6 +41,7 @@ After editing a source file, run its matching test file when one exists.
 - `import type` for type-only imports
 - Sort keys alphabetically in plain object literals
 - Comments only for non-obvious logic; minimize scope; match existing patterns
+- Do not reword existing code comments — leave their wording unchanged unless the underlying behavior changed and the comment is no longer accurate
 
 ## Library internals
 

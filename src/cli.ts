@@ -51,7 +51,9 @@ export async function run(
   options: UserOptions = {},
   internal: InternalOptions = {}
 ): Promise<void> {
-  const resolvedEntry = await resolveEntryPoint(entry);
+  const resolvedEntry = typeof entry === 'function'
+    ? await entry()
+    : entry;
 
   const {
     args = process.argv,
@@ -66,18 +68,20 @@ export async function run(
     completions,
     description,
     help,
-    name = inferName(args)
+    name = inferName(args),
+    version
   } = options;
 
   const context = createContext(
-    { description, name },
+    { description, name, version },
     { completions, help }
   );
 
   const response = await runCLI({
     args: args.slice(2),
     context,
-    entry: resolvedEntry
+    entry: resolvedEntry,
+    file: args[1]
   });
 
   switch (response.type) {
@@ -109,19 +113,14 @@ export async function run(
       if (output) {
         log.info(output);
       }
-    }
-  }
-}
 
-/**
- * Resolve the requested entry point
- */
-async function resolveEntryPoint(
-  provider: EntryPointProvider
-): Promise<EntryPoint> {
-  return typeof provider === 'function'
-    ? provider()
-    : provider;
+      break;
+    }
+
+    case 'version':
+      log.info(response.message);
+      break;
+  }
 }
 
 /**

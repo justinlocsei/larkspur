@@ -10,6 +10,7 @@ import { coerceError, OperationalError } from './errors.ts';
 import { buildHelp } from './help.ts';
 import type { Context } from './types.ts';
 import { validateCommands } from './validation.ts';
+import { resolveVersion } from './version.ts';
 
 /**
  * A request to run a CLI
@@ -18,6 +19,7 @@ export type RunRequest = {
   args: string[];
   context: Context;
   entry: EntryPoint;
+  file?: string;
 };
 
 /**
@@ -43,6 +45,13 @@ type HelpRunResponse = IsRunResponse<'help', {
 }>;
 
 /**
+ * A CLI run that returned early with a version message
+ */
+type VersionRunResponse = IsRunResponse<'version', {
+  message: string;
+}>;
+
+/**
  * A CLI run that completed successfully
  */
 type SuccessRunResponse = IsRunResponse<'success', {
@@ -56,7 +65,8 @@ type SuccessRunResponse = IsRunResponse<'success', {
 export type RunResponse =
   | ErrorRunResponse
   | HelpRunResponse
-  | SuccessRunResponse;
+  | SuccessRunResponse
+  | VersionRunResponse;
 
 /**
  * Report a CLI failure
@@ -71,7 +81,8 @@ function failWith(error: Error, help?: string): ErrorRunResponse {
 export async function runCLI({
   args,
   context,
-  entry
+  entry,
+  file
 }: RunRequest): Promise<RunResponse> {
   let parsing: ParsingResult;
   let commands: EntryPoint;
@@ -85,7 +96,7 @@ export async function runCLI({
   }
 
   try {
-    validateCommands(commands, context.config);
+    validateCommands(commands, context);
   } catch (error) {
     return failWith(
       OperationalError.wrap(error, 'Could not validate CLI commands')
@@ -93,7 +104,7 @@ export async function runCLI({
   }
 
   try {
-    parsing = parseCommand(args, commands);
+    parsing = parseCommand(args, commands, context);
   } catch (error) {
     return failWith(
       OperationalError.wrap(error, 'Could not parse CLI arguments')
@@ -112,6 +123,15 @@ export async function runCLI({
         message: buildHelp({ context, scope: parsing.scope }),
         type: 'help'
       };
+
+    case 'version': {
+      const { version } = parsing;
+
+      return {
+        message: await resolveVersion(version, file),
+        type: 'version'
+      };
+    }
   }
 
   let execution: RunResult;

@@ -11,10 +11,12 @@ import {
 } from './commands.ts';
 import { listShells } from './shells.ts';
 
+const context = createTestContext();
+
 function runCompletionCommand(args: string[]): ParsingResult {
   return parseCommand(['completions', ...args], {
     completions: defineCompletionCommands()
-  });
+  }, context);
 }
 
 describe('defineCompletionCommands', () => {
@@ -91,10 +93,10 @@ describe('defineCompletionCommands', () => {
           async () => {}
         ),
         completions: defineCompletionCommands()
-      });
+      }, context);
 
       assert(parsed.type === 'command', 'command not parsed');
-      const run = await parsed.run(createTestContext());
+      const run = await parsed.run(context);
 
       assert(run.type === 'success', 'command failed');
       assert.equal(run.output, 'alfa-one\n');

@@ -3,11 +3,27 @@ import type { Config } from './types/config.ts';
 export type { Config };
 
 /**
+ * A context available to functional version providers
+ */
+export type VersionContext = {
+  getEntryFile(): string;
+  getPackageVersion(): string;
+};
+
+/**
+ * A provider for a CLI's version
+ */
+export type VersionProvider =
+  | string
+  | ((context: VersionContext) => string | Promise<string>);
+
+/**
  * Metadata for a CLI
  */
 export type Metadata = {
   description?: string;
   name: string;
+  version?: VersionProvider;
 };
 
 /**

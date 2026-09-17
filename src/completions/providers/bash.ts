@@ -359,7 +359,10 @@ To use these completions, reload your profile or start a new shell.`.trim();
     commandNames: string[],
     subcommandCases: string[]
   ): CompletionFunction {
-    const flags = useSharedFlags(this.config);
+    const flags = useSharedFlags(
+      this.context,
+      levels.length === 0 ? 'root' : 'global'
+    );
 
     const setters = Object.entries(flags).flatMap(([n, f]) =>
       getFlagForms(n, f).map(flagToSetter)
@@ -395,7 +398,7 @@ To use these completions, reload your profile or start a new shell.`.trim();
   ): Completions {
     const flags: Flags = {
       ...command.flags,
-      ...useSharedFlags(this.config)
+      ...useSharedFlags(this.context, 'global')
     };
 
     const setters = Object.entries(flags).flatMap(([n, f]) =>

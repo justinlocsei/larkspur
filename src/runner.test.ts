@@ -5,7 +5,9 @@ import { OperationalError } from './errors.ts';
 import C from './factory.ts';
 import type { RunRequest } from './runner.ts';
 import { runCLI } from './runner.ts';
-import { createTestContext } from './tests.ts';
+import { createTestContext, useTempFile } from './tests.ts';
+
+import fs from 'node:fs/promises';
 
 const description = 'description';
 const handler = async () => {};
@@ -14,10 +16,7 @@ function testCLI(
   options: Omit<RunRequest, 'context'>,
   context = createTestContext()
 ) {
-  return runCLI({
-    ...options,
-    context
-  });
+  return runCLI({ ...options, context });
 }
 
 describe('runCLI', () => {
@@ -57,6 +56,46 @@ describe('runCLI', () => {
 
     assert(response.type === 'help', 'help not returned');
     assert.include(response.message, 'Show help');
+  });
+
+  it('can show the version', async () => {
+    const response = await testCLI({
+      args: ['--version'],
+      entry: { command: C(description, handler) }
+    }, createTestContext({ version: '1.2.3' }));
+
+    assert(response.type === 'version', 'version not returned');
+    assert.equal(response.message, '1.2.3');
+  });
+
+  it('supports async version providers', async () => {
+    const response = await testCLI({
+      args: ['--version'],
+      entry: { command: C(description, handler) }
+    }, createTestContext({ version: async () => '2.0.0' }));
+
+    assert(response.type === 'version', 'version not returned');
+    assert.equal(response.message, '2.0.0');
+  });
+
+  it('supports dynamic version providers', async () => {
+    await useTempFile(async scriptPath => {
+      await fs.writeFile(scriptPath, '1.0.0');
+
+      const response = await testCLI(
+        {
+          args: ['--version'],
+          entry: { command: C(description, handler) },
+          file: scriptPath
+        },
+        createTestContext({
+          version: c => fs.readFile(c.getEntryFile(), 'utf8')
+        })
+      );
+
+      assert(response.type === 'version', 'version not returned');
+      assert.equal(response.message, '1.0.0');
+    });
   });
 
   it('can explore the CLI', async () => {

@@ -21,6 +21,8 @@
   - [Modular Definitions](#modular-definitions)
 - [CLI Features](#cli-features)
   - [Help Messages](#help-messages)
+  - [Version Reporting](#version-reporting)
+    - [Dynamic Versions](#dynamic-versions)
   - [Command Discovery](#command-discovery)
   - [Shell Completions](#shell-completions)
 - [Configuring Larkspur](#configuring-larkspur)
@@ -113,9 +115,7 @@ await run({
         reporter
       })
     })
-  }),
-
-  version: C('Show the current version', () => '1.0.0')
+  })
 });
 ```
 
@@ -249,6 +249,55 @@ Any CLI built with Larkspur exposes a core set of functionality to a user withou
 
 Larkspur can show help messages for a CLI and each of its commands via a `--help` flag.  Passing this flag to the CLI's root command or a named command group will show all commands available at that level, and using `--help` with a command handler will show all available flags.
 
+### Version Reporting
+
+Larkspur allows you to define a version for your CLI that will be shown to your users if they call `my-cli --version`.  To define a version, provide it as a field in the options object passed to `run`:
+
+```js
+import C, { run } from 'larkspur';
+
+await run(
+  { command: C('A command', () => {}) },
+  { version: '1.0.0' }
+);
+```
+
+This will enable the `--version` flag, which is only accepted by the CLI itself, rather than its commands:
+
+```sh
+my-cli --version
+# => 1.0.0
+
+my-cli command --version
+# => Error: Unknown flag: --version
+```
+
+#### Dynamic Versions
+
+If your CLI's version is stored outside of its definition file, you can use a sync or async function that returns a string for the `version` field.  These functions are given a context object that exposes the following helpers:
+
+* `getEntryFile()`: Return the absolute path to the file Node executed to start your CLI
+* `getPackageVersion()`: Return the `version` field from the nearest `package.json` file
+
+Each of the following examples is a valid dynamic CLI version:
+
+```ts
+import fs from 'node:fs/promises';
+import type { VersionProvider as V } from 'larkspur';
+
+const isSync: V = () => '1.0.0';
+const isAsync: V = async () => '1.0.0';
+
+const fromFile: V = async ctx => {
+  const stats = await fs.stat(ctx.getEntryFile());
+  return `1.0.${stats.mtimeMs}`;
+};
+
+const fromPackage: V = ctx => ctx.getPackageVersion();
+```
+
+Most CLIs should be able to use `getPackageVersion` without issues.  The `getEntryFile` helper is intended as an escape hatch if you are distributing your CLI with an uncommon file structure.
+
 ### Command Discovery
 
 All commands and flags can be recursively listed using the top-level `explore` command. The output is structured and readable by humans or agents, and can be used to quickly gain an understanding of the full set of features offered by the CLI.
@@ -324,12 +373,13 @@ While Larkspur has strong opinions, it allows for some configuration via the opt
 import C, { run } from 'larkspur';
 
 await run(
-  { version: C('Show the current version', () => '1.0.0') },
+  { command: C('A command', () => {}) },
   {
     completions: { enabled: false },
     explore: { command: 'document' },
     help: { indent: 2 },
-    name: 'custom-name'
+    name: 'custom-name',
+    version: '1.0.0'
   }
 )
 ```
@@ -343,6 +393,7 @@ The available configuration options are as follows:
 * `explore.enabled`: Whether the explore command is available (default: `true`)
 * `help.indent`: The number of spaces used for indentation in help message (default: `2`)
 * `name`: A custom program name shown in help messages, which can be used if the inferred name of the CLI is incorrect
+* `version`: A version string or a function that returns one
 
 All of the properties above are optional.  If partial configuration data is provided, such as a `completions` object with a `group` but no `enabled` value, user-provided values will be merged on top of the default values.
 

@@ -89,7 +89,8 @@ export function createTestContext({
   description,
   explore,
   help,
-  name = 'testing'
+  name = 'testing',
+  version
 }: TestContextOptions = {}): Context {
   const config: UserConfig = { help };
 
@@ -101,7 +102,7 @@ export function createTestContext({
     config.explore = explore || { enabled: false };
   }
 
-  return createContext({ description, name }, config);
+  return createContext({ description, name, version }, config);
 }
 
 /**
