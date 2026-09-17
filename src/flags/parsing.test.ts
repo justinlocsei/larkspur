@@ -1,10 +1,14 @@
 import { afterEach, assert, beforeEach, describe, it } from 'vitest';
 
 import { NormalizedArgs } from '../args.ts';
-import { resolveConfig } from '../config.ts';
 import C from '../factory.ts';
 import { abs, filesystemRoot } from '../tests/paths.ts';
-import { checkConversion, ensure, inspect } from '../tests.ts';
+import {
+  checkConversion,
+  createTestContext,
+  ensure,
+  inspect
+} from '../tests.ts';
 import type { DistributiveOmit } from '../types/utils.ts';
 import { useFlag, useFlags } from './definition.ts';
 import type { FlagParsing, ParsingOptions } from './parsing.ts';
@@ -54,7 +58,10 @@ describe('extractValues', () => {
 
 describe('getSharedFlagValue', () => {
   it('gets the value of a shared flag', () => {
-    const flags = useSharedFlags(resolveConfig());
+    const flags = useSharedFlags(
+      createTestContext({ version: '1.0.0' }),
+      'global'
+    );
 
     const empty = parse([], flags);
     const full = parse(['--help'], flags);
