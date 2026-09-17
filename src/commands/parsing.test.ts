@@ -586,6 +586,31 @@ describe('parseCommand', () => {
     await ensure.rejects(() => parsed.run(context), '@error');
   });
 
+  it('can show the version at the root', () => {
+    const result = parse(['--version'], {
+      command: C(description, handler)
+    }, createTestContext({ version: '1.0.0' }));
+
+    assert.equal(result.type, 'version');
+  });
+
+  it('only supports a version flag when a version is defined', () => {
+    const result = parse(['--version'], {
+      command: C(description, handler)
+    });
+
+    assert.equal(result.type, 'error');
+  });
+
+  it('does not treat version as a root flag outside the root', () => {
+    const result = parse(['command', '--version'], {
+      command: C(description, handler)
+    }, createTestContext({ version: '1.0.0' }));
+
+    assert(result.type === 'error', 'No version flag outside the root');
+    assert.include(result.message, '--version');
+  });
+
   it('can request help', () => {
     const result = parse(['--help'], {
       command: C(description, handler)
