@@ -133,14 +133,16 @@ describe('applyMiddleware', () => {
     const stack = [
       middleware('outer', {
         handler: async next => {
-          order.push('outer');
-          return next();
+          order.push('outer:before');
+          await next();
+          order.push('outer:after');
         }
       }),
       middleware('inner', {
         handler: async next => {
-          order.push('inner');
-          return next();
+          order.push('inner:before');
+          await next();
+          order.push('inner:after');
         }
       })
     ];
@@ -150,6 +152,7 @@ describe('applyMiddleware', () => {
       C.tree({
         deploy: C(description, async () => {
           order.push('deploy');
+          return '@deploy';
         }),
         db: C.group(description, {
           migrate: C(description, async () => {
@@ -161,19 +164,29 @@ describe('applyMiddleware', () => {
 
     const deploy = parseCommand(['deploy'], tree, context);
     assert(deploy.type === 'command', 'deploy not parsed');
-    await deploy.run(context);
+
+    const deployResult = await deploy.run(context);
+    assert(deployResult.type === 'success', 'deploy failed');
+    assert.equal(deployResult.output, '@deploy');
 
     const migrate = parseCommand(['db', 'migrate'], tree, context);
     assert(migrate.type === 'command', 'migrate not parsed');
-    await migrate.run(context);
+
+    const migrateResult = await migrate.run(context);
+    assert(migrateResult.type === 'success', 'migrate failed');
+    assert.isUndefined(migrateResult.output);
 
     assert.deepEqual(order, [
-      'outer',
-      'inner',
+      'outer:before',
+      'inner:before',
       'deploy',
-      'outer',
-      'inner',
-      'migrate'
+      'inner:after',
+      'outer:after',
+      'outer:before',
+      'inner:before',
+      'migrate',
+      'inner:after',
+      'outer:after'
     ]);
   });
 
