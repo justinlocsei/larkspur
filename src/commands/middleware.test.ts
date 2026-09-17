@@ -200,6 +200,7 @@ describe('applyMiddleware', () => {
     const tree = applyMiddleware(
       stack,
       C.tree({
+        command: undefined,
         deploy: C(description, async () => {
           order.push('deploy');
           return '@deploy';
@@ -211,6 +212,8 @@ describe('applyMiddleware', () => {
         })
       })
     );
+
+    assert.isUndefined(tree.command);
 
     const deploy = parseCommand(['deploy'], tree, context);
     assert(deploy.type === 'command', 'deploy not parsed');
