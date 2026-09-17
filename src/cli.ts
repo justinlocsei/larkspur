@@ -80,7 +80,8 @@ export async function run(
   const response = await runCLI({
     args: args.slice(2),
     context,
-    entry: resolvedEntry
+    entry: resolvedEntry,
+    file: args[1]
   });
 
   switch (response.type) {

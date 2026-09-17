@@ -18,6 +18,7 @@ export type RunRequest = {
   args: string[];
   context: Context;
   entry: EntryPoint;
+  file?: string;
 };
 
 /**
@@ -79,7 +80,8 @@ function failWith(error: Error, help?: string): ErrorRunResponse {
 export async function runCLI({
   args,
   context,
-  entry
+  entry,
+  file
 }: RunRequest): Promise<RunResponse> {
   let parsing: ParsingResult;
   let commands: EntryPoint;
