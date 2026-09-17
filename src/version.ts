@@ -24,12 +24,14 @@ function createContext(file?: string): VersionContext {
 function resolvePackageManifest(directory: string): string | undefined {
   const candidate = path.join(directory, PACKAGE_JSON);
 
-  // codeql[js/path-injection]
-  if (!fs.existsSync(candidate)) {
+  let packagePath: string;
+
+  try {
+    // codeql[js/path-injection]
+    packagePath = fs.realpathSync(candidate);
+  } catch {
     return undefined;
   }
-
-  const packagePath = fs.realpathSync(candidate);
 
   if (path.basename(packagePath) !== PACKAGE_JSON) {
     throw new Error(`Invalid package manifest path: ${packagePath}`);
