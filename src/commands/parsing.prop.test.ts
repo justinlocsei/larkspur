@@ -3,16 +3,18 @@ import { assert } from 'vitest';
 
 import C from '../factory.ts';
 import { argv, identifier, singleCommand } from '../tests/properties.ts';
+import { createTestContext } from '../tests.ts';
 import { parseCommand } from './parsing.ts';
 import type { CommandTree } from './types.ts';
 
 const description = 'description';
 const handler = async () => {};
+const context = createTestContext();
 
 test.prop([singleCommand])(
   'valid command names resolve to handlers',
   command => {
-    const result = parseCommand([command.name], command.tree);
+    const result = parseCommand([command.name], command.tree, context);
 
     assert.equal(result.type, 'command');
   }
@@ -23,7 +25,7 @@ test.prop([argv, singleCommand])(
   (args, command) => {
     const result = parseCommand([command.name, ...args], {
       [command.name]: C(description, handler)
-    });
+    }, context);
 
     assert.equal(result.type, args.length === 0 ? 'command' : 'error');
   }
@@ -41,7 +43,7 @@ test.prop([
     const command = names[0];
     assert.isDefined(command, 'no command available');
 
-    const result = parseCommand([command], commands);
+    const result = parseCommand([command], commands, context);
     assert.equal(result.type, 'command');
   }
 );
@@ -65,7 +67,7 @@ test.prop([
       commands = { [branch]: C.group(description, commands) };
     }
 
-    const result = parseCommand(names, commands);
+    const result = parseCommand(names, commands, context);
     assert.equal(result.type, 'command');
   }
 );
