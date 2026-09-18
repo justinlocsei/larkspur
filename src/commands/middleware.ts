@@ -206,8 +206,7 @@ function wrapCommand(
  */
 function applyToCommand(
   stack: MiddlewareCommand[],
-  command: GenericCommandHandler,
-  path: string[]
+  command: GenericCommandHandler
 ): GenericCommandHandler {
   const { flags = {}, handler } = command;
 
@@ -280,7 +279,7 @@ function applyToTree(
       target[name] = group;
       push(command.subcommands, group.subcommands, path);
     } else {
-      target[name] = applyToCommand(middleware, command, path);
+      target[name] = applyToCommand(middleware, command);
     }
   }
 
@@ -303,7 +302,7 @@ export function applyMiddleware<T extends MiddlewareTarget>(
 ): T {
   if (isCommand(target)) {
     return target.type === 'handler'
-      ? applyToCommand(stack, target, []) as T
+      ? applyToCommand(stack, target) as T
       : {
         ...target,
         subcommands: applyToTree(stack, target.subcommands)
