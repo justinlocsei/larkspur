@@ -57,32 +57,32 @@ export type MiddlewareHandler<
  * A middleware command
  */
 export type MiddlewareCommand = {
+  description: string;
   flags?: Flags;
   handler: MiddlewareHandler;
-  id: string;
 };
 
 /**
  * Build a middleware command
  */
 export function buildMiddleware(
-  id: string,
+  description: string,
   handler: MiddlewareHandler
 ): MiddlewareCommand;
 export function buildMiddleware<T extends Flags>(
-  id: string,
+  description: string,
   flags: T,
   handler: MiddlewareHandler<T, 'narrow'>
 ): MiddlewareCommand;
 export function buildMiddleware<T extends Flags>(
-  id: string,
+  description: string,
   flags?: T | MiddlewareHandler,
   handler?: MiddlewareHandler<T, 'narrow'>
 ): MiddlewareCommand {
   if (typeof flags === 'function') {
     return {
-      handler: flags,
-      id
+      description,
+      handler: flags
     };
   }
 
@@ -91,9 +91,9 @@ export function buildMiddleware<T extends Flags>(
   }
 
   return {
+    description,
     flags,
-    handler: handler as MiddlewareHandler,
-    id
+    handler: handler as MiddlewareHandler
   };
 }
 
@@ -119,13 +119,12 @@ function mergeMiddlewareFlags(
 ): Flags {
   const merged = { ...commandFlags };
 
-  for (const { flags = {}, id } of stack) {
+  for (const { description, flags = {} } of stack) {
     for (const [name, flag] of sortEntries(flags)) {
       if (name in merged) {
         throw new OperationalError(
-          `The ${
-            flagToSetter(name)
-          } flag from the ${id} middleware is already present on command: ${
+          `Failed to apply middleware: ${description}`,
+          `The ${flagToSetter(name)} flag is already present on command: ${
             path.join(' > ')
           }`
         );
@@ -170,7 +169,7 @@ function wrapCommand(
       return;
     }
 
-    const { flags = {}, handler, id } = middleware;
+    const { description, flags = {}, handler } = middleware;
     let continued = false;
 
     await handler(
@@ -186,7 +185,8 @@ function wrapCommand(
 
     if (!continued) {
       throw new OperationalError(
-        `Middleware "${id}" did not continue the chain`
+        'Middleware did not continue the chain',
+        description
       );
     }
   };

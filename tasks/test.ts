@@ -5,7 +5,7 @@ import { build } from './build.ts';
 import { defineFilters, runSuite, runTests, SUITES } from './helpers/tests.ts';
 
 const preBuild = C.middleware(
-  'pre-build',
+  'Pre-build Larkspur',
   {
     build: C.flag(
       'boolean',
