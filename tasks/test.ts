@@ -40,7 +40,7 @@ export default C.group('Run tests', {
         {
           reporter: C.flag('choice', 'A coverage reporter', {
             choices: ['html', 'text'],
-            default: 'text'
+            default: 'html'
           })
         },
         ({ reporter }) => {
