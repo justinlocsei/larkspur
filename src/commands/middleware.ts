@@ -32,6 +32,17 @@ type NextFn = () => Promise<void>;
 export type FlagValues = Record<string, unknown>;
 
 /**
+ * The context passed to a middleware handler
+ */
+type MiddlewareHandlerContext<
+  F extends Flags = Flags,
+  C extends FlagContext = 'wide'
+> = {
+  command: string[];
+  flags: ValuesOf<F, C>;
+};
+
+/**
  * A middleware command's handler
  */
 export type MiddlewareHandler<
@@ -39,7 +50,7 @@ export type MiddlewareHandler<
   C extends FlagContext = 'wide'
 > = (
   next: NextFn,
-  flags: ValuesOf<F, C>
+  context: MiddlewareHandlerContext<F, C>
 ) => Promise<void>;
 
 /**
@@ -52,16 +63,11 @@ export type MiddlewareCommand = {
 };
 
 /**
- * A middleware handler without flags
- */
-type FlaglessHandler = (next: NextFn) => Promise<void>;
-
-/**
  * Build a middleware command
  */
 export function buildMiddleware(
   id: string,
-  handler: FlaglessHandler
+  handler: MiddlewareHandler
 ): MiddlewareCommand;
 export function buildMiddleware<T extends Flags>(
   id: string,
@@ -70,12 +76,12 @@ export function buildMiddleware<T extends Flags>(
 ): MiddlewareCommand;
 export function buildMiddleware<T extends Flags>(
   id: string,
-  flags?: T | FlaglessHandler,
+  flags?: T | MiddlewareHandler,
   handler?: MiddlewareHandler<T, 'narrow'>
 ): MiddlewareCommand {
   if (typeof flags === 'function') {
     return {
-      handler: async next => flags(next),
+      handler: flags,
       id
     };
   }
@@ -140,7 +146,8 @@ function wrapCommand(
   commandHandler: GenericHandlerFn,
   commandFlags: Flags,
   parsedFlags: FlagValues,
-  details: CommandParsingDetails
+  details: CommandParsingDetails,
+  command: string[]
 ): () => Promise<string | undefined> {
   let output: string | undefined;
 
@@ -171,7 +178,10 @@ function wrapCommand(
         continued = true;
         await runAt(index + 1);
       },
-      pickFlagValues(parsedFlags, flags)
+      {
+        command,
+        flags: pickFlagValues(parsedFlags, flags)
+      }
     );
 
     if (!continued) {
@@ -206,7 +216,8 @@ function applyToCommand(
       handler,
       flags,
       parsedFlags,
-      details
+      details,
+      path
     );
 
     return run();

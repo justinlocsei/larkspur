@@ -22,7 +22,7 @@ describe('buildMiddleware', () => {
     const command = buildMiddleware(
       'logging',
       { verbose: { description, type: 'boolean' } },
-      async (next, flags) => {
+      async (next, { flags }) => {
         assert.isDefined(flags.verbose);
         return next();
       }
@@ -40,7 +40,7 @@ describe('buildMiddleware', () => {
         number: { description, type: 'number' },
         string: { description, required: true, type: 'string' }
       },
-      async (next, flags) => {
+      async (next, { flags }) => {
         T.assert<
           T.Equivalent<
             typeof flags,
@@ -272,7 +272,7 @@ describe('applyMiddleware', () => {
         buildMiddleware(
           'logging',
           { verbose: { description, type: 'boolean' } },
-          async (next, flags) => {
+          async (next, { flags }) => {
             seen.logging = flags;
             await next();
           }
@@ -348,6 +348,35 @@ describe('applyMiddleware', () => {
 
     assert.instanceOf(result.error, OperationalError);
     assert.equal(result.error.message, '@failed');
+  });
+
+  it('passes the command path to middleware handlers', async () => {
+    const paths: string[][] = [];
+
+    const tree = applyMiddleware(
+      [
+        buildMiddleware('logging', async (next, { command }) => {
+          paths.push(command);
+          await next();
+        })
+      ],
+      C.tree({
+        deploy: C(description, handler),
+        db: C.group(description, {
+          migrate: C(description, handler)
+        })
+      })
+    );
+
+    const deploy = parseCommand(['deploy'], tree, context);
+    assert(deploy.type === 'command', 'deploy not parsed');
+    await deploy.run(context);
+
+    const migrate = parseCommand(['db', 'migrate'], tree, context);
+    assert(migrate.type === 'command', 'migrate not parsed');
+    await migrate.run(context);
+
+    assert.deepEqual(paths, [['deploy'], ['db', 'migrate']]);
   });
 
   it('throws when middleware exits without continuing the chain', async () => {
