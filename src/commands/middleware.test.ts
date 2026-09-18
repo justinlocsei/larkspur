@@ -380,6 +380,37 @@ describe('applyMiddleware', () => {
     assert.deepEqual(paths, [['deploy'], ['db', 'migrate']]);
   });
 
+  it('passes the full command path when middleware is applied at multiple levels', async () => {
+    let inner: string[] = [];
+    let outer: string[] = [];
+
+    const tree = applyMiddleware(
+      [buildMiddleware('Outer', async (next, { command }) => {
+        outer = command;
+        await next();
+      })],
+      C.tree({
+        test: applyMiddleware(
+          [buildMiddleware('Inner', async (next, { command }) => {
+            inner = command;
+            await next();
+          })],
+          C.group(description, {
+            unit: C(description, handler)
+          })
+        )
+      })
+    );
+
+    const parsed = parseCommand(['test', 'unit'], tree, context);
+    assert(parsed.type === 'command', 'command not parsed');
+
+    await parsed.run(context);
+
+    assert.deepEqual(inner, ['test', 'unit']);
+    assert.deepEqual(inner, outer);
+  });
+
   it('throws when middleware exits without continuing the chain', async () => {
     const tree = applyMiddleware(
       [

@@ -145,8 +145,7 @@ function wrapCommand(
   commandHandler: GenericHandlerFn,
   commandFlags: Flags,
   parsedFlags: FlagValues,
-  details: CommandParsingDetails,
-  command: string[]
+  details: CommandParsingDetails
 ): () => Promise<string | undefined> {
   let output: string | undefined;
 
@@ -178,7 +177,7 @@ function wrapCommand(
         await runAt(index + 1);
       },
       {
-        command,
+        command: details.path,
         flags: pickFlagValues(parsedFlags, flags)
       }
     );
@@ -216,8 +215,7 @@ function applyToCommand(
       handler,
       flags,
       parsedFlags,
-      details,
-      path
+      details
     );
 
     return run();
