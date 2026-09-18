@@ -1,5 +1,6 @@
 import { assert, describe, it } from 'vitest';
 
+import { applyMiddleware, buildMiddleware } from './commands/middleware.ts';
 import type { CommandTree } from './commands/types.ts';
 import { OperationalError } from './errors.ts';
 import C from './factory.ts';
@@ -174,6 +175,36 @@ describe('validateCommands', () => {
           })
         }, context),
       'Invalid flag --BadFlag on command: parent > leaf'
+    );
+  });
+
+  it('reports the first middleware flag conflict', () => {
+    const timing = 'Time command execution';
+
+    checkError(
+      () =>
+        validateCommands(
+          applyMiddleware(
+            [
+              buildMiddleware(
+                'Log command output',
+                { verbose: { description, type: 'boolean' } },
+                async next => next()
+              ),
+              buildMiddleware(
+                timing,
+                { verbose: { description, type: 'boolean' } },
+                async next => next()
+              )
+            ],
+            C.tree({
+              alfa: C(description, handler),
+              bravo: C(description, handler)
+            })
+          ),
+          context
+        ),
+      `Failed to apply middleware: ${timing}\nThe --verbose flag is already present on command: alfa`
     );
   });
 

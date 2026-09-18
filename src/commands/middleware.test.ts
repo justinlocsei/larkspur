@@ -10,7 +10,11 @@ import {
   T
 } from '../tests.ts';
 import type { FlagValues, MiddlewareHandler } from './middleware.ts';
-import { applyMiddleware, buildMiddleware } from './middleware.ts';
+import {
+  applyMiddleware,
+  buildMiddleware,
+  getFlagConflicts
+} from './middleware.ts';
 import { parseCommand } from './parsing.ts';
 
 const context = createTestContext();
@@ -119,49 +123,86 @@ describe('applyMiddleware', () => {
     ]);
   });
 
-  it('throws when a middleware flag conflicts with a command flag', () => {
-    assert.throws(
-      () =>
-        applyMiddleware(
-          [
-            buildMiddleware(
-              logging,
-              { verbose: { description, type: 'boolean' } },
-              async next => next()
-            )
-          ],
-          C.tree({
-            echo: C(description, {
-              verbose: { description, type: 'boolean' }
-            }, handler)
-          })
-        ),
-      `Failed to apply middleware: ${logging}\nThe --verbose flag is already present on command: echo`
+  it('records flag conflicts with commands', () => {
+    const tree = applyMiddleware(
+      [
+        buildMiddleware(
+          logging,
+          { verbose: { description, type: 'boolean' } },
+          async next => next()
+        )
+      ],
+      C.tree({
+        echo: C(description, {
+          verbose: { description, type: 'boolean' }
+        }, handler)
+      })
     );
+
+    const echo = tree.echo;
+    assert(echo?.type === 'handler', 'echo not defined');
+
+    assert.deepEqual(getFlagConflicts(echo), [
+      { description: logging, flag: 'verbose' }
+    ]);
   });
 
-  it('throws when middleware flags conflict with each other', () => {
-    assert.throws(
-      () =>
-        applyMiddleware(
-          [
-            buildMiddleware(
-              logging,
-              { verbose: { description, type: 'boolean' } },
-              async next => next()
-            ),
-            buildMiddleware(
-              'Time command execution',
-              { verbose: { description, type: 'boolean' } },
-              async next => next()
-            )
-          ],
-          C.tree({
-            deploy: C(description, handler)
-          })
+  it('records flag conflicts between middleware entries', () => {
+    const timing = 'Time command execution';
+
+    const tree = applyMiddleware(
+      [
+        buildMiddleware(
+          logging,
+          { verbose: { description, type: 'boolean' } },
+          async next => next()
         ),
-      'on command: deploy'
+        buildMiddleware(
+          timing,
+          { verbose: { description, type: 'boolean' } },
+          async next => next()
+        )
+      ],
+      C.tree({
+        deploy: C(description, handler)
+      })
     );
+
+    const deploy = tree.deploy;
+    assert(deploy?.type === 'handler', 'deploy not defined');
+
+    assert.deepEqual(getFlagConflicts(deploy), [
+      { description: timing, flag: 'verbose' }
+    ]);
+  });
+
+  it('records flag conflicts on nested commands', () => {
+    const tree = applyMiddleware(
+      [
+        buildMiddleware(
+          logging,
+          { verbose: { description, type: 'boolean' } },
+          async next => next()
+        )
+      ],
+      C.tree({
+        test: C.group(description, {
+          unit: C(description, {
+            verbose: { description, type: 'boolean' }
+          }, handler)
+        })
+      })
+    );
+
+    const group = tree.test;
+    assert(group?.type === 'group', 'test group not defined');
+
+    const unit = group.subcommands.unit;
+    assert(unit?.type === 'handler', 'unit not defined');
+
+    assert.deepEqual(getFlagConflicts(unit), [
+      { description: logging, flag: 'verbose' }
+    ]);
   });
 
   it('applies middleware to handlers within a group', async () => {

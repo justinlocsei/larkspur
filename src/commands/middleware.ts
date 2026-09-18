@@ -1,5 +1,3 @@
-import { OperationalError } from '../errors.ts';
-import { flagToSetter } from '../flags/data.ts';
 import type { FlagContext, Flags } from '../flags/types.ts';
 import type { ValuesOf } from '../flags/values.ts';
 import { drain, sortEntries } from '../utils.ts';
@@ -110,31 +108,73 @@ function pickFlagValues(
 }
 
 /**
+ * Merged middleware flags
+ */
+type MergedFlags = {
+  conflicts: FlagConflict[];
+  flags: Flags;
+};
+
+/**
+ * A middleware flag that would conflict with an existing one
+ */
+type FlagConflict = {
+  description: string;
+  flag: string;
+};
+
+/**
+ * A source of flag conflicts
+ */
+type ConflictSource = Record<symbol, FlagConflict[]>;
+
+const flagConflicts = Symbol('middlewareFlagConflicts');
+
+/**
+ * Read flag conflicts recorded on a command handler
+ */
+export function getFlagConflicts(
+  command: GenericCommandHandler
+): FlagConflict[] {
+  const conflicts = (command as ConflictSource)[flagConflicts];
+
+  return conflicts ? [...conflicts] : [];
+}
+
+/**
+ * Record flag conflicts on a command handler
+ */
+function setFlagConflicts(
+  command: GenericCommandHandler,
+  conflicts: FlagConflict[]
+): void {
+  if (conflicts.length) {
+    (command as ConflictSource)[flagConflicts] = conflicts;
+  }
+}
+
+/**
  * Merge middleware flags into a command's flags
  */
 function mergeMiddlewareFlags(
   stack: MiddlewareCommand[],
   commandFlags: Flags,
-  path: string[]
-): Flags {
+  existingConflicts: FlagConflict[]
+): MergedFlags {
   const merged = { ...commandFlags };
+  const conflicts = [...existingConflicts];
 
   for (const { description, flags = {} } of stack) {
     for (const [name, flag] of sortEntries(flags)) {
       if (name in merged) {
-        throw new OperationalError(
-          `Failed to apply middleware: ${description}`,
-          `The ${flagToSetter(name)} flag is already present on command: ${
-            path.join(' > ')
-          }`
-        );
+        conflicts.push({ description, flag: name });
       }
 
       merged[name] = flag;
     }
   }
 
-  return merged;
+  return { conflicts, flags: merged };
 }
 
 /**
@@ -206,8 +246,7 @@ function wrapCommand(
  */
 function applyToCommand(
   stack: MiddlewareCommand[],
-  command: GenericCommandHandler,
-  path: string[]
+  command: GenericCommandHandler
 ): GenericCommandHandler {
   const { flags = {}, handler } = command;
 
@@ -226,11 +265,21 @@ function applyToCommand(
     return run();
   };
 
-  return {
+  const merged = mergeMiddlewareFlags(
+    stack,
+    flags,
+    getFlagConflicts(command)
+  );
+
+  const wrapped: GenericCommandHandler = {
     ...command,
-    flags: mergeMiddlewareFlags(stack, flags, path),
+    flags: merged.flags,
     handler: wrappedHandler as GenericHandlerFn
   };
+
+  setFlagConflicts(wrapped, merged.conflicts);
+
+  return wrapped;
 }
 
 /**
@@ -280,7 +329,7 @@ function applyToTree(
       target[name] = group;
       push(command.subcommands, group.subcommands, path);
     } else {
-      target[name] = applyToCommand(middleware, command, path);
+      target[name] = applyToCommand(middleware, command);
     }
   }
 
@@ -303,7 +352,7 @@ export function applyMiddleware<T extends MiddlewareTarget>(
 ): T {
   if (isCommand(target)) {
     return target.type === 'handler'
-      ? applyToCommand(stack, target, []) as T
+      ? applyToCommand(stack, target) as T
       : {
         ...target,
         subcommands: applyToTree(stack, target.subcommands)

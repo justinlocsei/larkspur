@@ -1,4 +1,9 @@
-import type { Command, CommandTree } from './commands/types.ts';
+import { getFlagConflicts } from './commands/middleware.ts';
+import type {
+  Command,
+  CommandTree,
+  GenericCommandHandler
+} from './commands/types.ts';
 import { OperationalError } from './errors.ts';
 import { flagToSetter } from './flags/data.ts';
 import { NEGATE_BOOLEAN } from './flags/names.ts';
@@ -67,9 +72,30 @@ export function validateCommands(
 
     if (command.type === 'group') {
       push(command.subcommands, path);
-    } else if (command.flags) {
-      validateFlags(command.flags, scope, context);
+    } else {
+      validateMiddleware(command, scope);
+
+      if (command.flags) {
+        validateFlags(command.flags, scope, context);
+      }
     }
+  }
+}
+
+/**
+ * Validate any middleware applied to a command
+ */
+function validateMiddleware(
+  command: GenericCommandHandler,
+  scope: string
+): void {
+  for (const conflict of getFlagConflicts(command)) {
+    throw new OperationalError(
+      `Failed to apply middleware: ${conflict.description}`,
+      `The ${
+        flagToSetter(conflict.flag)
+      } flag is already present on command: ${scope}`
+    );
   }
 }
 
