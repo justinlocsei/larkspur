@@ -144,7 +144,7 @@ function wrapCommand(
 ): () => Promise<string | undefined> {
   let output: string | undefined;
 
-  let next: NextFn = async () => {
+  const runCommand: NextFn = async () => {
     const result = await commandHandler(
       pickFlagValues(parsedFlags, commandFlags),
       details
@@ -155,31 +155,34 @@ function wrapCommand(
     }
   };
 
-  for (const middleware of [...stack].reverse()) {
+  const runAt = async (index: number): Promise<void> => {
+    const middleware = stack[index];
+
+    if (!middleware) {
+      await runCommand();
+      return;
+    }
+
     const { flags = {}, handler, id } = middleware;
-    const innerNext = next;
+    let continued = false;
 
-    next = async () => {
-      let continued = false;
+    await handler(
+      async () => {
+        continued = true;
+        await runAt(index + 1);
+      },
+      pickFlagValues(parsedFlags, flags)
+    );
 
-      await handler(
-        async () => {
-          continued = true;
-          return innerNext();
-        },
-        pickFlagValues(parsedFlags, flags)
+    if (!continued) {
+      throw new OperationalError(
+        `Middleware "${id}" did not continue the chain`
       );
-
-      if (!continued) {
-        throw new OperationalError(
-          `Middleware "${id}" did not continue the chain`
-        );
-      }
-    };
-  }
+    }
+  };
 
   return async () => {
-    await next();
+    await runAt(0);
     return output;
   };
 }
