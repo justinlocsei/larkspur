@@ -160,6 +160,10 @@ function wrapCommand(
     }
   };
 
+  const abort = (message: string, description: string): never => {
+    throw new Error(`${message}\n${description}`);
+  };
+
   const runAt = async (index: number): Promise<void> => {
     const middleware = stack[index];
 
@@ -174,10 +178,7 @@ function wrapCommand(
     await handler(
       async () => {
         if (continued) {
-          throw new OperationalError(
-            'Middleware called next() more than once',
-            description
-          );
+          abort('Middleware called next() more than once', description);
         }
 
         continued = true;
@@ -190,10 +191,7 @@ function wrapCommand(
     );
 
     if (!continued) {
-      throw new OperationalError(
-        'Middleware did not continue the chain',
-        description
-      );
+      abort('Middleware did not continue the chain', description);
     }
   };
 

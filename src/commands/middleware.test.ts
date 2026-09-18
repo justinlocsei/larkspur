@@ -2,7 +2,13 @@ import { assert, describe, it } from 'vitest';
 
 import { OperationalError } from '../errors.ts';
 import C from '../factory.ts';
-import { createTestContext, description, handler, T } from '../tests.ts';
+import {
+  createTestContext,
+  description,
+  ensure,
+  handler,
+  T
+} from '../tests.ts';
 import type { FlagValues, MiddlewareHandler } from './middleware.ts';
 import { applyMiddleware, buildMiddleware } from './middleware.ts';
 import { parseCommand } from './parsing.ts';
@@ -452,10 +458,7 @@ describe('applyMiddleware', () => {
     const parsed = parseCommand(['deploy'], tree, context);
     assert(parsed.type === 'command', 'command not parsed');
 
-    const result = await parsed.run(context);
-    assert(result.type === 'failure', 'command succeeded');
-
-    assert.match(result.error.message, /called next/);
+    await ensure.rejects(() => parsed.run(context), 'called next');
     assert.equal(runs, 1);
   });
 
@@ -472,8 +475,6 @@ describe('applyMiddleware', () => {
     const parsed = parseCommand(['deploy'], tree, context);
     assert(parsed.type === 'command', 'command not parsed');
 
-    const result = await parsed.run(context);
-    assert(result.type === 'failure', 'command succeeded');
-    assert.match(result.error.message, /did not continue the chain/);
+    await ensure.rejects(() => parsed.run(context), 'chain');
   });
 });
