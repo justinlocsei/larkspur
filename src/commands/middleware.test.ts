@@ -262,6 +262,27 @@ describe('applyMiddleware', () => {
     assert.equal(result.output, '@output');
   });
 
+  it('returns string output through nested middleware wrappers', async () => {
+    const tree = applyMiddleware(
+      [buildMiddleware('Outer', async next => next())],
+      C.tree({
+        test: applyMiddleware(
+          [buildMiddleware('Inner', async next => next())],
+          C.group(description, {
+            echo: C(description, async () => '@output')
+          })
+        )
+      })
+    );
+
+    const parsed = parseCommand(['test', 'echo'], tree, context);
+    assert(parsed.type === 'command', 'command not parsed');
+
+    const result = await parsed.run(context);
+    assert(result.type === 'success', 'command failed');
+    assert.equal(result.output, '@output');
+  });
+
   it('merges flags and passes each handler only its subset', async () => {
     const seen = {
       command: {} as FlagValues,
