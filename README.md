@@ -483,6 +483,7 @@ A handler has access to details about how the command was parsed before executio
 * `commands`: The complete command tree
 * `context.config`: Resolved values for all configurable properties
 * `context.metadata`: The name and description of the current CLI
+* `path`: The path to the command as a list of strings, such as `['test', 'unit']`
 * `providedFlags`: A set containing the names of all flags that were provided by the user
 
 These details can be used to customize the behavior of a command:
