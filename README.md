@@ -909,7 +909,7 @@ Middleware commands are defined using the `C.middleware` function.  This offers 
 * `C.middleware(description, handler)`: Define action-only middleware
 * `C.middleware(description, flags, handler)`: Define middleware that adds flags to any wrapped commands and can access them in its handler
 
-A middleware handler is an async function that is given a `next` function and a context object.  A handler must call `next` to run the next action in the chain; not doing so will throw an error.  The context object has the following fields:
+A middleware handler is an async function that is given a `next` function and a context object.  A handler must call and await `next` to run the next action in the chain; not doing so will throw an error.  The context object has the following fields:
 
 * `command`: The full path to the command as a list of strings, such as `['test', 'unit']`
 * `flags`: Parsed flag values, if the middleware defines flags
