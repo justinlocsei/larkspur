@@ -43,6 +43,9 @@
   - [Repeatable Flags](#repeatable-flags)
   - [Flag Validation](#flag-validation)
   - [Custom Completions](#custom-completions)
+- [Middleware](#middleware)
+  - [Defining Middleware](#defining-middleware)
+  - [Applying Middleware](#applying-middleware)
 - [TypeScript](#typescript)
   - [Public Types](#public-types)
   - [Typed Helpers](#typed-helpers)
@@ -810,6 +813,112 @@ my-cli test --value test<TAB>
 ```
 
 While this is an advanced feature, it provides excellent completions in cases where building the list of suggestions requires complex logic.  For example, [Larkspur's own test commands](https://github.com/justinlocsei/larkspur/blob/main/tasks/test.ts) use custom completions for a `--file` flag that search the source tree for test files and provide them as relative paths without extensions, matching the expectations of Vitest.
+
+## Middleware
+
+Larkspur supports middleware commands that can extend existing commands in your CLI with additional flags and custom logic executed before and after your command's core logic.  To keep this concrete, let's start with an example:
+
+```js
+import C, { applyMiddleware, run } from 'larkspur';
+
+// Run a build before the command unless --no-build is passed
+//
+// The handler function only has access to the build flag, and will not be able
+// to read values for flags from other middleware or the wrapped command.
+const preBuild = C.middleware(
+  'Build the app before running a command',
+  { build: C.flag('boolean', 'Build the app', { default: true }) },
+  async (next, { flags }) => {
+    if (flags.build) {
+      await runAppBuild();
+    }
+
+    await next();
+  }
+);
+
+// Log the execution time of a task
+//
+// This runs code before and after the execution of the command, since calling
+// `await next()` invokes the command.  It uses the full path to the command to
+// generate labels like "test > unit".
+const profile = C.middleware(
+  'Profile the execution of a task',
+  async (next, { command }) => {
+    const label = command.join(' > ');
+
+    console.time(label);
+    await next();
+    console.timeEnd(label);
+  }
+);
+
+// Report any command errors to a theoretical tracking system
+//
+// This uses a try/catch block to forward an error in the case of a crash but
+// otherwise acts as transparent middleware.
+const reportErrors = C.middleware(
+  'Report errors to an external system',
+  async next => {
+    try {
+      await next();
+    } catch (error) {
+      await reportCommandError(error);
+      throw error;
+    }
+  }
+);
+
+// Apply middleware to different levels of the CLI
+//
+// This results in the following middleware chains for each command:
+//
+//   lint             | reportErrors > profile
+//   noop             | reportErrors
+//   test integration | reportErrors > profile > preBuild
+//   test unit        | reportErrors > profile > preBuild
+//
+// Middleware commands are called from left to right, so profiling will include
+// any time spent pre-building the application before running tests.
+const cli = applyMiddleware([reportErrors], C.tree({
+  lint: applyMiddleware(
+    [profile],
+    C('Run the linter', runLinter)
+  ),
+
+  noop: C('An empty command', () => {}),
+
+  test: applyMiddleware(
+    [profile, preBuild],
+    C.group('Run tests', {
+      integration: C('Run integration tests', runIntegrationTests),
+      unit: C('Run unit tests', runUnitTests),
+    })
+  )
+}));
+
+await run(cli);
+```
+
+The use of nested `applyMiddleware` calls allows you to compose stacks of middleware, with `reportErrors` applied to the entire stack but `preBuild` only running on the commands within the `test` group.
+
+### Defining Middleware
+
+Middleware commands are defined using the `C.middleware` function.  This offers the following signatures:
+
+* `C.middleware(description, handler)`: Define action-only middleware
+* `C.middleware(description, flags, handler)`: Define middleware that adds flags to any wrapped commands and can access them in its handler
+
+A middleware handler is an async function that is given a `next` function and a context object.  A handler must call `next` to run the next action in the chain; not doing so will throw an error.  The context object has the following fields:
+
+* `command`: The full path to the command as a list of strings, such as `['test', 'unit']`
+* `flags`: Parsed flag values, if the middleware defines flags
+
+Middleware that uses flags will only be able to access the values of those flags in its handler function, and will not see flag values from other middleware or the wrapped command.  If you're using Larkspur in TypeScript, the type of `flags` will reflect this.
+
+### Applying Middleware
+
+Middleware can be applied to a command, command group, or an entire CLI using the `applyMiddleware` function.  When called with a group or CLI, this function deeply applies a stack of middleware to every child command.  Middleware functions are applied from left to right, with the first entry in the middleware stack being called first.
 
 ## TypeScript
 
