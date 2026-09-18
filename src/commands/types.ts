@@ -117,5 +117,6 @@ export type EntryPoint = CommandTree;
 export type CommandParsingDetails<T extends Flags = Flags> = {
   commands: CommandTree;
   context: Context;
+  path: string[];
   providedFlags: ProvidedFlagNames<T>;
 };
