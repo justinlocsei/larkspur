@@ -432,6 +432,33 @@ describe('applyMiddleware', () => {
     assert.deepEqual(inner, outer);
   });
 
+  it('throws when middleware calls next() more than once', async () => {
+    let runs = 0;
+
+    const tree = applyMiddleware(
+      [
+        buildMiddleware('Double', async next => {
+          await next();
+          await next();
+        })
+      ],
+      C.tree({
+        deploy: C(description, async () => {
+          runs++;
+        })
+      })
+    );
+
+    const parsed = parseCommand(['deploy'], tree, context);
+    assert(parsed.type === 'command', 'command not parsed');
+
+    const result = await parsed.run(context);
+    assert(result.type === 'failure', 'command succeeded');
+
+    assert.match(result.error.message, /called next/);
+    assert.equal(runs, 1);
+  });
+
   it('throws when middleware exits without continuing the chain', async () => {
     const tree = applyMiddleware(
       [

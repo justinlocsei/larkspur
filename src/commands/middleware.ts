@@ -173,6 +173,13 @@ function wrapCommand(
 
     await handler(
       async () => {
+        if (continued) {
+          throw new OperationalError(
+            'Middleware called next() more than once',
+            description
+          );
+        }
+
         continued = true;
         await runAt(index + 1);
       },
