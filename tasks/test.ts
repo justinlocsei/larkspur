@@ -2,7 +2,10 @@ import { applyMiddleware } from '../src/commands/middleware.ts';
 import C from '../src/factory.ts';
 import { setConfigVariables } from '../src/tests/properties/config.ts';
 import { build } from './build.ts';
+import { REPO_ROOT } from './helpers/paths.ts';
 import { defineFilters, runSuite, runTests, SUITES } from './helpers/tests.ts';
+
+import path from 'node:path';
 
 const preBuild = C.middleware(
   'Pre-build Larkspur',
@@ -40,12 +43,24 @@ export default C.group('Run tests', {
             default: 'text'
           })
         },
-        flags =>
-          runTests([
-            '--coverage',
-            '--coverage.reporter',
-            flags.reporter
-          ])
+        ({ reporter }) => {
+          try {
+            runTests([
+              '--coverage',
+              '--coverage.reporter',
+              reporter
+            ]);
+          } catch (error) {
+            if (reporter === 'html') {
+              console.log(
+                '\n>> View coverage in your browser at: file://'
+                  + path.join(REPO_ROOT, 'coverage', 'index.html') + '\n'
+              );
+            }
+
+            throw error;
+          }
+        }
       ),
 
       integration: C(
