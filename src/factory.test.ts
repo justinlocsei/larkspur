@@ -56,6 +56,27 @@ describe('C.group', () => {
   });
 });
 
+describe('C.middleware', () => {
+  it('can define middleware with only a handler', () => {
+    const command = C.middleware('Log command execution', async next => next());
+
+    assert.equal(command.description, 'Log command execution');
+    assert.isUndefined(command.flags);
+    assert.isFunction(command.handler);
+  });
+
+  it('can define middleware with flags', () => {
+    const command = C.middleware(
+      'Log command execution',
+      { verbose: C.flag('boolean', description) },
+      async next => next()
+    );
+
+    assert.equal(command.description, 'Log command execution');
+    assert.isDefined(command.flags?.verbose);
+  });
+});
+
 describe('C.tree', () => {
   it('returns a command tree', () => {
     const tree = C.tree({

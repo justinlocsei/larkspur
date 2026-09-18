@@ -1,6 +1,7 @@
 import factory from './factory.ts';
 
 export { run } from './cli.ts';
+export { applyMiddleware } from './commands/middleware.ts';
 export type {
   Command,
   CommandGroup,

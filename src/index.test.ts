@@ -1,7 +1,7 @@
 import { assert, describe, it } from 'vitest';
 
 import type { ValuesOf } from './index.ts';
-import C, { run } from './index.ts';
+import C, { applyMiddleware, run } from './index.ts';
 import { T } from './tests.ts';
 
 describe('the public API', () => {
@@ -14,6 +14,10 @@ describe('the public API', () => {
 
   it('includes the CLI runner', () => {
     assert.isFunction(run);
+  });
+
+  it('includes the middleware applicator', () => {
+    assert.isFunction(applyMiddleware);
   });
 });
 

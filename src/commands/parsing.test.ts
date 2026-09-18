@@ -406,6 +406,7 @@ describe('parseCommand', () => {
             },
             handler: async (_, parsing) => {
               assert.equal(parsing.context.meta.name, 'test-cli');
+              assert.deepEqual(parsing.path, ['parent', 'command']);
 
               assert.equal(
                 parsing.commands.parent?.description,
