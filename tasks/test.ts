@@ -13,7 +13,7 @@ const preBuild = C.middleware(
       { default: true }
     )
   },
-  async (next, flags) => {
+  async (next, { flags }) => {
     if (flags.build) {
       build();
     }
