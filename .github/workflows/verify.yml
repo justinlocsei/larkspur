@@ -23,7 +23,7 @@ jobs:
     with:
       node-version: 24
       packages: ncurses-term zsh
-      task: test coverage
+      task: test coverage --reporter text
 
   package:
     name: Verify Package
