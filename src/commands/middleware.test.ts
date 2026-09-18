@@ -186,12 +186,12 @@ describe('applyMiddleware', () => {
     const order: string[] = [];
 
     const stack = [
-      buildMiddleware('Outer middleware', async next => {
+      buildMiddleware('Outer', async next => {
         order.push('outer:before');
         await next();
         order.push('outer:after');
       }),
-      buildMiddleware('Inner middleware', async next => {
+      buildMiddleware('Inner', async next => {
         order.push('inner:before');
         await next();
         order.push('inner:after');
