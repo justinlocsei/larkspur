@@ -52,10 +52,15 @@ All notable changes to this project will be documented in this file.
 
 - Initial release
 
+<!-- Versions -->
+
 [0.1.0]: https://github.com/justinlocsei/larkspur/compare/v0.0.3..v0.1.0
 [0.0.3]: https://github.com/justinlocsei/larkspur/compare/v0.0.2..v0.0.3
 [0.0.2]: https://github.com/justinlocsei/larkspur/compare/v0.0.1..v0.0.2
 [0.0.1]: https://github.com/justinlocsei/larkspur/releases/tag/v0.0.1
+
+<!-- PRs -->
+
 [#2]: https://github.com/justinlocsei/larkspur/pull/2
 [#3]: https://github.com/justinlocsei/larkspur/pull/3
 [#4]: https://github.com/justinlocsei/larkspur/pull/4
