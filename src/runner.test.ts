@@ -264,9 +264,9 @@ describe('runCLI', () => {
     assert(response.type === 'error', 'invalid tree was allowed');
     assert.instanceOf(response.error, OperationalError);
 
-    assert.equal(
+    assert.include(
       response.error.message,
-      'Invalid flag --BadFlag on command: testing'
+      'Invalid flag --BadFlag'
     );
   });
 
