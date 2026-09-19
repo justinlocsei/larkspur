@@ -7,7 +7,7 @@ export default defineConfig({
       exclude: [
         'src/**/*.test.ts',
         'src/**/tests.ts',
-        'src/tests/'
+        'src/tests/**'
       ],
       include: ['src/**/*.ts'],
       provider: 'v8',
@@ -23,7 +23,6 @@ export default defineConfig({
     environment: 'node',
     projects: [
       {
-        extends: true,
         test: {
           exclude: ['src/**/*.prop.test.ts'],
           include: ['src/**/*.test.ts'],
@@ -31,7 +30,6 @@ export default defineConfig({
         }
       },
       {
-        extends: true,
         test: {
           include: ['test/clis/**/*.test.ts'],
           name: 'integration',
@@ -39,7 +37,6 @@ export default defineConfig({
         }
       },
       {
-        extends: true,
         test: {
           include: ['src/**/*.prop.test.ts'],
           name: 'properties',
