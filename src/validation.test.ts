@@ -249,11 +249,11 @@ Wrong
           Wrong: C(description, handler)
         }, context),
       `
-Wrong
-  Invalid command name
-
 alfa
-  Invalid flag --BadFlag`
+  Invalid flag --BadFlag
+
+Wrong
+  Invalid command name`
     );
   });
 

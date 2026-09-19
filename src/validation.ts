@@ -82,17 +82,20 @@ class Validator {
       return undefined;
     }
 
-    const scopes = [...this.errors.keys()].sort();
     const lines: string[] = [];
 
-    for (const [index, scope] of scopes.entries()) {
+    const sorted = [...this.errors.entries()].sort(([left], [right]) =>
+      left.localeCompare(right)
+    );
+
+    for (const [index, [scope, messages]] of sorted.entries()) {
       if (index > 0) {
         lines.push('');
       }
 
       lines.push(scope);
 
-      for (const message of this.errors.get(scope) ?? []) {
+      for (const message of messages) {
         for (const line of message.split('\n')) {
           lines.push(`  ${line}`);
         }
