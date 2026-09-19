@@ -19,4 +19,4 @@ To publish a new version of Larkspur, take the following steps:
 11. Wait for [the Release workflow](https://github.com/justinlocsei/larkspur/actions/workflows/release.yml) to complete, which will create a staged package in npm for the next version of Larkspur.
 12. Approve the staged package [on npm](https://www.npmjs.com/).
 13. Run [the Verify Publishing workflow](https://github.com/justinlocsei/larkspur/actions/workflows/verify-publishing.yml) with the release's version number.
-14. [Create a GitHub Release](https://github.com/justinlocsei/larkspur/releases/new) from the version tag (`v<version>`), using the output of `larkspur publish release-notes --version <version>` as the release notes.
+14. [Create a GitHub Release](https://github.com/justinlocsei/larkspur/releases/new) from the version tag (`v<version>`), using the tag as the title and the output of `larkspur publish release-notes --version <version>` as the release notes.
