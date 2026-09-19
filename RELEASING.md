@@ -10,7 +10,7 @@ To publish a new version of Larkspur, take the following steps:
 2. Add an entry for the new version to `CHANGELOG.md`.
 3. Bump the version: `npm version <version> --no-git-tag-version`
 4. Commit the updated changelog and package files with the message "Release `<version>`".
-5. Push and open a PR against `main` with a title of "Release `<version>`".
+5. Push and open a PR against `main` with a title of "Release `<version>`" and a Release tag.
 6. Wait for all CI tasks to pass.
 7. Merge the PR.
 8. Wait for all CI tasks to pass on `main`.
