@@ -9,13 +9,23 @@ await run({
       charlie: C(
         'Valid',
         { delta: C.flag('boolean', 'Valid') },
-        async () => {}
+        () => {}
       ),
       echo: C(
         'Valid',
         { '-foxtrot': C.flag('boolean', 'Invalid') },
-        async () => {}
+        () => {}
       )
     })
-  })
+  }),
+
+  bravo: C('Valid', () => {}),
+
+  '-charlie': C('Invalid', () => {}),
+
+  '-golf': C(
+    'Invalid',
+    { '-hotel': C.flag('boolean', 'Invalid') },
+    () => {}
+  )
 });

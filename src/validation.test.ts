@@ -66,7 +66,7 @@ describe('validateCommands', () => {
       assert.fail('Expected validation to fail');
     } catch (error) {
       assert.instanceOf(error, OperationalError);
-      assert.equal(error.message, message);
+      assert.equal(error.message, message.trim());
     }
   }
 
@@ -126,7 +126,9 @@ describe('validateCommands', () => {
   it('reports root command names without handlers', () => {
     checkError(
       () => validateCommands({ absent: undefined }, context),
-      'No definition for command: absent'
+      `
+absent
+  No command definition`
     );
   });
 
@@ -136,7 +138,9 @@ describe('validateCommands', () => {
         validateCommands({
           parent: C.group(description, { child: undefined })
         }, context),
-      'No definition for command: parent > child'
+      `
+parent > child
+  No command definition`
     );
   });
 
@@ -146,7 +150,9 @@ describe('validateCommands', () => {
         validateCommands({
           Wrong: C(description, handler)
         }, context),
-      'Invalid command name: Wrong'
+      `
+Wrong
+  Invalid command name`
     );
   });
 
@@ -158,7 +164,9 @@ describe('validateCommands', () => {
             'bad child': C(description, handler)
           })
         }, context),
-      'Invalid command name: parent > bad child'
+      `
+parent > bad child
+  Invalid command name`
     );
   });
 
@@ -174,11 +182,13 @@ describe('validateCommands', () => {
             )
           })
         }, context),
-      'Invalid flag --BadFlag on command: parent > leaf'
+      `
+parent > leaf
+  Invalid flag --BadFlag`
     );
   });
 
-  it('reports the first middleware flag conflict', () => {
+  it('reports middleware flag conflicts across the tree', () => {
     const timing = 'Time command execution';
 
     checkError(
@@ -204,12 +214,51 @@ describe('validateCommands', () => {
           ),
           context
         ),
-      `Failed to apply middleware: ${timing}\nThe --verbose flag is already present on command: alfa`
+      `
+alfa
+  Duplicate --verbose flag on middleware: ${timing}
+
+bravo
+  Duplicate --verbose flag on middleware: ${timing}`
+    );
+  });
+
+  it('reports multiple validation errors on one command', () => {
+    checkError(
+      () =>
+        validateCommands({
+          Wrong: C(description, {
+            BadFlag: C.flag('string', description)
+          }, handler)
+        }, context),
+      `
+Wrong
+  Invalid command name
+  Invalid flag --BadFlag`
+    );
+  });
+
+  it('reports multiple validation errors across the tree', () => {
+    checkError(
+      () =>
+        validateCommands({
+          alfa: C(description, {
+            BadFlag: C.flag('string', description)
+          }, handler),
+          bravo: C(description, handler),
+          Wrong: C(description, handler)
+        }, context),
+      `
+alfa
+  Invalid flag --BadFlag
+
+Wrong
+  Invalid command name`
     );
   });
 
   it('reports flag names that start with the boolean negation prefix', () => {
-    ensure.throws(
+    checkError(
       () =>
         validateCommands({
           command: C(
@@ -218,14 +267,9 @@ describe('validateCommands', () => {
             handler
           )
         }, context),
-      e => {
-        assert.instanceOf(e, OperationalError);
-
-        assert.equal(
-          e.message,
-          'Invalid flag --no-verbose on command: command\nFlag names cannot start with "no-"'
-        );
-      }
+      `
+command
+  Invalid flag --no-verbose: Flag names cannot start with "no-"`
     );
   });
 });
