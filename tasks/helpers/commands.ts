@@ -25,7 +25,7 @@ export type CommandOptions = {
 export function captureOutput(
   command: string,
   args: string[],
-  options: SpawnSyncOptions
+  options: SpawnSyncOptions = {}
 ): SpawnSyncReturns<string> {
   const spawnOptions: SpawnSyncOptionsWithStringEncoding = {
     ...options,
