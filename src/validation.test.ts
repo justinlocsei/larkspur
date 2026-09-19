@@ -223,6 +223,21 @@ bravo
     );
   });
 
+  it('reports multiple validation errors on one command', () => {
+    checkError(
+      () =>
+        validateCommands({
+          Wrong: C(description, {
+            BadFlag: C.flag('string', description)
+          }, handler)
+        }, context),
+      `
+Wrong
+  Invalid command name
+  Invalid flag --BadFlag`
+    );
+  });
+
   it('reports multiple validation errors across the tree', () => {
     checkError(
       () =>
