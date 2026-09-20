@@ -4,8 +4,12 @@ import {
   verifyPublishedPackage
 } from './helpers/publish.ts';
 import { buildReleaseNotes, updateChangelog } from './helpers/release.ts';
+import { completeVersions } from './helpers/versions.ts';
 
-const version = C.flag('string', 'A version number', { required: true });
+const version = C.flag('string', 'A version number', {
+  completion: completeVersions,
+  required: true
+});
 
 export default C.group('Manage package publishing', {
   changelog: C(
