@@ -57,7 +57,7 @@ export function buildReleaseNotes(version: string): string {
  * Extract the latest version from the changelog
  */
 function extractLatestVersion(changelog: string): string {
-  const match = changelog.match(/^## \[([^\]]+)\]/m);
+  const match = changelog.match(/^## \[(\d+\.\d+\.\d+)\]/m);
   const version = match?.[1];
 
   if (!version) {
@@ -66,7 +66,10 @@ function extractLatestVersion(changelog: string): string {
     );
   }
 
-  return version;
+  return version
+    .split('.')
+    .map(v => Number(v))
+    .join('.');
 }
 
 /**
