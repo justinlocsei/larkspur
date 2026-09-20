@@ -8,13 +8,11 @@
   Larkspur is a zero-dependency, TypeScript-first CLI library for internal tools with nested commands.  It has strong opinions.  Every command and flag requires a description, only long flag names are allowed, and positional arguments are unsupported.  In return, you get self-describing CLIs that are easy for developers to learn and agents to understand.  You also get a small API surface with excellent type information, rich shell completions, detailed help messages, and an <code>explore</code> command that recursively shows all available commands and flags in the CLI.
 </p>
 
-<p align="center">
-  <a href="https://github.com/justinlocsei/larkspur/actions/workflows/verify.yml"><img src="https://github.com/justinlocsei/larkspur/actions/workflows/verify.yml/badge.svg" alt="Verify"></a>
-  <a href="https://www.npmjs.com/package/larkspur"><img src="https://img.shields.io/npm/v/larkspur.svg" alt="npm version"></a>
-  <a href="https://github.com/justinlocsei/larkspur/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/larkspur.svg" alt="License"></a>
-</p>
-
 ---
+
+[![Verify](https://github.com/justinlocsei/larkspur/actions/workflows/verify.yml/badge.svg)](https://github.com/justinlocsei/larkspur/actions/workflows/verify.yml)
+[![npm version](https://img.shields.io/npm/v/larkspur.svg)](https://www.npmjs.com/package/larkspur)
+[![License](https://img.shields.io/npm/l/larkspur.svg)](https://github.com/justinlocsei/larkspur/blob/main/LICENSE)
 
 <!-- <toc> -->
 - [Installation](#installation)
