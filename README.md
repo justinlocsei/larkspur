@@ -10,6 +10,10 @@
 
 ---
 
+[![Verify](https://github.com/justinlocsei/larkspur/actions/workflows/verify.yml/badge.svg)](https://github.com/justinlocsei/larkspur/actions/workflows/verify.yml)
+[![npm version](https://img.shields.io/npm/v/larkspur.svg)](https://www.npmjs.com/package/larkspur)
+[![License](https://img.shields.io/npm/l/larkspur.svg)](https://github.com/justinlocsei/larkspur/blob/main/LICENSE)
+
 <!-- <toc> -->
 - [Installation](#installation)
 - [Quick Start](#quick-start)
