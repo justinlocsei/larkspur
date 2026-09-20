@@ -4,12 +4,15 @@ All notable changes to this project will be documented in this file.
 
 ## [0.1.0] (2026-09-19)
 
+### Features
+
+- Support middleware commands ([#20])
+- Support a version flag ([#18])
+
 ### Changes
 
 - Show a combined list of validation errors ([#24])
 - Improve error messages for flag conflicts with middleware ([#23])
-- Support middleware commands ([#20])
-- Support a version flag ([#18])
 
 ### Development
 
