@@ -19,14 +19,14 @@ export type CommandHandler<
   C extends FlagContext = 'narrow'
 > = IsCommand<'handler', {
   flags?: F;
-  handler: CommmandHandlerFn<F, C>;
+  handler: CommandHandlerFn<F, C>;
   hidden?: true;
 }>;
 
 /**
  * A command's handler function
  */
-export type CommmandHandlerFn<
+export type CommandHandlerFn<
   F extends Flags = Flags,
   C extends FlagContext = 'narrow'
 > = (
