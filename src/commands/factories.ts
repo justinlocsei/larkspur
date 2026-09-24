@@ -4,31 +4,27 @@ import type {
   CommandHandlerRequest
 } from './definition.ts';
 import { defineCommandGroup, defineCommandHandler } from './definition.ts';
-import type {
-  CommandHandler,
-  CommandTree,
-  CommmandHandlerFn
-} from './types.ts';
+import type { CommandHandler, CommandHandlerFn, CommandTree } from './types.ts';
 
 /**
  * Build a command handler
  */
 export function buildCommandHandler(
   description: string,
-  handler: CommmandHandlerFn
+  handler: CommandHandlerFn
 ): CommandHandler<Flags, 'wide'>;
 export function buildCommandHandler<T extends Flags>(
   description: string,
   flags: T,
-  handler: CommmandHandlerFn<T>
+  handler: CommandHandlerFn<T>
 ): CommandHandler<Flags, 'wide'>;
 export function buildCommandHandler<T extends Flags>(
   command: CommandHandlerRequest<T>
 ): CommandHandler<Flags, 'wide'>;
 export function buildCommandHandler<T extends Flags>(
   description: string | CommandHandlerRequest<T>,
-  flags?: T | CommmandHandlerFn<T>,
-  handler?: CommmandHandlerFn<T>
+  flags?: T | CommandHandlerFn<T>,
+  handler?: CommandHandlerFn<T>
 ): CommandHandler<Flags, 'wide'> {
   let request: CommandHandlerRequest<T>;
 
