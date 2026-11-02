@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] (2026-11-02)
+
+## Features
+
+- Support silent operational errors ([#36])
+
+### Fixes
+
+- Correctly spell CommandHandlerFn ([#35])
+
+### Development
+
+- Upgrade dependencies (2026-09-24) ([#34])
+- Use specialized LinkedIn logos ([#33])
+- Use a square LinkedIn logo ([#32])
+- Add badges to the readme ([#31])
+- Add completions for versions in the publish tasks ([#30])
+- Automate changelog updates ([#29])
+- Improve the release documentation ([#28])
+- Add a  LinkedIn logo ([#27])
+
 ## [0.1.0] (2026-09-19)
 
 ### Features
@@ -57,6 +78,7 @@ All notable changes to this project will be documented in this file.
 
 <!-- Versions -->
 
+[0.2.0]: https://github.com/justinlocsei/larkspur/compare/v0.1.0..v0.2.0
 [0.1.0]: https://github.com/justinlocsei/larkspur/compare/v0.0.3..v0.1.0
 [0.0.3]: https://github.com/justinlocsei/larkspur/compare/v0.0.2..v0.0.3
 [0.0.2]: https://github.com/justinlocsei/larkspur/compare/v0.0.1..v0.0.2
@@ -86,3 +108,13 @@ All notable changes to this project will be documented in this file.
 [#23]: https://github.com/justinlocsei/larkspur/pull/23
 [#24]: https://github.com/justinlocsei/larkspur/pull/24
 [#25]: https://github.com/justinlocsei/larkspur/pull/25
+[#27]: https://github.com/justinlocsei/larkspur/pull/27
+[#28]: https://github.com/justinlocsei/larkspur/pull/28
+[#29]: https://github.com/justinlocsei/larkspur/pull/29
+[#30]: https://github.com/justinlocsei/larkspur/pull/30
+[#31]: https://github.com/justinlocsei/larkspur/pull/31
+[#32]: https://github.com/justinlocsei/larkspur/pull/32
+[#33]: https://github.com/justinlocsei/larkspur/pull/33
+[#34]: https://github.com/justinlocsei/larkspur/pull/34
+[#35]: https://github.com/justinlocsei/larkspur/pull/35
+[#36]: https://github.com/justinlocsei/larkspur/pull/36
