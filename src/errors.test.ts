@@ -56,6 +56,14 @@ describe('OperationalError', () => {
     assert.instanceOf(error, Error);
     assert.instanceOf(error, OperationalError);
     assert.equal(error.message, 'message');
+    assert.isFalse(error.silent);
+  });
+
+  it('can suppress CLI error output', () => {
+    const error = OperationalError.silent();
+
+    assert.isTrue(error.silent);
+    assert.equal(error.message, '');
   });
 
   it('combines the message and details', () => {
@@ -95,6 +103,14 @@ describe('OperationalError', () => {
       const wrapped = OperationalError.wrap(original, 'wrapped');
 
       assert.equal(wrapped.message, 'original');
+    });
+
+    it('preserves silent operational errors', () => {
+      const original = OperationalError.silent();
+      const wrapped = OperationalError.wrap(original, 'wrapped');
+
+      assert.isTrue(wrapped.silent);
+      assert.equal(wrapped.message, '');
     });
 
     it('wraps non-operational errors with a message and details', () => {
