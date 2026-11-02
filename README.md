@@ -555,6 +555,8 @@ C(
 );
 ```
 
+When a subprocess or tool has already printed failure output, throwing `OperationalError.silent()` will cause Larkspur to exit with a non-zero status without printing an additional message.
+
 ## Defining Flags
 
 Larkspur has a rich system for defining flags and exposing their values to command handlers.  All flags are defined via the `C.flag` factory function, which requires a flag type and description, followed by flag-specific options.
