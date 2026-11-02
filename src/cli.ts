@@ -93,11 +93,13 @@ export async function run(
         log.info('');
       }
 
-      log.error(
-        error instanceof OperationalError
-          ? error.message
-          : extractErrorDetails(error)
-      );
+      if (!(error instanceof OperationalError && error.silent)) {
+        log.error(
+          error instanceof OperationalError
+            ? error.message
+            : extractErrorDetails(error)
+        );
+      }
 
       onError(error);
       break;

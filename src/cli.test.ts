@@ -159,6 +159,21 @@ describe('run', () => {
     assert.include(output.info, '@description');
   });
 
+  it('exits without logging silent operational errors', async () => {
+    const { error, output } = await testRun(
+      {
+        lint: C(description, async () => {
+          throw OperationalError.silent();
+        })
+      },
+      ['test-cli', 'lint']
+    );
+
+    assert.instanceOf(error, OperationalError);
+    assert.isTrue(error.silent);
+    assert.isEmpty(output.error);
+  });
+
   it('logs standard errors with a stack trace', async () => {
     const { error, output } = await testRun(
       {
