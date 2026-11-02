@@ -27,6 +27,13 @@ export function coerceError(value: unknown): Error {
 
 export class OperationalError extends Error {
   /**
+   * Create a silent error
+   */
+  static silent(): OperationalError {
+    return new OperationalError('', undefined, { silent: true });
+  }
+
+  /**
    * Treat a value as details for an operational error
    */
   static wrap(cause: unknown, message: string): OperationalError {
@@ -35,12 +42,19 @@ export class OperationalError extends Error {
       : new OperationalError(message, coerceError(cause));
   }
 
+  readonly silent: boolean;
+
   /**
    * Create an operational error with optional details
    */
-  constructor(message: string, details?: ErrorDetails) {
+  constructor(
+    message: string,
+    details?: ErrorDetails,
+    { silent = false }: { silent?: boolean } = {}
+  ) {
     super(addDetails(message, formatDetails(details)));
     Object.setPrototypeOf(this, OperationalError.prototype);
+    this.silent = silent;
   }
 
   /**
