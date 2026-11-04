@@ -16,8 +16,8 @@
     "type": "git",
     "url": "git+https://github.com/justinlocsei/larkspur.git"
   },
-  "author": "Justin Locsei",
   "license": "MIT",
+  "author": "Justin Locsei",
   "type": "module",
   "exports": {
     ".": {
@@ -30,9 +30,6 @@
     "dist/index.d.mts",
     "dist/index.mjs"
   ],
-  "engines": {
-    "node": ">=22.0.0"
-  },
   "scripts": {
     "build": "node bin/larkspur build",
     "check": "node bin/larkspur check",
@@ -45,14 +42,17 @@
     "@fast-check/vitest": "^0.5.0",
     "@types/node": "^24.0.0",
     "@vitest/coverage-v8": "^5.0.0",
-    "dprint": "^0.57.0",
+    "dprint": "^0.64.3",
     "fast-check": "^4.9.0",
     "tsdown": "^0.23.0",
     "typescript": "^6.0.3",
     "vitest": "^5.0.0"
   },
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "allowScripts": {
     "fsevents@2.3.3": true,
-    "dprint@0.57.4": true
+    "dprint@0.64.3": true
   }
 }
