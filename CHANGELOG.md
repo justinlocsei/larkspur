@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.1] (2026-11-04)
+
+### Development
+
+- Link to Portflorio ([#39])
+- Upgrade dependencies (2026-11-04) ([#38])
+
 ## [0.2.0] (2026-11-02)
 
 ## Features
@@ -78,6 +85,7 @@ All notable changes to this project will be documented in this file.
 
 <!-- Versions -->
 
+[0.2.1]: https://github.com/justinlocsei/larkspur/compare/v0.2.0..v0.2.1
 [0.2.0]: https://github.com/justinlocsei/larkspur/compare/v0.1.0..v0.2.0
 [0.1.0]: https://github.com/justinlocsei/larkspur/compare/v0.0.3..v0.1.0
 [0.0.3]: https://github.com/justinlocsei/larkspur/compare/v0.0.2..v0.0.3
@@ -118,3 +126,5 @@ All notable changes to this project will be documented in this file.
 [#34]: https://github.com/justinlocsei/larkspur/pull/34
 [#35]: https://github.com/justinlocsei/larkspur/pull/35
 [#36]: https://github.com/justinlocsei/larkspur/pull/36
+[#38]: https://github.com/justinlocsei/larkspur/pull/38
+[#39]: https://github.com/justinlocsei/larkspur/pull/39
