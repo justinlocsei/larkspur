@@ -13,7 +13,7 @@ jobs:
     name: Check Code
     uses: ./.github/workflows/run-task.yml
     with:
-      node-version: 24
+      node-version: 26
       task: check
 
   coverage:
@@ -21,7 +21,7 @@ jobs:
     needs: test
     uses: ./.github/workflows/run-task.yml
     with:
-      node-version: 24
+      node-version: 26
       packages: ncurses-term zsh
       task: test coverage --reporter text
 
@@ -30,7 +30,7 @@ jobs:
     needs: check
     uses: ./.github/workflows/run-task.yml
     with:
-      node-version: 24
+      node-version: 26
       task: publish preflight
 
   test:

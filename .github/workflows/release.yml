@@ -18,9 +18,9 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - uses: ./.github/actions/install-node
-        name: Install Node.js 24
+        name: Install Node.js 26
         with:
-          node-version: 24
+          node-version: 26
 
       - name: Install zsh
         run: sudo apt-get install -y ncurses-term zsh
