@@ -4,8 +4,8 @@
     "lineWidth": 80,
     "module.sortImportDeclarations": "maintain",
     "quoteStyle": "preferSingle",
-    "semiColons": "prefer",
-    "trailingCommas": "never"
+    "trailingCommas": "never",
+    "semicolons": "prefer"
   },
   "json": {
     "trailingCommas": "never"
@@ -18,7 +18,7 @@
     "node_modules"
   ],
   "plugins": [
-    "npm:@dprint/json@0.25.2",
-    "npm:@dprint/typescript@0.96.1"
+    "npm:@dprint/json@0.26.0",
+    "npm:@dprint/typescript@0.101.0"
   ]
 }

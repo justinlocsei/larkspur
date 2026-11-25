@@ -29,11 +29,11 @@ function checkFormat(
 describe('formatCommands', () => {
   describe('full format', () => {
     it('formats a command with a description', () => {
-      checkFormat(C('@alfa', handler), ['alfa'], [
-        '$ test-cli alfa',
-        '',
-        '    @alfa'
-      ]);
+      checkFormat(
+        C('@alfa', handler),
+        ['alfa'],
+        ['$ test-cli alfa', '', '    @alfa']
+      );
     });
 
     it('formats required and optional flags with details', () => {
