@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0] (2026-11-25)
+
+### Development
+
+- Upgrade to Node.js v26 ([#43])
+- Upgrade dprint plugins ([#42])
+- Upgrade dependencies (2026-11-25) ([#41])
+
 ## [0.2.1] (2026-11-04)
 
 ### Development
@@ -85,6 +93,7 @@ All notable changes to this project will be documented in this file.
 
 <!-- Versions -->
 
+[1.0.0]: https://github.com/justinlocsei/larkspur/compare/v0.2.1..v1.0.0
 [0.2.1]: https://github.com/justinlocsei/larkspur/compare/v0.2.0..v0.2.1
 [0.2.0]: https://github.com/justinlocsei/larkspur/compare/v0.1.0..v0.2.0
 [0.1.0]: https://github.com/justinlocsei/larkspur/compare/v0.0.3..v0.1.0
@@ -128,3 +137,6 @@ All notable changes to this project will be documented in this file.
 [#36]: https://github.com/justinlocsei/larkspur/pull/36
 [#38]: https://github.com/justinlocsei/larkspur/pull/38
 [#39]: https://github.com/justinlocsei/larkspur/pull/39
+[#41]: https://github.com/justinlocsei/larkspur/pull/41
+[#42]: https://github.com/justinlocsei/larkspur/pull/42
+[#43]: https://github.com/justinlocsei/larkspur/pull/43
