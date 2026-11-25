@@ -130,12 +130,16 @@ Then add this line before loading compinit:
       '--current "$current" --shell zsh )}")'
     ].join(' ');
 
-    return this.defineFunction('user_fn', [...levels, flagName], [
-      'local current="${words[CURRENT]#*=}"',
-      'local -a choices',
-      choices,
-      "_describe 'value' choices"
-    ]);
+    return this.defineFunction(
+      'user_fn',
+      [...levels, flagName],
+      [
+        'local current="${words[CURRENT]#*=}"',
+        'local -a choices',
+        choices,
+        "_describe 'value' choices"
+      ]
+    );
   }
 
   /**
