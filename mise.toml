@@ -1,2 +1,5 @@
+[tools]
+node = "26.13.1"
+
 [env]
 _.path = ["./bin", "./test/clis/bin"]
